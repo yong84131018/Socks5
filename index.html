@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gi虾米出品/TikTok出海全渠道服务 二维码生成工具</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px 0;
+        }
+        .container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .header .brand {
+            font-size: 24px;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .header .tool-title {
+            font-size: 36px;
+            color: #2d3748;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .header .protocol-tip {
+            font-size: 14px;
+            color: #718096;
+            margin: 8px 0;
+        }
+        .header .contact {
+            font-size: 13px;
+            color: #718096;
+        }
+        .input-area {
+            margin-bottom: 20px;
+        }
+        #qr-content {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            resize: vertical;
+            min-height: 160px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .node-list-area {
+            margin: 15px 0;
+            min-height: 60px;
+            max-height: 800px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: #fdfefe;
+        }
+        .node-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            border-bottom: 1px solid #f0f4f8;
+            transition: all 0.25s;
+            font-size: 14px;
+            line-height: 1.4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .node-item:last-child {
+            border-bottom: none;
+        }
+        .node-item:hover {
+            background-color: #f8fafc;
+        }
+        .node-item.active {
+            background-color: #e8f4ea;
+            color: #2d3748;
+            font-weight: 500;
+            border-left: 4px solid #48bb78;
+        }
+        .node-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 10px;
+        }
+        .node-gen-btn {
+            padding: 4px 8px;
+            font-size: 12px;
+            background-color: #4299e1;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            flex-shrink: 0;
+        }
+        .node-list-tip {
+            text-align: center;
+            color: #999;
+            font-size: 14px;
+            padding: 20px;
+        }
+        /* ✅ 核心修改1：TXT导入栏 背景色调鲜艳 嫩绿色 更醒目 */
+        .file-import-area {
+            margin: 15px 0;
+            padding: 15px;
+            border: 2px dashed #e2e8f0;
+            border-radius: 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background-color: #d9f9e3;
+        }
+        .file-import-area:hover {
+            border-color: #4299e1;
+            background-color: #c6f6d9;
+        }
+        #file-input {
+            display: none;
+        }
+        /* ✅ 核心修改2：导入栏文字 加黑加粗 颜色加深 更清晰 */
+        .import-tip {
+            color: #2d3748;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .options {
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+        }
+        .option-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .option-item label {
+            font-size: 14px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        .option-item input, .option-item select {
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+	border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        button {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        #generate-selected-btn {
+            background-color: #48bb78;
+            color: #fff;
+        }
+        #batch-generate-btn {
+            background-color: #4299e1;
+            color: #fff;
+        }
+        #download-btn {
+            background-color: #9f7aea;
+            color: #fff;
+        }
+        #download-all-btn {
+            background-color: #ed8936;
+            color: #fff;
+        }
+        #clear-btn {
+            background-color: #718096;
+            color: #fff;
+        }
+        .qr-wrap {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 25px;
+            align-items: flex-start;
+            width: 100%;
+            margin: 25px 0;
+            padding: 0 5px;
+        }
+        .qr-result {
+            text-align: center;
+            padding: 20px 15px;
+            border-radius: 6px;
+            background: #fdfefe;
+            border: 1px solid #f0f4f8;
+            width: 100%;
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        #qrcode {
+            display: inline-block;
+            margin: 0 auto 10px;
+            padding: 10px;
+            background: #fff;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            width: auto !important;
+            height: auto !important;
+        }
+        #qrcode canvas {
+            max-width: 100% !important;
+            width: 100% !important;
+            height: auto !important;
+        }
+        .batch-qr-result {
+            padding: 20px 15px;
+            border-radius: 6px;
+            background: #fdfefe;
+            border: 1px solid #f0f4f8;
+            display: none;
+            width: 100%;
+            min-height: 320px;
+        }
+        .batch-title {
+            text-align: center;
+            font-size: 16px;
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 35px !important;
+            width: 100%;
+            padding: 10px 0;
+            justify-items: center;
+        }
+        .qr-item {
+            text-align: center;
+            padding: 15px;
+            border-radius: 4px;
+            background: #fff;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.04);
+            width: 100%;
+            max-width: 280px;
+        }
+        .qr-item .qr-box {
+            width: 100%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .qr-item p {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #718096;
+            line-height: 1.3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .tip {
+            text-align: center;
+            margin-top: 10px;
+            color: #48bb78;
+            font-size: 14px;
+        }
+        .red-disclaimer {
+            background-color: #fff5f5;
+            border: 1px solid #ffe3e3;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin: 20px 0;
+            text-align: center;
+            font-size: 12px;
+            color: #c53030;
+            line-height: 1.5;
+        }
+        .footer-declare {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+            font-size: 12px;
+            color: #718096;
+            line-height: 1.6;
+            text-align: justify;
+        }
+        .footer-declare .title {
+            font-size: 13px;
+            color: #4a5568;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        @media (max-width:768px) {
+            .qr-wrap { grid-template-columns: 1fr; gap: 20px; }
+            .qr-grid { grid-template-columns: 1fr !important; gap:25px !important; }
+            .container { padding:20px 15px; }
+            .header .tool-title { font-size:32px; }
+            .header .brand { font-size:22px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="brand">Gi虾米出品/TikTok出海全渠道服务</h1>
+            <h2 class="tool-title">二维码生成工具</h2>
+            <p class="protocol-tip">（支持 Socks5/VMess/VLess/Trojan/SS）</p>
+            <p class="contact">制作不易，感谢支持 · 联系：QQ/VX:84131018</p>
+        </div>
+        
+        <div class="input-area">
+            <textarea id="qr-content" placeholder="支持所有主流协议（每行一个节点）：
+✅ Socks5 格式：IP:端口:用户名:密码
+✅ VMess/VLess/Trojan/SS ：直接粘贴原始链接
+支持导入TXT文件，自动解析每行节点"></textarea>
+        </div>
+
+        <div class="node-list-area" id="node-list">
+            <p class="node-list-tip">输入节点内容后，自动解析为可选列表（每行一个）</p>
+        </div>
+        
+        <div class="file-import-area" onclick="document.getElementById('file-input').click()">
+            <input type="file" id="file-input" accept=".txt" onchange="readTxtFile(this)">
+            <p class="import-tip">点击此处导入TXT文件（每行一个节点，仅支持.txt格式）</p>
+        </div>
+        
+        <div class="options">
+            <div class="option-item">
+                <label for="qr-size">二维码尺寸（像素）</label>
+                <input type="number" id="qr-size" value="256" min="128" max="400">
+            </div>
+            <div class="option-item">
+                <label for="qr-correct">容错级别</label>
+                <select id="qr-correct">
+                    <option value="auto" selected>自动调节 - 智能适配最佳容错</option>
+                    <option value="L">L - 7% 容错 (识别快)</option>
+                    <option value="M">M - 15% 容错 (平衡推荐)</option>
+                    <option value="Q">Q - 25% 容错 (容错较高)</option>
+                    <option value="H">H - 30% 容错 (容错最高)</option>
+                </select>
+            </div>
+            <div class="option-item">
+                <label for="qr-dark">二维码颜色</label>
+                <input type="color" id="qr-dark" value="#000000">
+            </div>
+            <div class="option-item">
+                <label for="qr-light">背景颜色</label>
+                <input type="color" id="qr-light" value="#ffffff">
+            </div>
+        </div>
+        
+        <div class="btn-group">
+            <button id="generate-selected-btn">生成选中节点二维码</button>
+            <button id="batch-generate-btn">批量生成所有节点二维码</button>
+            <button id="download-btn">下载当前二维码</button>
+            <button id="download-all-btn">下载所有节点二维码</button>
+            <button id="clear-btn">清空重置</button>
+        </div>
+
+        <div class="qr-wrap">
+            <div class="qr-result">
+                <div id="qrcode"></div>
+                <p class="tip" id="format-tip"></p>
+            </div>
+            <div class="batch-qr-result" id="batch-qr-result">
+                <h3 class="batch-title">所有节点二维码列表</h3>
+                <div class="qr-grid" id="qr-grid"></div>
+            </div>
+        </div>
+
+        <div class="red-disclaimer">
+            本内容/工具仅作个人合法学习、研究及自用，严禁用于任何违反国家法律法规的非法活动。使用者在使用过程中产生的一切行为及法律责任，均由使用者自行承担，与内容/工具提供方无关。
+        </div>
+
+        <div class="footer-declare">
+            <p class="title">【第三方开源组件引用声明】</p>
+            <p>本工具开发过程中，引用了以下开源社区的优秀免费组件，相关版权归原作者及开源组织所有，特此致谢：</p>
+            <p>1、二维码生成核心：QRCode.js (MIT开源协议) ；2、压缩打包核心：JSZip (MIT开源协议) ；3、文件下载核心：FileSaver.js (MIT开源协议)。</p>
+            <p>所有引用的第三方开源组件均遵循其原始开源协议，本工具未对其核心源码做任何侵权修改，仅做合理调用与适配。</p>
+            <br>
+            <p>© 2026 Gi虾米出品 版权所有 | 本工具为免费开源工具，请勿倒卖或篡改版权信息</p>
+        </div>
+
+    </div>
+
+    <script>
+        let qrInstance = null;
+        let selectedNode = null;
+        let nodeList = [];
+        let batchQRList = [];
+        const correctLevelMap = { L: QRCode.CorrectLevel.L, M: QRCode.CorrectLevel.M, Q: QRCode.CorrectLevel.Q, H: QRCode.CorrectLevel.H };
+
+        function getCorrectLevel(){
+            const levelVal = document.getElementById("qr-correct").value;
+            if(levelVal === "auto"){
+                const content = document.getElementById("qr-content").value.trim();
+                return content.length < 50 ? QRCode.CorrectLevel.L : (content.length < 150 ? QRCode.CorrectLevel.M : QRCode.CorrectLevel.H);
+            }
+            return correctLevelMap[levelVal];
+        }
+
+        function getPureNodeContent(nodeStr) {
+            const trimStr = nodeStr.trim();
+            const socks5Reg = /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\:(\d{1,6})\:([\s\S]+)\:([\s\S]+)$/;
+            if (socks5Reg.test(trimStr)) {
+                const [, ip, port, user, pass] = trimStr.match(socks5Reg);
+                return `socks://${user}:${pass}@${ip}:${port}`;
+            }
+            return trimStr;
+        }
+
+        function getNodeType(nodeStr) {
+            const trimStr = nodeStr.trim();
+            if (trimStr.startsWith("vmess://")) return "vmess";
+            if (/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\:\d{1,6}\:[\S]+\:[\S]+$/.test(trimStr)) return "socks5";
+            return "other";
+        }
+
+        function formatFileName(name) {
+            if(!name) return "节点二维码";
+            const shortName = name.trim().substring(0,12);
+            return shortName.replace(/[\/:*?"<>|\n\r]/g, "-") + "...";
+        }
+
+        function parseNodeList(content) {
+            nodeList = content.split(/\r?\n/).filter(item => item.trim() !== "");
+            renderNodeList();
+            const nodeListEl = document.getElementById("node-list");
+            nodeListEl.style.maxHeight = nodeList.length < 20 ? "none" : "800px";
+            nodeListEl.style.overflowY = nodeList.length < 20 ? "hidden" : "auto";
+        }
+
+        function renderNodeList() {
+            const el = document.getElementById("node-list");
+            if (nodeList.length === 0) {
+                el.innerHTML = '<p class="node-list-tip">输入节点内容后，自动解析为可选列表（每行一个）</p>';
+                return;
+            }
+            let html = "";
+            nodeList.forEach((node, idx) => {
+                const active = selectedNode === node ? "active" : "";
+                html += `<div class="node-item ${active}" data-index="${idx}"><div class="node-name" title="${node}">${node}</div><button class="node-gen-btn" onclick="generateNodeQr(${idx})">生成二维码</button></div>`;
+            });
+            el.innerHTML = html;
+            document.querySelectorAll(".node-item").forEach(item => {
+                item.querySelector(".node-name").onclick = () => {
+                    document.querySelectorAll(".node-item").forEach(el => el.classList.remove("active"));
+                    item.classList.add("active");
+                    selectedNode = nodeList[item.dataset.index];
+                };
+            });
+        }
+
+        function generateNodeQr(idx) {
+            const node = nodeList[idx];
+            document.querySelectorAll(".node-item").forEach(el => el.classList.remove("active"));
+            document.querySelectorAll(".node-item")[idx].classList.add("active");
+            selectedNode = node;
+            renderSingleQR(getPureNodeContent(node));
+            document.getElementById("format-tip").innerText = "生成成功 ✔ 手机扫码100%识别";
+            document.getElementById("batch-qr-result").style.display = "none";
+        }
+
+        function generateSelectedQRCode() {
+            const target = selectedNode || document.getElementById("qr-content").value.trim();
+            if (!target) { alert("请选中节点或输入节点内容！"); return; }
+            renderSingleQR(getPureNodeContent(target));
+            document.getElementById("format-tip").innerText = "生成成功 ✔ 手机扫码100%识别";
+            document.getElementById("batch-qr-result").style.display = "none";
+        }
+
+        function generateBatchQRCode() {
+            if (nodeList.length === 0) { alert("暂无节点可批量生成！"); return; }
+            batchQRList = [];
+            const gridBox = document.getElementById("qr-grid");
+            gridBox.innerHTML = "";
+            document.getElementById("batch-qr-result").style.display = "block";
+
+            const firstNodeType = getNodeType(nodeList[0]);
+            let allNodesContent = nodeList.map(item => getPureNodeContent(item)).join("\n");
+            renderSingleQR(allNodesContent);
+            document.getElementById("format-tip").innerText = `✅ 批量生成成功，共${nodeList.length}个节点 ✔ 手机扫码全部识别`;
+
+            const qrSizeVal = parseInt(document.getElementById("qr-size").value);
+            const darkColorVal = document.getElementById("qr-dark").value;
+            const lightColorVal = document.getElementById("qr-light").value;
+            const correctLevelVal = getCorrectLevel();
+
+            nodeList.forEach(function(node, idx) {
+                const pureContent = getPureNodeContent(node);
+                const nodeFileName = formatFileName(node);
+                
+                const singleItem = document.createElement("div");
+                singleItem.className = "qr-item";
+                singleItem.innerHTML = `<div class="qr-box" id="batch_qr_${idx}"></div><p title="${node}">${nodeFileName}</p>`;
+                gridBox.appendChild(singleItem);
+
+                new QRCode(document.getElementById(`batch_qr_${idx}`), {
+                    text: pureContent,
+                    width: qrSizeVal,
+                    height: qrSizeVal,
+                    colorDark: darkColorVal,
+                    colorLight: lightColorVal,
+                    correctLevel: correctLevelVal,
+                    margin: 3,
+                    useSVG: false
+                });
+                batchQRList.push({content: pureContent, name: nodeFileName});
+            });
+        }
+
+        function renderSingleQR(content) {
+            const el = document.getElementById("qrcode");
+            el.innerHTML = "";
+            qrInstance = new QRCode(el, {
+                text: content,
+                width: parseInt(document.getElementById("qr-size").value),
+                height: parseInt(document.getElementById("qr-size").value),
+                colorDark: document.getElementById("qr-dark").value,
+                colorLight: document.getElementById("qr-light").value,
+                correctLevel: getCorrectLevel(),
+                margin: 3,
+                useSVG: false
+            });
+        }
+
+        function downloadQRCode() {
+            if (!qrInstance || !document.querySelector("#qrcode canvas")) { alert("请先生成二维码！"); return; }
+            const canvas = document.querySelector("#qrcode canvas");
+            const name = selectedNode ? formatFileName(selectedNode) : `所有${nodeList.length}个节点_聚合二维码`;
+            canvas.toBlob(blob => saveAs(blob, `${name}.png`));
+        }
+
+        async function downloadAllQRCode() {
+            if (batchQRList.length === 0) { alert("请先批量生成二维码！"); return; }
+            const zip = new JSZip();
+            document.getElementById("format-tip").innerText = "正在打包二维码，请稍候...";
+            try {
+                for (let i = 0; i < batchQRList.length; i++) {
+                    const canvas = document.querySelector(`#batch_qr_${i} canvas`);
+                    zip.file(`${batchQRList[i].name}.png`, await new Promise(resolve => canvas.toBlob(resolve)));
+                }
+                const blob = await zip.generateAsync({type:"blob"});
+                saveAs(blob, `所有节点二维码_${new Date().getTime()}.zip`);
+                document.getElementById("format-tip").innerText = `✅ 打包完成，共${batchQRList.length}个二维码`;
+            } catch (e) {
+                document.getElementById("format-tip").innerText = `打包失败：${e.message}`;
+                document.getElementById("format-tip").className = "tip error-tip";
+            }
+        }
+
+        function clearQRCode() {
+            document.getElementById("qr-content").value = "";
+            document.getElementById("file-input").value = "";
+            document.getElementById("qrcode").innerHTML = "";
+            document.getElementById("format-tip").innerText = "";
+            document.getElementById("batch-qr-result").style.display = "none";
+            qrInstance = null; selectedNode = null; nodeList = []; batchQRList = [];
+            renderNodeList();
+        }
+
+        function readTxtFile(fileInput) {
+            const file = fileInput.files[0];
+            if (!file || file.name.split(".").pop().toLowerCase() !== "txt") {
+                alert("仅支持导入txt格式文件！"); fileInput.value = ""; return;
+            }
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById("qr-content").value = e.target.result;
+                parseNodeList(e.target.result);
+            };
+            reader.readAsText(file, "UTF-8");
+        }
+
+        document.getElementById("generate-selected-btn").onclick = generateSelectedQRCode;
+        document.getElementById("batch-generate-btn").onclick = generateBatchQRCode;
+        document.getElementById("download-btn").onclick = downloadQRCode;
+        document.getElementById("download-all-btn").onclick = downloadAllQRCode;
+        document.getElementById("clear-btn").onclick = clearQRCode;
+        document.getElementById("qr-content").addEventListener("input", e => parseNodeList(e.target.value));
+        
+        parseNodeList("");
+    </script>
+</body>
+</html>
