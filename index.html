@@ -215,7 +215,6 @@
         .modal-content p{font-size:15px;color:#475569;margin-bottom:24px;line-height:1.5;word-break:break-all}
         .modal-content button{background:linear-gradient(135deg,#e83e8c,#c8236b);color:#fff;border:none;border-radius:40px;padding:12px 28px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s}
         .modal-content button:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(232,62,140,0.35)}
-        /* 手机端适配 - 保持右侧菜单在外部，不隐藏，用户可右滑查看 */
         @media (max-width:768px){
             .container{width:100%;padding:18px}
             .qr-wrap{grid-template-columns:1fr}
@@ -226,7 +225,6 @@
             #apiKey,.api-history-select,.btn-clear-api,.voice-id-input,.btn-fetch-api-info{width:100%;min-width:auto}
             .quota-card{flex-direction:column;align-items:stretch;text-align:center}
             .history-download-btn{padding:3px 8px;font-size:11px}
-            /* 右侧菜单保持原样，不隐藏，不改变位置，用户右滑即可看到 */
             .right-link-wrap{right:-160px;width:145px}
             .link-item-btn,.contact-link-btn{padding:18px 12px;font-size:14px}
         }
@@ -568,7 +566,6 @@
     // API历史记录 - 按日期分组，显示“X天前”，保存时间无限制
     function loadApiHistory() {
         let list = JSON.parse(localStorage.getItem("api_key_history")) || [];
-        // 无限制保存，不过滤时间
         localStorage.setItem("api_key_history", JSON.stringify(list));
         const groups = {};
         list.forEach(item => {
@@ -596,8 +593,7 @@
     }
     
     function clearApiHistory() { if (confirm("确定清空所有API Key历史记录吗？")) { localStorage.removeItem("api_key_history"); loadApiHistory(); document.getElementById("apiKey").value = ""; document.getElementById("quotaCard").style.display = "none"; document.getElementById("log").innerText = "✅ API历史记录已清空"; setTimeout(() => { if (document.getElementById("log").innerText.includes("清空")) document.getElementById("log").innerText = ""; }, 3000); } }
-    function saveApiHistory(key) { if (!key) return; let list = JSON.parse(localStorage.getItem("api_key_history")) || []; list = list.filter(i => i.key !== key); list.unshift({ key, time: Date.now() }); if (list.length > 200) list = list.slice(0, 200); // 限制最多200条，防止过大
-    localStorage.setItem("api_key_history", JSON.stringify(list)); loadApiHistory(); }
+    function saveApiHistory(key) { if (!key) return; let list = JSON.parse(localStorage.getItem("api_key_history")) || []; list = list.filter(i => i.key !== key); list.unshift({ key, time: Date.now() }); if (list.length > 200) list = list.slice(0, 200); localStorage.setItem("api_key_history", JSON.stringify(list)); loadApiHistory(); }
     function onApiKeyInput() { autoFetchQuota(document.getElementById("apiKey").value.trim()); }
     function updateSlider(slider) { const v = parseFloat(slider.value); const el = document.getElementById(slider.id+"Val"); if (slider.id === "stability" || slider.id === "similarity") el.innerText = Math.round(v*100)+"%"; else if (slider.id === "speed") el.innerText = v.toFixed(1); else el.innerText = v; }
     function loadTtsTxtFile(e) { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = ev => { document.getElementById("text").value = ev.target.result; updateCharCount(); autoResizeTextarea(); document.getElementById("log").innerText = "✅ 文件已导入"; setTimeout(() => { if (document.getElementById("log").innerText === "✅ 文件已导入") document.getElementById("log").innerText = ""; }, 3000); }; r.readAsText(f, "UTF-8"); e.target.value = ""; }
