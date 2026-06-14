@@ -5,92 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Gi虾米出品 · TikTok出海工具箱 · 三合一工具集</title>
     <style>
-        /* 预先加载一个拦截样式，防止闪烁 */
-        .block-page {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            background: #0f0f1a;
-            font-family: sans-serif;
-            margin: 0;
-        }
-        .block-card {
-            text-align: center;
-            background: #1a1a2e;
-            padding: 40px 60px;
-            border-radius: 24px;
-        }
-        .block-card h1 { color: #e94560; font-size: 28px; margin-bottom: 16px; }
-        .block-card p { color: #aaa; margin-top: 16px; }
-        .block-card .emoji { font-size: 64px; margin-bottom: 16px; }
-    </style>
-</head>
-<body>
-<script>
-    // ==================== 最顶层的域名校验（立即执行，彻底拦截） ====================
-    (function() {
-        // 获取协议和域名
-        var protocol = window.location.protocol;
-        var host = window.location.hostname;
-        
-        // 允许的域名列表（请修改为您的实际域名）
-        var ALLOWED_DOMAINS = ['ciuok.com', 'www.ciuok.com'];
-        
-        // 1. 检测本地文件协议
-        if (protocol === 'file:') {
-            // 清空页面
-            document.documentElement.innerHTML = '';
-            // 重新写入拦截内容
-            document.write('<div class="block-page"><div class="block-card"><div class="emoji">🔒</div><h1>未经授权</h1><p>此工具无法在本地运行，请通过官方域名访问。</p><p style="font-size:12px; color:#666;">' + window.location.href + '</p></div></div>');
-            // 停止所有后续脚本执行
-            throw new Error("Access Denied: File protocol.");
-        }
-        
-        // 2. 检测域名是否在白名单中
-        var isAllowed = false;
-        for (var i = 0; i < ALLOWED_DOMAINS.length; i++) {
-            if (host === ALLOWED_DOMAINS[i]) {
-                isAllowed = true;
-                break;
-            }
-        }
-        
-        // 3. 本地开发环境放行（可选，调试用）
-        if (host === 'localhost' || host === '127.0.0.1') {
-            isAllowed = true;
-        }
-        
-        // 4. 如果不是授权域名，彻底拦截
-        if (!isAllowed) {
-            // 清空页面
-            document.documentElement.innerHTML = '';
-            // 重新写入拦截内容
-            document.write('<div class="block-page"><div class="block-card"><div class="emoji">🔒</div><h1>未经授权</h1><p>本工具仅授权在 <strong style="color:#e94560;">ciuok.com</strong> 使用</p><p style="font-size:12px; color:#666;">当前域名：' + host + '</p><p style="font-size:12px; color:#666;">请通过官方域名访问</p></div></div>');
-            // 停止所有后续脚本执行
-            throw new Error("Access Denied: Domain " + host);
-        }
-    })();
-</script>
-    <!-- 核心第三方库 -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
-    <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:"PingFang SC","Microsoft YaHei",sans-serif}
         body{background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2070&auto=format');background-size:cover;background-attachment:fixed;background-position:center;background-repeat:no-repeat;position:relative;min-height:100vh;padding:20px 0}
         body::before{content:"";position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.4);backdrop-filter:blur(2px);z-index:-1;pointer-events:none}
         .outer-container{width:90%;max-width:1000px;margin:0 auto;display:flex;justify-content:center;align-items:flex-start;position:relative}
-        /* 右侧悬浮菜单 - 保持在右侧外部，不遮挡主内容，手机端可右滑查看 */
-        .right-link-wrap{
-            position: absolute;
-            right: -160px;
-            top: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: 145px;
-        }
+        .right-link-wrap{position:absolute;right:-160px;top:0;display:flex;flex-direction:column;gap:12px;width:145px}
         .link-item-btn{padding:18px 12px;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:all .3s;text-align:center;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.2);width:100%;line-height:1.4}
         .btn-tiktok{background:#ed8936}.btn-tiktok:hover{background:#dd6b20;transform:translateY(-2px)}
         .btn-tool{background:#38b2ac}.btn-tool:hover{background:#2c7a7b;transform:translateY(-2px)}
@@ -188,8 +107,10 @@
         .history-date-header span{font-size:11px;color:#94a3b8;font-weight:400}
         .history-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#f8fafc;border-radius:10px;margin:4px 0 4px 12px;cursor:pointer;transition:.2s;border-left:3px solid transparent}
         .history-item:hover{background:#f1f5f9;border-left-color:#e83e8c}
-        .history-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        .history-download-btn{background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff;border:none;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:500;cursor:pointer;transition:.2s;margin-left:8px;white-space:nowrap;flex-shrink:0}
+        .history-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+        .history-play-btn{background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff;border:none;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:500;cursor:pointer;transition:.2s;margin-left:8px;white-space:nowrap}
+        .history-play-btn:hover{transform:scale(1.02);background:linear-gradient(135deg,#0f766e,#0d5c54)}
+        .history-download-btn{background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff;border:none;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:500;cursor:pointer;transition:.2s;margin-left:8px;white-space:nowrap;flex-shrink:0}
         .history-download-btn:hover{transform:scale(1.02);background:linear-gradient(135deg,#0f766e,#0d5c54);box-shadow:0 2px 6px rgba(13,148,136,0.4)}
         .history-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px}
         .history-link{font-size:13px;color:#e83e8c;text-decoration:none}
@@ -215,7 +136,6 @@
         .modal-content p{font-size:15px;color:#475569;margin-bottom:24px;line-height:1.5;word-break:break-all}
         .modal-content button{background:linear-gradient(135deg,#e83e8c,#c8236b);color:#fff;border:none;border-radius:40px;padding:12px 28px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s}
         .modal-content button:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(232,62,140,0.35)}
-        /* 手机端适配 - 保持右侧菜单在外部，不隐藏，用户可右滑查看 */
         @media (max-width:768px){
             .container{width:100%;padding:18px}
             .qr-wrap{grid-template-columns:1fr}
@@ -225,8 +145,7 @@
             .api-row,.voice-row{flex-direction:column;align-items:stretch}
             #apiKey,.api-history-select,.btn-clear-api,.voice-id-input,.btn-fetch-api-info{width:100%;min-width:auto}
             .quota-card{flex-direction:column;align-items:stretch;text-align:center}
-            .history-download-btn{padding:3px 8px;font-size:11px}
-            /* 右侧菜单保持原样，不隐藏，不改变位置，用户右滑即可看到 */
+            .history-play-btn,.history-download-btn{padding:3px 8px;font-size:10px}
             .right-link-wrap{right:-160px;width:145px}
             .link-item-btn,.contact-link-btn{padding:18px 12px;font-size:14px}
         }
@@ -286,7 +205,6 @@
     </div>
 </div>
 <script>
-    // ==================== 域名校验已在最顶部完成，以下代码仅在通过校验后执行 ====================
     // ==================== 手动关闭弹窗 ====================
     function showModalDialog(title, message) {
         return new Promise((resolve) => {
@@ -314,11 +232,10 @@
         return `${firstLine}_${dateTime}.mp3`;
     }
     
-    // ==================== 计算“多少天前” - 统一显示 X天前 ====================
+    // ==================== 计算“多少天前” ====================
     function getDaysAgo(date) {
         const now = new Date();
-        const diffTime = now.getTime() - date.getTime();
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
         if (diffDays === 0) return "0天前";
         return `${diffDays}天前`;
     }
@@ -443,6 +360,7 @@
         }
     }
     
+    // ==================== 历史记录渲染（修复：点击文字填充到文本框，点击按钮播放/下载）====================
     function renderTtsHistoryByDate() {
         const container = document.getElementById("historyList");
         if (!container) return;
@@ -473,6 +391,7 @@
                 const displayText = item.content.length > 30 ? item.content.substring(0, 30) + "..." : item.content;
                 html += `<div class="history-item" data-content="${escapeHtml(item.content)}" data-time="${item.time}">
                             <span class="history-text" title="${escapeHtml(item.content)}">${escapeHtml(displayText)}</span>
+                            <button class="history-play-btn" data-time="${item.time}" title="播放音频">▶ 播放</button>
                             <button class="history-download-btn" data-time="${item.time}" title="重新下载">重新下载</button>
                          </div>`;
             });
@@ -481,21 +400,31 @@
         if (sortedDates.length === 0) html = '<div style="text-align:center; color:#94a3b8; padding:20px;">暂无历史记录</div>';
         container.innerHTML = html;
         
+        // 点击文字区域：填充到文本框
         container.querySelectorAll('.history-text').forEach(el => {
             const parentItem = el.parentElement;
-            const timeAttr = parentItem.getAttribute('data-time');
-            if (timeAttr) {
-                const item = ttsHistory.find(i => i.time === parseInt(timeAttr));
-                if (item) {
-                    el.style.cursor = 'pointer';
-                    el.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        playHistoryAudio(item);
-                    });
-                }
+            const content = parentItem.getAttribute('data-content');
+            if (content) {
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    document.getElementById('text').value = content;
+                    updateCharCount();
+                    autoResizeTextarea();
+                });
             }
         });
         
+        // 点击播放按钮：播放音频
+        container.querySelectorAll('.history-play-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const time = parseInt(btn.getAttribute('data-time'));
+                const item = ttsHistory.find(i => i.time === time);
+                if (item) playHistoryAudio(item);
+            });
+        });
+        
+        // 点击下载按钮：重新下载
         container.querySelectorAll('.history-download-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -541,10 +470,7 @@
             const a = document.createElement("a");
             a.href = downloadUrl;
             a.download = fileName;
-            a.style.display = "none";
-            document.body.appendChild(a);
             a.click();
-            document.body.removeChild(a);
             setTimeout(() => { URL.revokeObjectURL(downloadUrl); URL.revokeObjectURL(audioUrl); }, 1000);
             const reader = new FileReader();
             reader.readAsDataURL(blob);
@@ -565,10 +491,8 @@
     function updateCharCount() { const text = document.getElementById('text').value; document.getElementById('charCount').textContent = `字数：${text.length}`; autoResizeTextarea(); }
     function formatTime(timestamp) { const d = new Date(timestamp); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
     
-    // API历史记录 - 按日期分组，显示“X天前”，保存时间无限制
     function loadApiHistory() {
         let list = JSON.parse(localStorage.getItem("api_key_history")) || [];
-        // 无限制保存，不过滤时间
         localStorage.setItem("api_key_history", JSON.stringify(list));
         const groups = {};
         list.forEach(item => {
@@ -596,8 +520,7 @@
     }
     
     function clearApiHistory() { if (confirm("确定清空所有API Key历史记录吗？")) { localStorage.removeItem("api_key_history"); loadApiHistory(); document.getElementById("apiKey").value = ""; document.getElementById("quotaCard").style.display = "none"; document.getElementById("log").innerText = "✅ API历史记录已清空"; setTimeout(() => { if (document.getElementById("log").innerText.includes("清空")) document.getElementById("log").innerText = ""; }, 3000); } }
-    function saveApiHistory(key) { if (!key) return; let list = JSON.parse(localStorage.getItem("api_key_history")) || []; list = list.filter(i => i.key !== key); list.unshift({ key, time: Date.now() }); if (list.length > 200) list = list.slice(0, 200); // 限制最多200条，防止过大
-    localStorage.setItem("api_key_history", JSON.stringify(list)); loadApiHistory(); }
+    function saveApiHistory(key) { if (!key) return; let list = JSON.parse(localStorage.getItem("api_key_history")) || []; list = list.filter(i => i.key !== key); list.unshift({ key, time: Date.now() }); if (list.length > 200) list = list.slice(0, 200); localStorage.setItem("api_key_history", JSON.stringify(list)); loadApiHistory(); }
     function onApiKeyInput() { autoFetchQuota(document.getElementById("apiKey").value.trim()); }
     function updateSlider(slider) { const v = parseFloat(slider.value); const el = document.getElementById(slider.id+"Val"); if (slider.id === "stability" || slider.id === "similarity") el.innerText = Math.round(v*100)+"%"; else if (slider.id === "speed") el.innerText = v.toFixed(1); else el.innerText = v; }
     function loadTtsTxtFile(e) { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = ev => { document.getElementById("text").value = ev.target.result; updateCharCount(); autoResizeTextarea(); document.getElementById("log").innerText = "✅ 文件已导入"; setTimeout(() => { if (document.getElementById("log").innerText === "✅ 文件已导入") document.getElementById("log").innerText = ""; }, 3000); }; r.readAsText(f, "UTF-8"); e.target.value = ""; }
