@@ -5,11 +5,92 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Gi虾米出品 · TikTok出海工具箱 · 三合一工具集</title>
     <style>
+        /* 预先加载一个拦截样式，防止闪烁 */
+        .block-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #0f0f1a;
+            font-family: sans-serif;
+            margin: 0;
+        }
+        .block-card {
+            text-align: center;
+            background: #1a1a2e;
+            padding: 40px 60px;
+            border-radius: 24px;
+        }
+        .block-card h1 { color: #e94560; font-size: 28px; margin-bottom: 16px; }
+        .block-card p { color: #aaa; margin-top: 16px; }
+        .block-card .emoji { font-size: 64px; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+<script>
+    // ==================== 最顶层的域名校验（立即执行，彻底拦截） ====================
+    (function() {
+        // 获取协议和域名
+        var protocol = window.location.protocol;
+        var host = window.location.hostname;
+        
+        // 允许的域名列表（请修改为您的实际域名）
+        var ALLOWED_DOMAINS = ['ciuok.com', 'www.ciuok.com'];
+        
+        // 1. 检测本地文件协议
+        if (protocol === 'file:') {
+            // 清空页面
+            document.documentElement.innerHTML = '';
+            // 重新写入拦截内容
+            document.write('<div class="block-page"><div class="block-card"><div class="emoji">🔒</div><h1>未经授权</h1><p>此工具无法在本地运行，请通过官方域名访问。</p><p style="font-size:12px; color:#666;">' + window.location.href + '</p></div></div>');
+            // 停止所有后续脚本执行
+            throw new Error("Access Denied: File protocol.");
+        }
+        
+        // 2. 检测域名是否在白名单中
+        var isAllowed = false;
+        for (var i = 0; i < ALLOWED_DOMAINS.length; i++) {
+            if (host === ALLOWED_DOMAINS[i]) {
+                isAllowed = true;
+                break;
+            }
+        }
+        
+        // 3. 本地开发环境放行（可选，调试用）
+        if (host === 'localhost' || host === '127.0.0.1') {
+            isAllowed = true;
+        }
+        
+        // 4. 如果不是授权域名，彻底拦截
+        if (!isAllowed) {
+            // 清空页面
+            document.documentElement.innerHTML = '';
+            // 重新写入拦截内容
+            document.write('<div class="block-page"><div class="block-card"><div class="emoji">🔒</div><h1>未经授权</h1><p>本工具仅授权在 <strong style="color:#e94560;">ciuok.com</strong> 使用</p><p style="font-size:12px; color:#666;">当前域名：' + host + '</p><p style="font-size:12px; color:#666;">请通过官方域名访问</p></div></div>');
+            // 停止所有后续脚本执行
+            throw new Error("Access Denied: Domain " + host);
+        }
+    })();
+</script>
+    <!-- 核心第三方库 -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <style>
         *{margin:0;padding:0;box-sizing:border-box;font-family:"PingFang SC","Microsoft YaHei",sans-serif}
         body{background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2070&auto=format');background-size:cover;background-attachment:fixed;background-position:center;background-repeat:no-repeat;position:relative;min-height:100vh;padding:20px 0}
         body::before{content:"";position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.4);backdrop-filter:blur(2px);z-index:-1;pointer-events:none}
         .outer-container{width:90%;max-width:1000px;margin:0 auto;display:flex;justify-content:center;align-items:flex-start;position:relative}
-        .right-link-wrap{position:absolute;right:-160px;top:0;display:flex;flex-direction:column;gap:12px;width:145px}
+        /* 右侧悬浮菜单 - 保持在右侧外部，不遮挡主内容，手机端可右滑查看 */
+        .right-link-wrap{
+            position: absolute;
+            right: -160px;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 145px;
+        }
         .link-item-btn{padding:18px 12px;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:all .3s;text-align:center;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.2);width:100%;line-height:1.4}
         .btn-tiktok{background:#ed8936}.btn-tiktok:hover{background:#dd6b20;transform:translateY(-2px)}
         .btn-tool{background:#38b2ac}.btn-tool:hover{background:#2c7a7b;transform:translateY(-2px)}
@@ -107,10 +188,8 @@
         .history-date-header span{font-size:11px;color:#94a3b8;font-weight:400}
         .history-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#f8fafc;border-radius:10px;margin:4px 0 4px 12px;cursor:pointer;transition:.2s;border-left:3px solid transparent}
         .history-item:hover{background:#f1f5f9;border-left-color:#e83e8c}
-        .history-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
-        .history-play-btn{background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff;border:none;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:500;cursor:pointer;transition:.2s;margin-left:8px;white-space:nowrap}
-        .history-play-btn:hover{transform:scale(1.02);background:linear-gradient(135deg,#0f766e,#0d5c54)}
-        .history-download-btn{background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff;border:none;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:500;cursor:pointer;transition:.2s;margin-left:8px;white-space:nowrap;flex-shrink:0}
+        .history-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .history-download-btn{background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff;border:none;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:500;cursor:pointer;transition:.2s;margin-left:8px;white-space:nowrap;flex-shrink:0}
         .history-download-btn:hover{transform:scale(1.02);background:linear-gradient(135deg,#0f766e,#0d5c54);box-shadow:0 2px 6px rgba(13,148,136,0.4)}
         .history-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px}
         .history-link{font-size:13px;color:#e83e8c;text-decoration:none}
@@ -136,6 +215,7 @@
         .modal-content p{font-size:15px;color:#475569;margin-bottom:24px;line-height:1.5;word-break:break-all}
         .modal-content button{background:linear-gradient(135deg,#e83e8c,#c8236b);color:#fff;border:none;border-radius:40px;padding:12px 28px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s}
         .modal-content button:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(232,62,140,0.35)}
+        /* 手机端适配 - 保持右侧菜单在外部，不隐藏，用户可右滑查看 */
         @media (max-width:768px){
             .container{width:100%;padding:18px}
             .qr-wrap{grid-template-columns:1fr}
@@ -145,7 +225,8 @@
             .api-row,.voice-row{flex-direction:column;align-items:stretch}
             #apiKey,.api-history-select,.btn-clear-api,.voice-id-input,.btn-fetch-api-info{width:100%;min-width:auto}
             .quota-card{flex-direction:column;align-items:stretch;text-align:center}
-            .history-play-btn,.history-download-btn{padding:3px 8px;font-size:10px}
+            .history-download-btn{padding:3px 8px;font-size:11px}
+            /* 右侧菜单保持原样，不隐藏，不改变位置，用户右滑即可看到 */
             .right-link-wrap{right:-160px;width:145px}
             .link-item-btn,.contact-link-btn{padding:18px 12px;font-size:14px}
         }
@@ -188,7 +269,7 @@
                 <hr style="margin:15px 0">
                 <div class="tts-textarea-container"><textarea id="text" class="tts-textarea" placeholder="输入要朗读的文字，支持长文本自动换行...&#10;支持导入TXT文件" oninput="autoResizeTextarea(); updateCharCount();"></textarea><div class="tts-char-count" id="charCount">字数：0</div></div>
                 <div class="btn-group"><button id="generateAudioBtn" class="tts-btn-primary">🎙️ 生成音频+自动下载</button><button id="importTxtBtn" class="tts-btn-secondary">📄 导入TXT</button><button id="clearHistoryBtn" class="tts-btn-danger">🗑️ 清空历史</button></div>
-                <input type="file" id="ttsFileInput" accept=".txt" style="display:none"><div id="log"></div><audio id="audio" controls></audio>
+                <input type="file" id="ttsFileInput" accept=".txt" style="display:none"><div id="log"></div><audio id="audio" controls>
                 <div class="history-box"><div class="history-header"><h4>📜 文本历史 (保存7天)</h4><a href="https://elevenlabs.io/app/home" target="_blank" class="history-link">官方链接 II ElevenLabs</a></div><div id="historyList"></div></div>
             </div>
             <div class="red-disclaimer" style="margin-top:20px">本内容/工具仅作个人合法学习、研究及自用，严禁用于任何违反国家法律法规的非法活动。使用者在使用过程中产生的一切行为及法律责任，均由使用者自行承担，与内容/工具提供方无关。</div>
@@ -205,6 +286,7 @@
     </div>
 </div>
 <script>
+    // ==================== 域名校验已在最顶部完成，以下代码仅在通过校验后执行 ====================
     // ==================== 手动关闭弹窗 ====================
     function showModalDialog(title, message) {
         return new Promise((resolve) => {
@@ -232,10 +314,11 @@
         return `${firstLine}_${dateTime}.mp3`;
     }
     
-    // ==================== 计算“多少天前” ====================
+    // ==================== 计算“多少天前” - 统一显示 X天前 ====================
     function getDaysAgo(date) {
         const now = new Date();
-        const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+        const diffTime = now.getTime() - date.getTime();
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
         if (diffDays === 0) return "0天前";
         return `${diffDays}天前`;
     }
@@ -295,292 +378,4 @@
                 const byteString = atob(item.blobBase64.split(',')[1]);
                 const ab = new ArrayBuffer(byteString.length);
                 const ia = new Uint8Array(ab);
-                for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-                const blob = new Blob([ab], { type: "audio/mpeg" });
-                const audioUrl = URL.createObjectURL(blob);
-                const audioEl = document.getElementById('audio');
-                audioEl.src = audioUrl;
-                audioEl.play().catch(e => console.log("播放失败:", e));
-                setTimeout(() => URL.revokeObjectURL(audioUrl), 3000);
-            } catch(e) {
-                document.getElementById("log").innerText = "❌ 播放失败，音频文件可能已损坏";
-            }
-        } else {
-            document.getElementById("log").innerText = "⚠️ 该历史记录没有缓存音频，请重新生成";
-            setTimeout(() => { if (document.getElementById("log").innerText.includes("没有缓存")) document.getElementById("log").innerText = ""; }, 3000);
-        }
-    }
-    
-    function loadTtsHistory() {
-        const all = JSON.parse(localStorage.getItem("tts_history_v2")) || [];
-        const now = Date.now();
-        const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
-        ttsHistory = all.filter(item => now - item.time < SEVEN_DAYS);
-        localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
-        renderTtsHistoryByDate();
-    }
-    
-    function saveTtsHistory(content, blobData) {
-        if (!content) return;
-        const recentExists = ttsHistory.some(x => x.content === content && (Date.now() - x.time) < 30 * 24 * 60 * 60 * 1000);
-        if (recentExists) return;
-        if (blobData) {
-            const reader = new FileReader();
-            reader.readAsDataURL(blobData);
-            reader.onloadend = function() {
-                ttsHistory.unshift({ content, time: Date.now(), blobBase64: reader.result });
-                if (ttsHistory.length > 100) ttsHistory = ttsHistory.slice(0, 100);
-                localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
-                renderTtsHistoryByDate();
-            };
-            return;
-        }
-        ttsHistory.unshift({ content, time: Date.now(), blobBase64: null });
-        if (ttsHistory.length > 100) ttsHistory = ttsHistory.slice(0, 100);
-        localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
-        renderTtsHistoryByDate();
-    }
-    
-    async function reDownloadHistory(item) {
-        if (item.blobBase64) {
-            const byteString = atob(item.blobBase64.split(',')[1]);
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-            for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-            const blob = new Blob([ab], { type: "audio/mpeg" });
-            const fileName = generateFileName(item.content);
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = fileName;
-            a.click();
-            setTimeout(() => URL.revokeObjectURL(a.href), 100);
-            await showModalDialog("✅ 重新下载成功", `文件已保存：${fileName}`);
-        } else {
-            alert("该历史记录没有缓存音频，请重新生成。");
-        }
-    }
-    
-    // ==================== 历史记录渲染（修复：点击文字填充到文本框，点击按钮播放/下载）====================
-    function renderTtsHistoryByDate() {
-        const container = document.getElementById("historyList");
-        if (!container) return;
-        const groups = {};
-        const now = new Date();
-        const todayStr = formatDateKey(now);
-        const yesterdayStr = formatDateKey(new Date(now.getTime() - 86400000));
-        ttsHistory.forEach(item => {
-            const date = new Date(item.time);
-            let dateKey = formatDateKey(date);
-            let displayDate = dateKey;
-            if (dateKey === todayStr) displayDate = "今天";
-            else if (dateKey === yesterdayStr) displayDate = "昨天";
-            else {
-                const diffDays = Math.floor((now.getTime() - date.getTime()) / 86400000);
-                if (diffDays <= 7) displayDate = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][date.getDay()];
-                else displayDate = `${date.getMonth()+1}月${date.getDate()}日`;
-            }
-            if (!groups[dateKey]) groups[dateKey] = { displayDate, items: [] };
-            groups[dateKey].items.push(item);
-        });
-        const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a));
-        let html = '';
-        sortedDates.forEach(dateKey => {
-            const group = groups[dateKey];
-            html += `<div class="history-date-group"><div class="history-date-header">📅 ${group.displayDate} <span>(${group.items.length}条)</span></div>`;
-            group.items.forEach(item => {
-                const displayText = item.content.length > 30 ? item.content.substring(0, 30) + "..." : item.content;
-                html += `<div class="history-item" data-content="${escapeHtml(item.content)}" data-time="${item.time}">
-                            <span class="history-text" title="${escapeHtml(item.content)}">${escapeHtml(displayText)}</span>
-                            <button class="history-play-btn" data-time="${item.time}" title="播放音频">▶ 播放</button>
-                            <button class="history-download-btn" data-time="${item.time}" title="重新下载">重新下载</button>
-                         </div>`;
-            });
-            html += `</div>`;
-        });
-        if (sortedDates.length === 0) html = '<div style="text-align:center; color:#94a3b8; padding:20px;">暂无历史记录</div>';
-        container.innerHTML = html;
-        
-        // 点击文字区域：填充到文本框
-        container.querySelectorAll('.history-text').forEach(el => {
-            const parentItem = el.parentElement;
-            const content = parentItem.getAttribute('data-content');
-            if (content) {
-                el.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    document.getElementById('text').value = content;
-                    updateCharCount();
-                    autoResizeTextarea();
-                });
-            }
-        });
-        
-        // 点击播放按钮：播放音频
-        container.querySelectorAll('.history-play-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const time = parseInt(btn.getAttribute('data-time'));
-                const item = ttsHistory.find(i => i.time === time);
-                if (item) playHistoryAudio(item);
-            });
-        });
-        
-        // 点击下载按钮：重新下载
-        container.querySelectorAll('.history-download-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const time = parseInt(btn.getAttribute('data-time'));
-                const item = ttsHistory.find(i => i.time === time);
-                if (item) reDownloadHistory(item);
-            });
-        });
-    }
-    
-    function formatDateKey(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`; }
-    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
-    function clearTtsHistory() { if (!confirm("确定清空所有文本历史？")) return; ttsHistory = []; localStorage.removeItem("tts_history_v2"); renderTtsHistoryByDate(); document.getElementById("log").innerText = "✅ 文本历史已清空"; setTimeout(() => { if (document.getElementById("log").innerText.includes("清空")) document.getElementById("log").innerText = ""; }, 3000); }
-    
-    // ==================== TTS 生成核心 ====================
-    let autoQuotaTimer = null;
-    async function fetchQuotaOnly(apiKey) { if (!apiKey) return; try { const res = await fetch("https://api.elevenlabs.io/v1/user", { method: "GET", headers: { "xi-api-key": apiKey } }); const quotaCard = document.getElementById('quotaCard'); const quotaAmountSpan = document.getElementById('quotaAmount'); if (res.ok) { const data = await res.json(); if (data.subscription) { const remaining = Math.max(0, (data.subscription.character_limit || 0) - (data.subscription.character_count || 0)); quotaAmountSpan.innerText = remaining.toLocaleString(); quotaCard.style.display = 'flex'; if (remaining < 10000) quotaCard.classList.add('quota-warning'); else quotaCard.classList.remove('quota-warning'); } } else if (res.status === 401) quotaCard.style.display = 'none'; } catch(e) { console.warn(e); } }
-    function autoFetchQuota(apiKey) { if (autoQuotaTimer) clearTimeout(autoQuotaTimer); autoQuotaTimer = setTimeout(() => { if (apiKey && apiKey.length > 10) fetchQuotaOnly(apiKey); }, 800); }
-    
-    async function startGenerate() {
-        const key = document.getElementById("apiKey").value.trim();
-        const vid = document.getElementById("voiceId").value.trim();
-        const txt = document.getElementById("text").value.trim();
-        const log = document.getElementById("log");
-        if (!key) { log.innerText = "❌ 请输入API Key"; return; }
-        if (!vid) { log.innerText = "❌ 请输入声音ID"; return; }
-        if (!txt) { log.innerText = "❌ 请输入要转换的文字"; return; }
-        saveApiHistory(key);
-        log.innerText = "🔄 正在生成音频，请稍候...";
-        try {
-            const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${vid}`, {
-                method: "POST", headers: { "xi-api-key": key, "Content-Type": "application/json" },
-                body: JSON.stringify({ text: txt, model_id: "eleven_multilingual_v2", voice_settings: { stability: parseFloat(document.getElementById("stability").value), similarity_boost: parseFloat(document.getElementById("similarity").value), style: parseFloat(document.getElementById("style").value), use_speaker_boost: false }, speed: parseFloat(document.getElementById("speed").value) })
-            });
-            if (!res.ok) { let errorMsg = ""; try { const errorData = await res.json(); errorMsg = errorData.detail?.message || errorData.detail || JSON.stringify(errorData); } catch(e) { errorMsg = await res.text(); } throw new Error(errorMsg); }
-            const buf = await res.arrayBuffer();
-            const blob = new Blob([buf], { type: "audio/mpeg" });
-            const audioUrl = URL.createObjectURL(blob);
-            document.getElementById("audio").src = audioUrl;
-            document.getElementById("audio").play().catch(e => console.log("自动播放被阻止"));
-            const fileName = generateFileName(txt);
-            const downloadUrl = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = downloadUrl;
-            a.download = fileName;
-            a.click();
-            setTimeout(() => { URL.revokeObjectURL(downloadUrl); URL.revokeObjectURL(audioUrl); }, 1000);
-            const reader = new FileReader();
-            reader.readAsDataURL(blob);
-            reader.onloadend = function() {
-                ttsHistory.unshift({ content: txt, time: Date.now(), blobBase64: reader.result });
-                if (ttsHistory.length > 100) ttsHistory = ttsHistory.slice(0, 100);
-                localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
-                renderTtsHistoryByDate();
-            };
-            log.innerText = "✅ 生成成功！音频已自动播放并下载";
-            await showModalDialog("✅ 下载成功", `文件已保存：${fileName}\n\n文件命名规则：文本第一行_日期时间.mp3`);
-            setTimeout(() => fetchQuotaOnly(key), 1000);
-        } catch (error) { const chineseMsg = translateErrorMessage(error.message); log.innerText = `❌ ${chineseMsg}`; console.error(error); }
-    }
-    
-    // ==================== 其他辅助函数 ====================
-    function autoResizeTextarea() { const ta = document.getElementById('text'); if (ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; } }
-    function updateCharCount() { const text = document.getElementById('text').value; document.getElementById('charCount').textContent = `字数：${text.length}`; autoResizeTextarea(); }
-    function formatTime(timestamp) { const d = new Date(timestamp); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
-    
-    function loadApiHistory() {
-        let list = JSON.parse(localStorage.getItem("api_key_history")) || [];
-        localStorage.setItem("api_key_history", JSON.stringify(list));
-        const groups = {};
-        list.forEach(item => {
-            const date = new Date(item.time);
-            const dateKey = formatDateKey(date);
-            if (!groups[dateKey]) groups[dateKey] = { date, items: [] };
-            groups[dateKey].items.push(item);
-        });
-        const apiSelect = document.getElementById("apiHistorySelect");
-        const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a));
-        apiSelect.innerHTML = '<option value="">📅 历史记录</option>';
-        sortedDates.forEach(dateKey => {
-            const group = groups[dateKey];
-            const daysAgoText = getDaysAgo(group.date);
-            const optgroup = document.createElement("optgroup");
-            optgroup.label = `📅 ${dateKey} (${daysAgoText})`;
-            group.items.forEach(item => {
-                const option = document.createElement("option");
-                option.value = item.key;
-                option.textContent = `${item.key.substring(0, 12)}...  ${formatTime(item.time)}`;
-                optgroup.appendChild(option);
-            });
-            apiSelect.appendChild(optgroup);
-        });
-    }
-    
-    function clearApiHistory() { if (confirm("确定清空所有API Key历史记录吗？")) { localStorage.removeItem("api_key_history"); loadApiHistory(); document.getElementById("apiKey").value = ""; document.getElementById("quotaCard").style.display = "none"; document.getElementById("log").innerText = "✅ API历史记录已清空"; setTimeout(() => { if (document.getElementById("log").innerText.includes("清空")) document.getElementById("log").innerText = ""; }, 3000); } }
-    function saveApiHistory(key) { if (!key) return; let list = JSON.parse(localStorage.getItem("api_key_history")) || []; list = list.filter(i => i.key !== key); list.unshift({ key, time: Date.now() }); if (list.length > 200) list = list.slice(0, 200); localStorage.setItem("api_key_history", JSON.stringify(list)); loadApiHistory(); }
-    function onApiKeyInput() { autoFetchQuota(document.getElementById("apiKey").value.trim()); }
-    function updateSlider(slider) { const v = parseFloat(slider.value); const el = document.getElementById(slider.id+"Val"); if (slider.id === "stability" || slider.id === "similarity") el.innerText = Math.round(v*100)+"%"; else if (slider.id === "speed") el.innerText = v.toFixed(1); else el.innerText = v; }
-    function loadTtsTxtFile(e) { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = ev => { document.getElementById("text").value = ev.target.result; updateCharCount(); autoResizeTextarea(); document.getElementById("log").innerText = "✅ 文件已导入"; setTimeout(() => { if (document.getElementById("log").innerText === "✅ 文件已导入") document.getElementById("log").innerText = ""; }, 3000); }; r.readAsText(f, "UTF-8"); e.target.value = ""; }
-    async function fetchApiInfo() { const apiKey = document.getElementById('apiKey').value.trim(); if (!apiKey) { document.getElementById("log").innerText = "❌ 请先输入API Key"; return; } document.getElementById("log").innerText = "🔄 正在获取API信息..."; try { const userRes = await fetch("https://api.elevenlabs.io/v1/user", { method: "GET", headers: { "xi-api-key": apiKey } }); if (userRes.ok) { const data = await userRes.json(); if (data.subscription) { const remaining = Math.max(0, (data.subscription.character_limit || 0) - (data.subscription.character_count || 0)); document.getElementById("quotaAmount").innerText = remaining.toLocaleString(); document.getElementById("quotaCard").style.display = 'flex'; if (remaining < 10000) document.getElementById("quotaCard").classList.add('quota-warning'); else document.getElementById("quotaCard").classList.remove('quota-warning'); } } else if (userRes.status === 401) { document.getElementById("log").innerText = "❌ API Key 无效或已过期"; document.getElementById("quotaCard").style.display = 'none'; setTimeout(() => { if (document.getElementById("log").innerText.includes("无效")) document.getElementById("log").innerText = ""; }, 3000); return; } const voicesRes = await fetch("https://api.elevenlabs.io/v1/voices", { method: "GET", headers: { "xi-api-key": apiKey } }); if (voicesRes.ok) { const voicesData = await voicesRes.json(); if (voicesData.voices) { voiceList = voicesData.voices.map(v => ({ voice_id: v.voice_id, name: v.name })); sessionStorage.setItem('elevenlabs_voices', JSON.stringify(voiceList)); } } else { voiceList = [...BUILTIN_VOICES]; } updateVoiceNameDisplay(); document.getElementById("log").innerText = "✅ 获取成功！已更新额度和声音库"; saveApiHistory(apiKey); setTimeout(() => { if (document.getElementById("log").innerText.includes("获取成功")) document.getElementById("log").innerText = ""; }, 4000); } catch(e) { voiceList = [...BUILTIN_VOICES]; updateVoiceNameDisplay(); document.getElementById("log").innerText = "⚠️ 使用内置声音库"; } }
-    
-    // ==================== 二维码/V2Ray 逻辑 ====================
-    let qrInstance = null, selectedNode = null, nodeList = [], batchQRList = [];
-    const correctLevelMap = { L: QRCode.CorrectLevel.L, M: QRCode.CorrectLevel.M, Q: QRCode.CorrectLevel.Q, H: QRCode.CorrectLevel.H };
-    function getCorrectLevel() { const levelVal = document.getElementById("qr-correct").value; if (levelVal === "auto") { const content = document.getElementById("qr-content").value.trim(); return content.length < 50 ? QRCode.CorrectLevel.L : (content.length < 150 ? QRCode.CorrectLevel.M : QRCode.CorrectLevel.H); } return correctLevelMap[levelVal]; }
-    function getPureNodeContent(nodeStr) { const trimStr = nodeStr.trim(); const socks5Reg = /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\:(\d{1,6})\:([\s\S]+)\:([\s\S]+)$/; if (socks5Reg.test(trimStr)) { const [, ip, port, user, pass] = trimStr.match(socks5Reg); return `socks://${user}:${pass}@${ip}:${port}`; } return trimStr; }
-    function parseNodeList(content) { nodeList = content.split(/\r?\n/).filter(item => item.trim() !== ""); renderNodeList(); }
-    function renderNodeList() { const el = document.getElementById("node-list"); if (nodeList.length === 0) { el.innerHTML = '<p class="node-list-tip">输入节点内容后，自动解析为可选列表（每行一个）</p>'; return; } let html = ""; nodeList.forEach((node, idx) => { const active = selectedNode === node ? "active" : ""; html += `<div class="node-item ${active}" data-index="${idx}"><div class="node-name" title="${node}">${node.substring(0, 70)}</div><button class="node-gen-btn" onclick="generateNodeQr(${idx})">生成二维码</button></div>`; }); el.innerHTML = html; document.querySelectorAll(".node-item").forEach(item => { item.querySelector(".node-name").onclick = () => { document.querySelectorAll(".node-item").forEach(el => el.classList.remove("active")); item.classList.add("active"); selectedNode = nodeList[item.dataset.index]; }; }); }
-    window.generateNodeQr = function(idx) { const node = nodeList[idx]; document.querySelectorAll(".node-item").forEach(el => el.classList.remove("active")); document.querySelectorAll(".node-item")[idx].classList.add("active"); selectedNode = node; renderSingleQR(getPureNodeContent(node)); document.getElementById("format-tip").innerText = "生成成功 ✔ 手机扫码100%识别"; document.getElementById("batch-qr-result").style.display = "none"; };
-    function generateSelectedQRCode() { const target = selectedNode || document.getElementById("qr-content").value.trim(); if (!target) { alert("请选中节点或输入节点内容！"); return; } renderSingleQR(getPureNodeContent(target)); document.getElementById("format-tip").innerText = "生成成功 ✔ 手机扫码100%识别"; document.getElementById("batch-qr-result").style.display = "none"; }
-    function generateBatchQRCode() { if (nodeList.length === 0) { alert("暂无节点可批量生成！"); return; } batchQRList = []; const gridBox = document.getElementById("qr-grid"); gridBox.innerHTML = ""; document.getElementById("batch-qr-result").style.display = "block"; const allContent = nodeList.map(item => getPureNodeContent(item)).join("\n"); renderSingleQR(allContent); document.getElementById("format-tip").innerText = `批量生成成功，共${nodeList.length}个节点 ✔ 手机扫码全部识别`; const qrSizeVal = parseInt(document.getElementById("qr-size").value); const darkColorVal = document.getElementById("qr-dark").value; const lightColorVal = document.getElementById("qr-light").value; const correctLvl = getCorrectLevel(); nodeList.forEach((node, idx) => { const pure = getPureNodeContent(node); const shortName = (node.substring(0, 20).replace(/[\/:*?"<>|]/g, '-') || "节点") + "..."; const itemDiv = document.createElement("div"); itemDiv.className = "qr-item"; itemDiv.innerHTML = `<div class="qr-box" id="batch_qr_${idx}"></div><p title="${node}">${shortName}</p>`; gridBox.appendChild(itemDiv); new QRCode(document.getElementById(`batch_qr_${idx}`), { text: pure, width: qrSizeVal, height: qrSizeVal, colorDark: darkColorVal, colorLight: lightColorVal, correctLevel: correctLvl, margin: 2 }); batchQRList.push({ content: pure, name: shortName }); }); }
-    function renderSingleQR(content) { const el = document.getElementById("qrcode"); el.innerHTML = ""; qrInstance = new QRCode(el, { text: content, width: parseInt(document.getElementById("qr-size").value), height: parseInt(document.getElementById("qr-size").value), colorDark: document.getElementById("qr-dark").value, colorLight: document.getElementById("qr-light").value, correctLevel: getCorrectLevel(), margin: 2 }); }
-    function downloadQRCode() { const canvas = document.querySelector("#qrcode canvas"); if (!canvas) { alert("请先生成二维码！"); return; } const name = selectedNode ? (selectedNode.substring(0, 20).replace(/[\/:*?"<>|]/g,'-') || "二维码") : `聚合二维码`; canvas.toBlob(blob => saveAs(blob, `${name}.png`)); }
-    async function downloadAllQRCode() { if (batchQRList.length === 0) { alert("请先批量生成二维码！"); return; } const zip = new JSZip(); for (let i = 0; i < batchQRList.length; i++) { const canvas = document.querySelector(`#batch_qr_${i} canvas`); if (canvas) zip.file(`${batchQRList[i].name}.png`, await new Promise(r => canvas.toBlob(r))); } const blob = await zip.generateAsync({ type: "blob" }); saveAs(blob, `所有节点二维码_${Date.now()}.zip`); document.getElementById("format-tip").innerText = `打包完成，共${batchQRList.length}个二维码`; }
-    function clearQRCode() { document.getElementById("qr-content").value = ""; document.getElementById("file-input").value = ""; document.getElementById("qrcode").innerHTML = ""; document.getElementById("format-tip").innerText = ""; document.getElementById("batch-qr-result").style.display = "none"; qrInstance = null; selectedNode = null; nodeList = []; batchQRList = []; renderNodeList(); }
-    function readTxtFile(fileInput) { const file = fileInput.files[0]; if (!file || !file.name.endsWith('.txt')) { alert("请上传 .txt 格式文件"); fileInput.value = ""; return; } const reader = new FileReader(); reader.onload = e => { document.getElementById("qr-content").value = e.target.result; parseNodeList(e.target.result); }; reader.readAsText(file, "UTF-8"); }
-    function v2Convert() { const raw = document.getElementById('v2Input').value.trim(); if (!raw) { alert("请输入节点 (格式 IP:端口:账号:密码)"); return; } const lines = raw.split(/\r?\n/).filter(l => l.trim()); const result = []; for (let l of lines) { const parts = l.split(':'); if (parts.length >= 4) { const [ip, port, user, pass] = parts; try { const base = btoa(user + ":" + pass); result.push(`socks://${base}@${ip}:${port}`); } catch(e) { result.push(`# 转换失败: ${l}`); } } else { result.push(`# 格式错误: ${l}`); } } document.getElementById('v2Result').value = result.join('\n'); }
-    function v2Copy() { const textarea = document.getElementById('v2Result'); if (!textarea.value.trim() || textarea.value === "转换结果将显示在这里...") { alert("请先转换生成结果"); return; } textarea.select(); document.execCommand('copy'); const tipDiv = document.createElement('div'); tipDiv.innerText = '复制成功'; tipDiv.style.cssText = "position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#10b981; color:white; padding:8px 20px; border-radius:40px; z-index:10000; font-size:14px;"; document.body.appendChild(tipDiv); setTimeout(() => tipDiv.remove(), 1500); }
-    
-    document.getElementById("generate-selected-btn").onclick = generateSelectedQRCode;
-    document.getElementById("batch-generate-btn").onclick = generateBatchQRCode;
-    document.getElementById("download-btn").onclick = downloadQRCode;
-    document.getElementById("download-all-btn").onclick = downloadAllQRCode;
-    document.getElementById("clear-btn").onclick = clearQRCode;
-    document.getElementById("qr-content").addEventListener("input", e => parseNodeList(e.target.value));
-    parseNodeList("");
-    document.getElementById('v2ConvertBtn').addEventListener('click', v2Convert);
-    document.getElementById('v2CopyBtn').addEventListener('click', v2Copy);
-    document.getElementById('generateAudioBtn').addEventListener('click', startGenerate);
-    document.getElementById('importTxtBtn').addEventListener('click', () => document.getElementById('ttsFileInput').click());
-    document.getElementById('clearHistoryBtn').addEventListener('click', clearTtsHistory);
-    document.getElementById('ttsFileInput').addEventListener('change', loadTtsTxtFile);
-    document.getElementById('fetchApiInfoBtn').addEventListener('click', fetchApiInfo);
-    document.getElementById('voiceId').addEventListener('input', updateVoiceNameDisplay);
-    document.getElementById('apiKey').addEventListener('input', onApiKeyInput);
-    document.getElementById('apiKey').addEventListener('change', onApiKeyInput);
-    document.getElementById("apiHistorySelect").addEventListener("change", (e) => { if (e.target.value) { document.getElementById("apiKey").value = e.target.value; autoFetchQuota(e.target.value); } });
-    document.getElementById("clearApiHistoryBtn").addEventListener("click", clearApiHistory);
-    document.querySelectorAll(".param-slider").forEach(s => { updateSlider(s); s.addEventListener("input", () => updateSlider(s)); });
-    
-    loadApiHistory();
-    loadTtsHistory();
-    updateCharCount();
-    updateVoiceNameDisplay();
-    setTimeout(autoResizeTextarea, 100);
-    const savedApiKey = localStorage.getItem("last_used_api_key");
-    if (savedApiKey && document.getElementById('apiKey').value === "") { document.getElementById('apiKey').value = savedApiKey; autoFetchQuota(savedApiKey); }
-    
-    const qrPanel = document.getElementById('qrToolPanel'), v2Panel = document.getElementById('v2rayToolPanel'), ttsPanel = document.getElementById('ttsToolPanel');
-    document.getElementById('switchToV2Btn').addEventListener('click', () => { qrPanel.classList.add('hidden-panel'); v2Panel.classList.remove('hidden-panel'); ttsPanel.classList.add('hidden-panel'); });
-    document.getElementById('switchToTtsBtn').addEventListener('click', () => { qrPanel.classList.add('hidden-panel'); v2Panel.classList.add('hidden-panel'); ttsPanel.classList.remove('hidden-panel'); setTimeout(autoResizeTextarea, 50); });
-    document.getElementById('backToQrBtn').addEventListener('click', () => { v2Panel.classList.add('hidden-panel'); ttsPanel.classList.add('hidden-panel'); qrPanel.classList.remove('hidden-panel'); });
-    document.getElementById('backToQrFromTtsBtn').addEventListener('click', () => { ttsPanel.classList.add('hidden-panel'); v2Panel.classList.add('hidden-panel'); qrPanel.classList.remove('hidden-panel'); });
-    
-    document.querySelectorAll('.link-dropdown').forEach(dropdown => { const btn = dropdown.querySelector('.link-item-btn'); const content = dropdown.querySelector('.dropdown-content'); let timer; btn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('active'); }); content.addEventListener('mouseenter', () => clearTimeout(timer)); content.addEventListener('mouseleave', () => { timer = setTimeout(() => dropdown.classList.remove('active'), 1000); }); });
-    document.addEventListener('click', () => document.querySelectorAll('.link-dropdown').forEach(d => d.classList.remove('active')));
-</script>
-</body>
-</html>
+                for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i
