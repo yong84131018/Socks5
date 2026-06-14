@@ -4,42 +4,66 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Gi虾米出品 · TikTok出海工具箱 · 三合一工具集</title>
-    <!-- ==================== 域名白名单校验（防直接下载使用）==================== -->
-    <script>
-        (function() {
-            // 在这里设置您允许访问的域名
-            const ALLOWED_DOMAINS = [
-                'ciuok.com',           // 您的主域名
-                'www.ciuok.com',       // 带www的域名
-                'localhost',           // 本地开发（可选）
-                '127.0.0.1'            // 本地开发（可选）
-            ];
-            
-            const currentHost = window.location.hostname;
-            const protocol = window.location.protocol;
-            
-            // 1. 检测是否是通过 file:// 协议直接打开的本地文件
-            if (protocol === 'file:') {
-                document.body.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; min-height:100vh; background:#0f0f1a; font-family:sans-serif;"><div style="text-align:center; background:#1a1a2e; padding:40px 60px; border-radius:24px;"><div style="font-size:64px; margin-bottom:16px;">🔒</div><h1 style="color:#e94560; font-size:28px;">未经授权</h1><p style="color:#aaa; margin-top:16px;">此工具无法在本地运行，请通过官方域名访问。</p><p style="color:#666; font-size:12px; margin-top:20px;">' + window.location.href + '</p></div></div>';
-                throw new Error("Access Denied: File protocol is not allowed.");
+    <style>
+        /* 预先加载一个拦截样式，防止闪烁 */
+        .block-page {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: #0f0f1a;
+            font-family: sans-serif;
+            margin: 0;
+        }
+        .block-card {
+            text-align: center;
+            background: #1a1a2e;
+            padding: 40px 60px;
+            border-radius: 24px;
+        }
+        .block-card h1 { color: #e94560; font-size: 28px; margin-bottom: 16px; }
+        .block-card p { color: #aaa; margin-top: 16px; }
+        .block-card .emoji { font-size: 64px; margin-bottom: 16px; }
+    </style>
+</head>
+<body>
+<script>
+    // ==================== 最顶层的域名校验（立即执行，拦截一切） ====================
+    (function() {
+        // 获取协议和域名
+        var protocol = window.location.protocol;
+        var host = window.location.hostname;
+        
+        // 允许的域名列表（请修改为您的实际域名）
+        var ALLOWED_DOMAINS = ['ciuok.com', 'www.ciuok.com'];
+        
+        // 1. 检测本地文件协议
+        if (protocol === 'file:') {
+            document.body.innerHTML = '<div class="block-page"><div class="block-card"><div class="emoji">🔒</div><h1>未经授权</h1><p>此工具无法在本地运行，请通过官方域名访问。</p><p style="font-size:12px; color:#666;">' + window.location.href + '</p></div></div>';
+            throw new Error("Access Denied: File protocol.");
+        }
+        
+        // 2. 检测域名是否在白名单中
+        var isAllowed = false;
+        for (var i = 0; i < ALLOWED_DOMAINS.length; i++) {
+            if (host === ALLOWED_DOMAINS[i]) {
+                isAllowed = true;
+                break;
             }
-            
-            // 2. 检测当前域名是否在白名单中
-            let isAllowed = false;
-            for (let domain of ALLOWED_DOMAINS) {
-                if (currentHost === domain || currentHost.endsWith('.' + domain)) {
-                    isAllowed = true;
-                    break;
-                }
-            }
-            
-            // 如果不是授权域名，销毁页面内容
-            if (!isAllowed) {
-                document.body.innerHTML = '<div style="display:flex; align-items:center; justify-content:center; min-height:100vh; background:#0f0f1a; font-family:sans-serif;"><div style="text-align:center; background:#1a1a2e; padding:40px 60px; border-radius:24px;"><div style="font-size:64px; margin-bottom:16px;">🔒</div><h1 style="color:#e94560; font-size:28px;">未经授权</h1><p style="color:#aaa; margin-top:16px;">本工具仅授权在 <strong style="color:#e94560;">ciuok.com</strong> 使用</p><p style="color:#666; font-size:12px; margin-top:20px;">请通过官方域名访问</p></div></div>';
-                throw new Error("Access Denied: Domain not authorized.");
-            }
-        })();
-    </script>
+        }
+        
+        // 3. 本地开发环境放行（可选，调试用）
+        if (host === 'localhost' || host === '127.0.0.1') {
+            isAllowed = true;
+        }
+        
+        // 4. 如果不是授权域名，拦截
+        if (!isAllowed) {
+            document.body.innerHTML = '<div class="block-page"><div class="block-card"><div class="emoji">🔒</div><h1>未经授权</h1><p>本工具仅授权在 <strong style="color:#e94560;">ciuok.com</strong> 使用</p><p style="font-size:12px; color:#666;">当前域名：' + host + '</p><p style="font-size:12px; color:#666;">请通过官方域名访问</p></div></div>';
+            throw new Error("Access Denied: Domain " + host);
+        }
+    })();
+</script>
     <!-- 核心第三方库 -->
     <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -148,7 +172,6 @@
         .history-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#f8fafc;border-radius:10px;margin:4px 0 4px 12px;cursor:pointer;transition:.2s;border-left:3px solid transparent}
         .history-item:hover{background:#f1f5f9;border-left-color:#e83e8c}
         .history-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        /* ✅ 重新下载按钮 - 完整文字 */
         .history-download-btn{background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff;border:none;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:500;cursor:pointer;transition:.2s;margin-left:8px;white-space:nowrap;flex-shrink:0}
         .history-download-btn:hover{transform:scale(1.02);background:linear-gradient(135deg,#0f766e,#0d5c54);box-shadow:0 2px 6px rgba(13,148,136,0.4)}
         .history-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px}
