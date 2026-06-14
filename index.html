@@ -24,13 +24,13 @@
         .block-card h1 { color: #e94560; font-size: 28px; margin-bottom: 16px; }
         .block-card p { color: #aaa; margin-top: 16px; }
         .block-card .emoji { font-size: 64px; margin-bottom: 16px; }
-        /* TTS 历史记录增强样式 */
+        /* TTS 历史记录样式 */
         .history-item-buttons {
             display: flex;
             gap: 8px;
             flex-shrink: 0;
         }
-        .history-play-btn, .history-load-btn {
+        .history-play-btn, .history-download-btn {
             border: none;
             border-radius: 20px;
             padding: 4px 12px;
@@ -48,25 +48,9 @@
             transform: scale(1.02);
             background: linear-gradient(135deg, #0f766e, #0d5c54);
         }
-        .history-load-btn {
-            background: linear-gradient(135deg, #4f46e5, #6366f1);
-            color: white;
-        }
-        .history-load-btn:hover {
-            transform: scale(1.02);
-            background: linear-gradient(135deg, #4338ca, #4f46e5);
-        }
         .history-download-btn {
             background: linear-gradient(135deg, #f59e0b, #d97706);
             color: white;
-            border: none;
-            border-radius: 20px;
-            padding: 4px 12px;
-            font-size: 11px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            white-space: nowrap;
         }
         .history-download-btn:hover {
             transform: scale(1.02);
@@ -97,6 +81,7 @@
             font-size: 13px;
             cursor: pointer;
             color: #1e293b;
+            transition: color 0.2s;
         }
         .history-text:hover {
             color: #e83e8c;
@@ -105,7 +90,7 @@
         @media (max-width: 768px) {
             .history-item { flex-wrap: wrap; }
             .history-item-buttons { margin-left: auto; }
-            .history-play-btn, .history-load-btn, .history-download-btn { padding: 4px 8px; font-size: 10px; }
+            .history-play-btn, .history-download-btn { padding: 4px 8px; font-size: 10px; }
         }
     </style>
 </head>
@@ -394,7 +379,12 @@
     
     function playAudioFromBlob(blob) { const url = URL.createObjectURL(blob); const audioEl = document.getElementById('audio'); audioEl.src = url; audioEl.play().catch(e => console.log("播放失败:", e)); setTimeout(() => URL.revokeObjectURL(url), 5000); }
     
-    function loadTextToInput(content) { document.getElementById("text").value = content; updateCharCount(); autoResizeTextarea(); document.getElementById("log").innerText = "✅ 已加载历史文本到输入框"; setTimeout(() => { if (document.getElementById("log").innerText.includes("加载历史")) document.getElementById("log").innerText = ""; }, 2000); }
+    // 点击文本直接加载到输入框，无弹窗提示
+    function loadTextToInput(content) { 
+        document.getElementById("text").value = content; 
+        updateCharCount(); 
+        autoResizeTextarea(); 
+    }
     
     function loadTtsHistory() { const all = JSON.parse(localStorage.getItem("tts_history_v2")) || []; const now = Date.now(); const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000; ttsHistory = all.filter(item => now - item.time < SEVEN_DAYS); localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory)); renderTtsHistoryByDate(); }
     
@@ -430,7 +420,6 @@
                             <span class="history-text" title="${escapeHtml(item.content)}">${escapeHtml(displayText)}</span>
                             <div class="history-item-buttons">
                                 <button class="history-play-btn" data-time="${item.time}">▶ 播放</button>
-                                <button class="history-load-btn" data-time="${item.time}">📋 加载文本</button>
                                 <button class="history-download-btn" data-time="${item.time}">⬇ 下载</button>
                             </div>
                          </div>`;
@@ -440,10 +429,40 @@
         if (sortedDates.length === 0) html = '<div style="text-align:center; color:#94a3b8; padding:20px;">暂无历史记录</div>';
         container.innerHTML = html;
         
-        container.querySelectorAll('.history-text').forEach(el => { el.addEventListener('click', (e) => { const time = parseInt(el.parentElement.getAttribute('data-time')); const item = ttsHistory.find(i => i.time === time); if (item) loadTextToInput(item.content); }); });
-        container.querySelectorAll('.history-play-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const time = parseInt(btn.getAttribute('data-time')); const item = ttsHistory.find(i => i.time === time); if (item && item.blobBase64) { const byteString = atob(item.blobBase64.split(',')[1]); const ab = new ArrayBuffer(byteString.length); const ia = new Uint8Array(ab); for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i); const blob = new Blob([ab], { type: "audio/mpeg" }); playAudioFromBlob(blob); } else { alert("无缓存的音频数据，请重新生成。"); } }); });
-        container.querySelectorAll('.history-load-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const time = parseInt(btn.getAttribute('data-time')); const item = ttsHistory.find(i => i.time === time); if (item) loadTextToInput(item.content); }); });
-        container.querySelectorAll('.history-download-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const time = parseInt(btn.getAttribute('data-time')); const item = ttsHistory.find(i => i.time === time); if (item) reDownloadHistory(item); }); });
+        // 点击文本加载到输入框（无弹窗）
+        container.querySelectorAll('.history-text').forEach(el => { 
+            el.addEventListener('click', (e) => { 
+                e.stopPropagation(); 
+                const time = parseInt(el.parentElement.getAttribute('data-time')); 
+                const item = ttsHistory.find(i => i.time === time); 
+                if (item) loadTextToInput(item.content); 
+            }); 
+        });
+        // 播放按钮
+        container.querySelectorAll('.history-play-btn').forEach(btn => { 
+            btn.addEventListener('click', (e) => { 
+                e.stopPropagation(); 
+                const time = parseInt(btn.getAttribute('data-time')); 
+                const item = ttsHistory.find(i => i.time === time); 
+                if (item && item.blobBase64) { 
+                    const byteString = atob(item.blobBase64.split(',')[1]); 
+                    const ab = new ArrayBuffer(byteString.length); 
+                    const ia = new Uint8Array(ab); 
+                    for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i); 
+                    const blob = new Blob([ab], { type: "audio/mpeg" }); 
+                    playAudioFromBlob(blob); 
+                } else { alert("无缓存的音频数据，请重新生成。"); } 
+            }); 
+        });
+        // 下载按钮
+        container.querySelectorAll('.history-download-btn').forEach(btn => { 
+            btn.addEventListener('click', (e) => { 
+                e.stopPropagation(); 
+                const time = parseInt(btn.getAttribute('data-time')); 
+                const item = ttsHistory.find(i => i.time === time); 
+                if (item) reDownloadHistory(item); 
+            }); 
+        });
     }
     
     function formatDateKey(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`; }
