@@ -28,7 +28,7 @@
 </head>
 <body>
 <script>
-    // ==================== 最顶层的域名校验（立即执行，拦截一切） ====================
+    // ==================== 最顶层的域名校验（立即执行，彻底拦截） ====================
     (function() {
         // 获取协议和域名
         var protocol = window.location.protocol;
@@ -39,7 +39,11 @@
         
         // 1. 检测本地文件协议
         if (protocol === 'file:') {
-            document.body.innerHTML = '<div class="block-page"><div class="block-card"><div class="emoji">🔒</div><h1>未经授权</h1><p>此工具无法在本地运行，请通过官方域名访问。</p><p style="font-size:12px; color:#666;">' + window.location.href + '</p></div></div>';
+            // 清空页面
+            document.documentElement.innerHTML = '';
+            // 重新写入拦截内容
+            document.write('<div class="block-page"><div class="block-card"><div class="emoji">🔒</div><h1>未经授权</h1><p>此工具无法在本地运行，请通过官方域名访问。</p><p style="font-size:12px; color:#666;">' + window.location.href + '</p></div></div>');
+            // 停止所有后续脚本执行
             throw new Error("Access Denied: File protocol.");
         }
         
@@ -57,9 +61,13 @@
             isAllowed = true;
         }
         
-        // 4. 如果不是授权域名，拦截
+        // 4. 如果不是授权域名，彻底拦截
         if (!isAllowed) {
-            document.body.innerHTML = '<div class="block-page"><div class="block-card"><div class="emoji">🔒</div><h1>未经授权</h1><p>本工具仅授权在 <strong style="color:#e94560;">ciuok.com</strong> 使用</p><p style="font-size:12px; color:#666;">当前域名：' + host + '</p><p style="font-size:12px; color:#666;">请通过官方域名访问</p></div></div>';
+            // 清空页面
+            document.documentElement.innerHTML = '';
+            // 重新写入拦截内容
+            document.write('<div class="block-page"><div class="block-card"><div class="emoji">🔒</div><h1>未经授权</h1><p>本工具仅授权在 <strong style="color:#e94560;">ciuok.com</strong> 使用</p><p style="font-size:12px; color:#666;">当前域名：' + host + '</p><p style="font-size:12px; color:#666;">请通过官方域名访问</p></div></div>');
+            // 停止所有后续脚本执行
             throw new Error("Access Denied: Domain " + host);
         }
     })();
@@ -73,7 +81,16 @@
         body{background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2070&auto=format');background-size:cover;background-attachment:fixed;background-position:center;background-repeat:no-repeat;position:relative;min-height:100vh;padding:20px 0}
         body::before{content:"";position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.4);backdrop-filter:blur(2px);z-index:-1;pointer-events:none}
         .outer-container{width:90%;max-width:1000px;margin:0 auto;display:flex;justify-content:center;align-items:flex-start;position:relative}
-        .right-link-wrap{position:absolute;right:-160px;top:0;display:flex;flex-direction:column;gap:12px;width:145px}
+        /* 右侧悬浮菜单 - 保持在右侧外部，不遮挡主内容，手机端可右滑查看 */
+        .right-link-wrap{
+            position: absolute;
+            right: -160px;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 145px;
+        }
         .link-item-btn{padding:18px 12px;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:all .3s;text-align:center;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.2);width:100%;line-height:1.4}
         .btn-tiktok{background:#ed8936}.btn-tiktok:hover{background:#dd6b20;transform:translateY(-2px)}
         .btn-tool{background:#38b2ac}.btn-tool:hover{background:#2c7a7b;transform:translateY(-2px)}
@@ -198,7 +215,21 @@
         .modal-content p{font-size:15px;color:#475569;margin-bottom:24px;line-height:1.5;word-break:break-all}
         .modal-content button{background:linear-gradient(135deg,#e83e8c,#c8236b);color:#fff;border:none;border-radius:40px;padding:12px 28px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s}
         .modal-content button:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(232,62,140,0.35)}
-        @media (max-width:768px){.right-link-wrap{display:none}.qr-wrap{grid-template-columns:1fr}.qr-grid{grid-template-columns:1fr !important}.container{padding:18px}.param-label{width:100%}.param-slider{max-width:100%}.api-row,.voice-row{flex-direction:column;align-items:stretch}#apiKey,.api-history-select,.btn-clear-api,.voice-id-input,.btn-fetch-api-info{width:100%;min-width:auto}.quota-card{flex-direction:column;align-items:stretch;text-align:center}.history-download-btn{padding:3px 8px;font-size:11px}}
+        /* 手机端适配 - 保持右侧菜单在外部，不隐藏，用户可右滑查看 */
+        @media (max-width:768px){
+            .container{width:100%;padding:18px}
+            .qr-wrap{grid-template-columns:1fr}
+            .qr-grid{grid-template-columns:1fr !important}
+            .param-label{width:100%}
+            .param-slider{max-width:100%}
+            .api-row,.voice-row{flex-direction:column;align-items:stretch}
+            #apiKey,.api-history-select,.btn-clear-api,.voice-id-input,.btn-fetch-api-info{width:100%;min-width:auto}
+            .quota-card{flex-direction:column;align-items:stretch;text-align:center}
+            .history-download-btn{padding:3px 8px;font-size:11px}
+            /* 右侧菜单保持原样，不隐藏，不改变位置，用户右滑即可看到 */
+            .right-link-wrap{right:-160px;width:145px}
+            .link-item-btn,.contact-link-btn{padding:18px 12px;font-size:14px}
+        }
     </style>
 </head>
 <body>
@@ -255,6 +286,7 @@
     </div>
 </div>
 <script>
+    // ==================== 域名校验已在最顶部完成，以下代码仅在通过校验后执行 ====================
     // ==================== 手动关闭弹窗 ====================
     function showModalDialog(title, message) {
         return new Promise((resolve) => {
