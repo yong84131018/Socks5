@@ -24,50 +24,111 @@
         .block-card h1 { color: #e94560; font-size: 28px; margin-bottom: 16px; }
         .block-card p { color: #aaa; margin-top: 16px; }
         .block-card .emoji { font-size: 64px; margin-bottom: 16px; }
+        /* TTS 历史记录增强样式 */
+        .history-item-buttons {
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .history-play-btn, .history-load-btn {
+            border: none;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .history-play-btn {
+            background: linear-gradient(135deg, #0d9488, #0f766e);
+            color: white;
+        }
+        .history-play-btn:hover {
+            transform: scale(1.02);
+            background: linear-gradient(135deg, #0f766e, #0d5c54);
+        }
+        .history-load-btn {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: white;
+        }
+        .history-load-btn:hover {
+            transform: scale(1.02);
+            background: linear-gradient(135deg, #4338ca, #4f46e5);
+        }
+        .history-download-btn {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .history-download-btn:hover {
+            transform: scale(1.02);
+            background: linear-gradient(135deg, #d97706, #b45309);
+        }
+        .history-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 12px;
+            background: #f8fafc;
+            border-radius: 12px;
+            margin: 6px 0 6px 12px;
+            transition: .2s;
+            border-left: 3px solid transparent;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .history-item:hover {
+            background: #f1f5f9;
+            border-left-color: #e83e8c;
+        }
+        .history-text {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 13px;
+            cursor: pointer;
+            color: #1e293b;
+        }
+        .history-text:hover {
+            color: #e83e8c;
+            text-decoration: underline;
+        }
+        @media (max-width: 768px) {
+            .history-item { flex-wrap: wrap; }
+            .history-item-buttons { margin-left: auto; }
+            .history-play-btn, .history-load-btn, .history-download-btn { padding: 4px 8px; font-size: 10px; }
+        }
     </style>
 </head>
 <body>
 <script>
     // ==================== 最顶层的域名校验（立即执行，彻底拦截） ====================
     (function() {
-        // 获取协议和域名
         var protocol = window.location.protocol;
         var host = window.location.hostname;
-        
-        // 允许的域名列表（请修改为您的实际域名）
         var ALLOWED_DOMAINS = ['ciuok.com', 'www.ciuok.com'];
-        
-        // 1. 检测本地文件协议
         if (protocol === 'file:') {
-            // 清空页面
             document.documentElement.innerHTML = '';
-            // 重新写入拦截内容
             document.write('<div class="block-page"><div class="block-card"><div class="emoji">🔒</div><h1>未经授权</h1><p>此工具无法在本地运行，请通过官方域名访问。</p><p style="font-size:12px; color:#666;">' + window.location.href + '</p></div></div>');
-            // 停止所有后续脚本执行
             throw new Error("Access Denied: File protocol.");
         }
-        
-        // 2. 检测域名是否在白名单中
         var isAllowed = false;
         for (var i = 0; i < ALLOWED_DOMAINS.length; i++) {
-            if (host === ALLOWED_DOMAINS[i]) {
-                isAllowed = true;
-                break;
-            }
+            if (host === ALLOWED_DOMAINS[i]) { isAllowed = true; break; }
         }
-        
-        // 3. 本地开发环境放行（可选，调试用）
-        if (host === 'localhost' || host === '127.0.0.1') {
-            isAllowed = true;
-        }
-        
-        // 4. 如果不是授权域名，彻底拦截
+        if (host === 'localhost' || host === '127.0.0.1') { isAllowed = true; }
         if (!isAllowed) {
-            // 清空页面
             document.documentElement.innerHTML = '';
-            // 重新写入拦截内容
             document.write('<div class="block-page"><div class="block-card"><div class="emoji">🔒</div><h1>未经授权</h1><p>本工具仅授权在 <strong style="color:#e94560;">ciuok.com</strong> 使用</p><p style="font-size:12px; color:#666;">当前域名：' + host + '</p><p style="font-size:12px; color:#666;">请通过官方域名访问</p></div></div>');
-            // 停止所有后续脚本执行
             throw new Error("Access Denied: Domain " + host);
         }
     })();
@@ -81,16 +142,7 @@
         body{background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2070&auto=format');background-size:cover;background-attachment:fixed;background-position:center;background-repeat:no-repeat;position:relative;min-height:100vh;padding:20px 0}
         body::before{content:"";position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.4);backdrop-filter:blur(2px);z-index:-1;pointer-events:none}
         .outer-container{width:90%;max-width:1000px;margin:0 auto;display:flex;justify-content:center;align-items:flex-start;position:relative}
-        /* 右侧悬浮菜单 - 保持在右侧外部，不遮挡主内容，手机端可右滑查看 */
-        .right-link-wrap{
-            position: absolute;
-            right: -160px;
-            top: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            width: 145px;
-        }
+        .right-link-wrap{position:absolute;right:-160px;top:0;display:flex;flex-direction:column;gap:12px;width:145px}
         .link-item-btn{padding:18px 12px;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:all .3s;text-align:center;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.2);width:100%;line-height:1.4}
         .btn-tiktok{background:#ed8936}.btn-tiktok:hover{background:#dd6b20;transform:translateY(-2px)}
         .btn-tool{background:#38b2ac}.btn-tool:hover{background:#2c7a7b;transform:translateY(-2px)}
@@ -100,9 +152,6 @@
         .dropdown-content{display:none;position:absolute;top:0;left:100%;min-width:180px;background:#fff;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);z-index:9999;margin-left:8px;overflow:hidden}
         .link-dropdown.active .dropdown-content{display:block}
         .dropdown-item{padding:14px 12px;color:#2d3748;text-decoration:none;display:block;text-align:left;transition:.25s;font-size:14px;font-weight:500}
-        .tiktok-item:hover{background:#fff2e8;color:#ed8936}
-        .tool-item:hover{background:#e8f8f8;color:#38b2ac}
-        .node-item:hover{background:#f5f0ff;color:#9f7aea}
         .contact-link-btn{padding:18px 12px;background:#4299e1;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:all .3s;text-align:center;text-decoration:none;box-shadow:0 2px 8px rgba(66,153,225,0.3);width:100%;line-height:1.4;margin-top:0}
         .contact-link-btn:hover{background:#3182ce;transform:translateY(-2px)}
         .container{width:100%;max-width:1000px;background:rgba(255,255,255,0.96);padding:30px;border-radius:28px;box-shadow:0 20px 35px -12px rgba(0,0,0,0.2);overflow:hidden;transition:all .2s;border:1px solid rgba(255,255,240,0.6)}
@@ -173,7 +222,7 @@
         .voice-row{display:flex;gap:10px;align-items:center;margin:10px 0 5px 0;flex-wrap:wrap}
         .voice-id-input{flex:2;padding:12px;border-radius:14px;border:1px solid #cbd5e1;font-size:14px}
         .btn-fetch-api-info{flex:0.9;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;border:none;border-radius:40px;padding:12px 10px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
-        .btn-fetch-api-info:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(79,70,229,0.3)}
+        .btn-fetch-api-info:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(79,70,229,0.35)}
         .voice-name-display{font-size:13px;color:#e83e8c;background:#fef2f2;padding:6px 12px;border-radius:40px;display:inline-block;margin-top:5px}
         .param-item{display:flex;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
         .param-label{width:130px;font-size:14px;font-weight:700;color:#334155}
@@ -186,11 +235,6 @@
         .history-date-group{margin-top:12px}
         .history-date-header{font-size:13px;font-weight:600;color:#475569;padding:6px 8px;background:#f1f5f9;border-radius:8px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
         .history-date-header span{font-size:11px;color:#94a3b8;font-weight:400}
-        .history-item{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:#f8fafc;border-radius:10px;margin:4px 0 4px 12px;cursor:pointer;transition:.2s;border-left:3px solid transparent}
-        .history-item:hover{background:#f1f5f9;border-left-color:#e83e8c}
-        .history-text{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-        .history-download-btn{background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff;border:none;border-radius:20px;padding:4px 12px;font-size:12px;font-weight:500;cursor:pointer;transition:.2s;margin-left:8px;white-space:nowrap;flex-shrink:0}
-        .history-download-btn:hover{transform:scale(1.02);background:linear-gradient(135deg,#0f766e,#0d5c54);box-shadow:0 2px 6px rgba(13,148,136,0.4)}
         .history-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px}
         .history-link{font-size:13px;color:#e83e8c;text-decoration:none}
         .history-link:hover{text-decoration:underline}
@@ -224,7 +268,6 @@
             .api-row,.voice-row{flex-direction:column;align-items:stretch}
             #apiKey,.api-history-select,.btn-clear-api,.voice-id-input,.btn-fetch-api-info{width:100%;min-width:auto}
             .quota-card{flex-direction:column;align-items:stretch;text-align:center}
-            .history-download-btn{padding:3px 8px;font-size:11px}
             .right-link-wrap{right:-160px;width:145px}
             .link-item-btn,.contact-link-btn{padding:18px 12px;font-size:14px}
         }
@@ -284,8 +327,7 @@
     </div>
 </div>
 <script>
-    // ==================== 域名校验已在最顶部完成，以下代码仅在通过校验后执行 ====================
-    // ==================== 手动关闭弹窗 ====================
+    // ==================== 域名校验已在最顶部完成 ====================
     function showModalDialog(title, message) {
         return new Promise((resolve) => {
             const overlay = document.createElement('div');
@@ -300,7 +342,6 @@
         });
     }
     
-    // ==================== 生成文件名（文本第一行 + 日期时间）====================
     function generateFileName(textContent) {
         let firstLine = textContent.split(/\r?\n/)[0].trim();
         if (!firstLine) firstLine = "语音";
@@ -312,7 +353,6 @@
         return `${firstLine}_${dateTime}.mp3`;
     }
     
-    // ==================== 计算“多少天前” - 统一显示 X天前 ====================
     function getDaysAgo(date) {
         const now = new Date();
         const diffTime = now.getTime() - date.getTime();
@@ -321,15 +361,13 @@
         return `${diffDays}天前`;
     }
     
-    // ==================== 错误信息中文翻译 ====================
     function translateErrorMessage(errorText) {
         const errorMap = {
-            "Failed to fetch": "网络连接失败，请检查网络后重试","NetworkError": "网络错误","Invalid API key": "API Key 无效，请检查并输入正确的 Key",
-            "API key is invalid": "API Key 无效","missing_api_key": "缺少 API Key","unauthorized": "API Key 认证失败，请确认 Key 是否正确",
-            "Voice not found": "声音 ID 不存在，请输入有效的声音 ID","voice not found": "声音 ID 不存在","text is required": "请输入要转换的文字内容",
-            "text too long": "文本内容过长，请缩短后重试","quota exceeded": "字符额度已用完，请升级套餐或等待下月重置","character limit exceeded": "超过字符限额",
-            "monthly limit reached": "本月额度已用完","Internal server error": "服务器内部错误，请稍后重试","Service unavailable": "服务暂时不可用",
-            "Rate limit": "请求频率过高，请稍后再试","Too many requests": "请求过于频繁，请稍后重试"
+            "Failed to fetch": "网络连接失败，请检查网络后重试","NetworkError": "网络错误","Invalid API key": "API Key 无效",
+            "API key is invalid": "API Key 无效","missing_api_key": "缺少 API Key","unauthorized": "API Key 认证失败",
+            "Voice not found": "声音 ID 不存在","text is required": "请输入要转换的文字内容",
+            "text too long": "文本内容过长","quota exceeded": "字符额度已用完","character limit exceeded": "超过字符限额",
+            "monthly limit reached": "本月额度已用完","Internal server error": "服务器内部错误","Service unavailable": "服务暂时不可用"
         };
         let lowerError = errorText.toLowerCase();
         for (let [eng, chn] of Object.entries(errorMap)) {
@@ -338,108 +376,31 @@
         return errorText.length > 100 ? "生成失败：" + errorText.substring(0, 100) + "..." : "生成失败：" + errorText;
     }
     
-    // ==================== 历史记录变量 ====================
     let ttsHistory = [];
     let voiceList = [];
     const BUILTIN_VOICES = [
         { voice_id: "bIHbv24MWmeRgasZH58o", name: "Will - Relaxed Optimist" },
-        { voice_id: "21m00Tcm4TlvDq8ikWAM", name: "Rachel" },
-        { voice_id: "AZnzlk1Xvd90eVPlC3gNE", name: "Drew" },
-        { voice_id: "29vD33N1CtxCmqQRPOHJ", name: "Clyde" },
-        { voice_id: "D38z5RcWu1voky8WS1ja", name: "Paul" },
-        { voice_id: "7Ego4wtoOJQ4V8ZNgT0V", name: "Thomas" },
-        { voice_id: "5Q0OrxXNIxTkr9FmX9Rl", name: "Josh" },
-        { voice_id: "ZkEQUQ5ZkK0zJmQpHY0V", name: "Emily" },
-        { voice_id: "LbR1DRY1cJmQkEaH0R1V", name: "Elli" },
-        { voice_id: "f3ffn1QvNt4Jh8zJzZ9G", name: "Dorothy" },
-        { voice_id: "r6o4XrHjWqf1nVvZpQxG", name: "Charlotte" },
+        { voice_id: "21m00Tcm4TlvDq8ikWAM", name: "Rachel" }, { voice_id: "AZnzlk1Xvd90eVPlC3gNE", name: "Drew" },
+        { voice_id: "29vD33N1CtxCmqQRPOHJ", name: "Clyde" }, { voice_id: "D38z5RcWu1voky8WS1ja", name: "Paul" },
+        { voice_id: "7Ego4wtoOJQ4V8ZNgT0V", name: "Thomas" }, { voice_id: "5Q0OrxXNIxTkr9FmX9Rl", name: "Josh" },
+        { voice_id: "ZkEQUQ5ZkK0zJmQpHY0V", name: "Emily" }, { voice_id: "LbR1DRY1cJmQkEaH0R1V", name: "Elli" },
+        { voice_id: "f3ffn1QvNt4Jh8zJzZ9G", name: "Dorothy" }, { voice_id: "r6o4XrHjWqf1nVvZpQxG", name: "Charlotte" },
         { voice_id: "VR6AewLTigWG4xSOukaG", name: "Arnold" }
     ];
     voiceList = [...BUILTIN_VOICES];
     
-    function getVoiceNameById(voiceId) {
-        if (!voiceId) return "未知声音";
-        const found = voiceList.find(v => v.voice_id === voiceId);
-        return found ? found.name : (BUILTIN_VOICES.find(v => v.voice_id === voiceId)?.name || "自定义声音");
-    }
+    function getVoiceNameById(voiceId) { if (!voiceId) return "未知声音"; const found = voiceList.find(v => v.voice_id === voiceId); return found ? found.name : (BUILTIN_VOICES.find(v => v.voice_id === voiceId)?.name || "自定义声音"); }
+    function updateVoiceNameDisplay() { const voiceId = document.getElementById('voiceId').value.trim(); const displaySpan = document.getElementById('voiceNameDisplay'); displaySpan.innerHTML = voiceId ? `🎤 当前声音：${getVoiceNameById(voiceId)}` : `⚠️ 请输入声音ID`; displaySpan.style.color = voiceId ? "#e83e8c" : "#f59e0b"; }
     
-    function updateVoiceNameDisplay() {
-        const voiceId = document.getElementById('voiceId').value.trim();
-        const displaySpan = document.getElementById('voiceNameDisplay');
-        displaySpan.innerHTML = voiceId ? `🎤 当前声音：${getVoiceNameById(voiceId)}` : `⚠️ 请输入声音ID`;
-        displaySpan.style.color = voiceId ? "#e83e8c" : "#f59e0b";
-    }
+    function playAudioFromBlob(blob) { const url = URL.createObjectURL(blob); const audioEl = document.getElementById('audio'); audioEl.src = url; audioEl.play().catch(e => console.log("播放失败:", e)); setTimeout(() => URL.revokeObjectURL(url), 5000); }
     
-    function playHistoryAudio(item) {
-        if (item.blobBase64) {
-            try {
-                const byteString = atob(item.blobBase64.split(',')[1]);
-                const ab = new ArrayBuffer(byteString.length);
-                const ia = new Uint8Array(ab);
-                for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-                const blob = new Blob([ab], { type: "audio/mpeg" });
-                const audioUrl = URL.createObjectURL(blob);
-                const audioEl = document.getElementById('audio');
-                audioEl.src = audioUrl;
-                audioEl.play().catch(e => console.log("播放失败:", e));
-                setTimeout(() => URL.revokeObjectURL(audioUrl), 3000);
-            } catch(e) {
-                document.getElementById("log").innerText = "❌ 播放失败，音频文件可能已损坏";
-            }
-        } else {
-            document.getElementById("log").innerText = "⚠️ 该历史记录没有缓存音频，请重新生成";
-            setTimeout(() => { if (document.getElementById("log").innerText.includes("没有缓存")) document.getElementById("log").innerText = ""; }, 3000);
-        }
-    }
+    function loadTextToInput(content) { document.getElementById("text").value = content; updateCharCount(); autoResizeTextarea(); document.getElementById("log").innerText = "✅ 已加载历史文本到输入框"; setTimeout(() => { if (document.getElementById("log").innerText.includes("加载历史")) document.getElementById("log").innerText = ""; }, 2000); }
     
-    function loadTtsHistory() {
-        const all = JSON.parse(localStorage.getItem("tts_history_v2")) || [];
-        const now = Date.now();
-        const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
-        ttsHistory = all.filter(item => now - item.time < SEVEN_DAYS);
-        localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
-        renderTtsHistoryByDate();
-    }
+    function loadTtsHistory() { const all = JSON.parse(localStorage.getItem("tts_history_v2")) || []; const now = Date.now(); const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000; ttsHistory = all.filter(item => now - item.time < SEVEN_DAYS); localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory)); renderTtsHistoryByDate(); }
     
-    function saveTtsHistory(content, blobData) {
-        if (!content) return;
-        const recentExists = ttsHistory.some(x => x.content === content && (Date.now() - x.time) < 30 * 24 * 60 * 60 * 1000);
-        if (recentExists) return;
-        if (blobData) {
-            const reader = new FileReader();
-            reader.readAsDataURL(blobData);
-            reader.onloadend = function() {
-                ttsHistory.unshift({ content, time: Date.now(), blobBase64: reader.result });
-                if (ttsHistory.length > 100) ttsHistory = ttsHistory.slice(0, 100);
-                localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
-                renderTtsHistoryByDate();
-            };
-            return;
-        }
-        ttsHistory.unshift({ content, time: Date.now(), blobBase64: null });
-        if (ttsHistory.length > 100) ttsHistory = ttsHistory.slice(0, 100);
-        localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
-        renderTtsHistoryByDate();
-    }
+    function saveTtsHistory(content, blobData) { if (!content) return; if (blobData) { const reader = new FileReader(); reader.readAsDataURL(blobData); reader.onloadend = function() { ttsHistory.unshift({ content, time: Date.now(), blobBase64: reader.result }); if (ttsHistory.length > 100) ttsHistory = ttsHistory.slice(0, 100); localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory)); renderTtsHistoryByDate(); }; return; } ttsHistory.unshift({ content, time: Date.now(), blobBase64: null }); if (ttsHistory.length > 100) ttsHistory = ttsHistory.slice(0, 100); localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory)); renderTtsHistoryByDate(); }
     
-    async function reDownloadHistory(item) {
-        if (item.blobBase64) {
-            const byteString = atob(item.blobBase64.split(',')[1]);
-            const ab = new ArrayBuffer(byteString.length);
-            const ia = new Uint8Array(ab);
-            for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-            const blob = new Blob([ab], { type: "audio/mpeg" });
-            const fileName = generateFileName(item.content);
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = fileName;
-            a.click();
-            setTimeout(() => URL.revokeObjectURL(a.href), 100);
-            await showModalDialog("✅ 重新下载成功", `文件已保存：${fileName}`);
-        } else {
-            alert("该历史记录没有缓存音频，请重新生成。");
-        }
-    }
+    async function reDownloadHistory(item) { if (item.blobBase64) { const byteString = atob(item.blobBase64.split(',')[1]); const ab = new ArrayBuffer(byteString.length); const ia = new Uint8Array(ab); for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i); const blob = new Blob([ab], { type: "audio/mpeg" }); const fileName = generateFileName(item.content); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 100); await showModalDialog("✅ 重新下载成功", `文件已保存：${fileName}`); } else { alert("该历史记录没有缓存音频，请重新生成。"); } }
     
     function renderTtsHistoryByDate() {
         const container = document.getElementById("historyList");
@@ -454,11 +415,7 @@
             let displayDate = dateKey;
             if (dateKey === todayStr) displayDate = "今天";
             else if (dateKey === yesterdayStr) displayDate = "昨天";
-            else {
-                const diffDays = Math.floor((now.getTime() - date.getTime()) / 86400000);
-                if (diffDays <= 7) displayDate = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][date.getDay()];
-                else displayDate = `${date.getMonth()+1}月${date.getDate()}日`;
-            }
+            else { const diffDays = Math.floor((now.getTime() - date.getTime()) / 86400000); if (diffDays <= 7) displayDate = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][date.getDay()]; else displayDate = `${date.getMonth()+1}月${date.getDate()}日`; }
             if (!groups[dateKey]) groups[dateKey] = { displayDate, items: [] };
             groups[dateKey].items.push(item);
         });
@@ -468,10 +425,14 @@
             const group = groups[dateKey];
             html += `<div class="history-date-group"><div class="history-date-header">📅 ${group.displayDate} <span>(${group.items.length}条)</span></div>`;
             group.items.forEach(item => {
-                const displayText = item.content.length > 30 ? item.content.substring(0, 30) + "..." : item.content;
-                html += `<div class="history-item" data-content="${escapeHtml(item.content)}" data-time="${item.time}">
+                const displayText = item.content.length > 35 ? item.content.substring(0, 35) + "..." : item.content;
+                html += `<div class="history-item" data-time="${item.time}">
                             <span class="history-text" title="${escapeHtml(item.content)}">${escapeHtml(displayText)}</span>
-                            <button class="history-download-btn" data-time="${item.time}" title="重新下载">重新下载</button>
+                            <div class="history-item-buttons">
+                                <button class="history-play-btn" data-time="${item.time}">▶ 播放</button>
+                                <button class="history-load-btn" data-time="${item.time}">📋 加载文本</button>
+                                <button class="history-download-btn" data-time="${item.time}">⬇ 下载</button>
+                            </div>
                          </div>`;
             });
             html += `</div>`;
@@ -479,36 +440,16 @@
         if (sortedDates.length === 0) html = '<div style="text-align:center; color:#94a3b8; padding:20px;">暂无历史记录</div>';
         container.innerHTML = html;
         
-        container.querySelectorAll('.history-text').forEach(el => {
-            const parentItem = el.parentElement;
-            const timeAttr = parentItem.getAttribute('data-time');
-            if (timeAttr) {
-                const item = ttsHistory.find(i => i.time === parseInt(timeAttr));
-                if (item) {
-                    el.style.cursor = 'pointer';
-                    el.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        playHistoryAudio(item);
-                    });
-                }
-            }
-        });
-        
-        container.querySelectorAll('.history-download-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const time = parseInt(btn.getAttribute('data-time'));
-                const item = ttsHistory.find(i => i.time === time);
-                if (item) reDownloadHistory(item);
-            });
-        });
+        container.querySelectorAll('.history-text').forEach(el => { el.addEventListener('click', (e) => { const time = parseInt(el.parentElement.getAttribute('data-time')); const item = ttsHistory.find(i => i.time === time); if (item) loadTextToInput(item.content); }); });
+        container.querySelectorAll('.history-play-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const time = parseInt(btn.getAttribute('data-time')); const item = ttsHistory.find(i => i.time === time); if (item && item.blobBase64) { const byteString = atob(item.blobBase64.split(',')[1]); const ab = new ArrayBuffer(byteString.length); const ia = new Uint8Array(ab); for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i); const blob = new Blob([ab], { type: "audio/mpeg" }); playAudioFromBlob(blob); } else { alert("无缓存的音频数据，请重新生成。"); } }); });
+        container.querySelectorAll('.history-load-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const time = parseInt(btn.getAttribute('data-time')); const item = ttsHistory.find(i => i.time === time); if (item) loadTextToInput(item.content); }); });
+        container.querySelectorAll('.history-download-btn').forEach(btn => { btn.addEventListener('click', (e) => { e.stopPropagation(); const time = parseInt(btn.getAttribute('data-time')); const item = ttsHistory.find(i => i.time === time); if (item) reDownloadHistory(item); }); });
     }
     
     function formatDateKey(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`; }
     function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
     function clearTtsHistory() { if (!confirm("确定清空所有文本历史？")) return; ttsHistory = []; localStorage.removeItem("tts_history_v2"); renderTtsHistoryByDate(); document.getElementById("log").innerText = "✅ 文本历史已清空"; setTimeout(() => { if (document.getElementById("log").innerText.includes("清空")) document.getElementById("log").innerText = ""; }, 3000); }
     
-    // ==================== TTS 生成核心 ====================
     let autoQuotaTimer = null;
     async function fetchQuotaOnly(apiKey) { if (!apiKey) return; try { const res = await fetch("https://api.elevenlabs.io/v1/user", { method: "GET", headers: { "xi-api-key": apiKey } }); const quotaCard = document.getElementById('quotaCard'); const quotaAmountSpan = document.getElementById('quotaAmount'); if (res.ok) { const data = await res.json(); if (data.subscription) { const remaining = Math.max(0, (data.subscription.character_limit || 0) - (data.subscription.character_count || 0)); quotaAmountSpan.innerText = remaining.toLocaleString(); quotaCard.style.display = 'flex'; if (remaining < 10000) quotaCard.classList.add('quota-warning'); else quotaCard.classList.remove('quota-warning'); } } else if (res.status === 401) quotaCard.style.display = 'none'; } catch(e) { console.warn(e); } }
     function autoFetchQuota(apiKey) { if (autoQuotaTimer) clearTimeout(autoQuotaTimer); autoQuotaTimer = setTimeout(() => { if (apiKey && apiKey.length > 10) fetchQuotaOnly(apiKey); }, 800); }
@@ -546,52 +487,18 @@
             setTimeout(() => { URL.revokeObjectURL(downloadUrl); URL.revokeObjectURL(audioUrl); }, 1000);
             const reader = new FileReader();
             reader.readAsDataURL(blob);
-            reader.onloadend = function() {
-                ttsHistory.unshift({ content: txt, time: Date.now(), blobBase64: reader.result });
-                if (ttsHistory.length > 100) ttsHistory = ttsHistory.slice(0, 100);
-                localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
-                renderTtsHistoryByDate();
-            };
+            reader.onloadend = function() { saveTtsHistory(txt, blob); };
             log.innerText = "✅ 生成成功！音频已自动播放并下载";
             await showModalDialog("✅ 下载成功", `文件已保存：${fileName}\n\n文件命名规则：文本第一行_日期时间.mp3`);
             setTimeout(() => fetchQuotaOnly(key), 1000);
         } catch (error) { const chineseMsg = translateErrorMessage(error.message); log.innerText = `❌ ${chineseMsg}`; console.error(error); }
     }
     
-    // ==================== 其他辅助函数 ====================
     function autoResizeTextarea() { const ta = document.getElementById('text'); if (ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; } }
     function updateCharCount() { const text = document.getElementById('text').value; document.getElementById('charCount').textContent = `字数：${text.length}`; autoResizeTextarea(); }
     function formatTime(timestamp) { const d = new Date(timestamp); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
     
-    // API历史记录 - 按日期分组，显示“X天前”，保存时间无限制
-    function loadApiHistory() {
-        let list = JSON.parse(localStorage.getItem("api_key_history")) || [];
-        localStorage.setItem("api_key_history", JSON.stringify(list));
-        const groups = {};
-        list.forEach(item => {
-            const date = new Date(item.time);
-            const dateKey = formatDateKey(date);
-            if (!groups[dateKey]) groups[dateKey] = { date, items: [] };
-            groups[dateKey].items.push(item);
-        });
-        const apiSelect = document.getElementById("apiHistorySelect");
-        const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a));
-        apiSelect.innerHTML = '<option value="">📅 历史记录</option>';
-        sortedDates.forEach(dateKey => {
-            const group = groups[dateKey];
-            const daysAgoText = getDaysAgo(group.date);
-            const optgroup = document.createElement("optgroup");
-            optgroup.label = `📅 ${dateKey} (${daysAgoText})`;
-            group.items.forEach(item => {
-                const option = document.createElement("option");
-                option.value = item.key;
-                option.textContent = `${item.key.substring(0, 12)}...  ${formatTime(item.time)}`;
-                optgroup.appendChild(option);
-            });
-            apiSelect.appendChild(optgroup);
-        });
-    }
-    
+    function loadApiHistory() { let list = JSON.parse(localStorage.getItem("api_key_history")) || []; localStorage.setItem("api_key_history", JSON.stringify(list)); const groups = {}; list.forEach(item => { const date = new Date(item.time); const dateKey = formatDateKey(date); if (!groups[dateKey]) groups[dateKey] = { date, items: [] }; groups[dateKey].items.push(item); }); const apiSelect = document.getElementById("apiHistorySelect"); const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a)); apiSelect.innerHTML = '<option value="">📅 历史记录</option>'; sortedDates.forEach(dateKey => { const group = groups[dateKey]; const daysAgoText = getDaysAgo(group.date); const optgroup = document.createElement("optgroup"); optgroup.label = `📅 ${dateKey} (${daysAgoText})`; group.items.forEach(item => { const option = document.createElement("option"); option.value = item.key; option.textContent = `${item.key.substring(0, 12)}...  ${formatTime(item.time)}`; optgroup.appendChild(option); }); apiSelect.appendChild(optgroup); }); }
     function clearApiHistory() { if (confirm("确定清空所有API Key历史记录吗？")) { localStorage.removeItem("api_key_history"); loadApiHistory(); document.getElementById("apiKey").value = ""; document.getElementById("quotaCard").style.display = "none"; document.getElementById("log").innerText = "✅ API历史记录已清空"; setTimeout(() => { if (document.getElementById("log").innerText.includes("清空")) document.getElementById("log").innerText = ""; }, 3000); } }
     function saveApiHistory(key) { if (!key) return; let list = JSON.parse(localStorage.getItem("api_key_history")) || []; list = list.filter(i => i.key !== key); list.unshift({ key, time: Date.now() }); if (list.length > 200) list = list.slice(0, 200); localStorage.setItem("api_key_history", JSON.stringify(list)); loadApiHistory(); }
     function onApiKeyInput() { autoFetchQuota(document.getElementById("apiKey").value.trim()); }
@@ -599,7 +506,7 @@
     function loadTtsTxtFile(e) { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = ev => { document.getElementById("text").value = ev.target.result; updateCharCount(); autoResizeTextarea(); document.getElementById("log").innerText = "✅ 文件已导入"; setTimeout(() => { if (document.getElementById("log").innerText === "✅ 文件已导入") document.getElementById("log").innerText = ""; }, 3000); }; r.readAsText(f, "UTF-8"); e.target.value = ""; }
     async function fetchApiInfo() { const apiKey = document.getElementById('apiKey').value.trim(); if (!apiKey) { document.getElementById("log").innerText = "❌ 请先输入API Key"; return; } document.getElementById("log").innerText = "🔄 正在获取API信息..."; try { const userRes = await fetch("https://api.elevenlabs.io/v1/user", { method: "GET", headers: { "xi-api-key": apiKey } }); if (userRes.ok) { const data = await userRes.json(); if (data.subscription) { const remaining = Math.max(0, (data.subscription.character_limit || 0) - (data.subscription.character_count || 0)); document.getElementById("quotaAmount").innerText = remaining.toLocaleString(); document.getElementById("quotaCard").style.display = 'flex'; if (remaining < 10000) document.getElementById("quotaCard").classList.add('quota-warning'); else document.getElementById("quotaCard").classList.remove('quota-warning'); } } else if (userRes.status === 401) { document.getElementById("log").innerText = "❌ API Key 无效或已过期"; document.getElementById("quotaCard").style.display = 'none'; setTimeout(() => { if (document.getElementById("log").innerText.includes("无效")) document.getElementById("log").innerText = ""; }, 3000); return; } const voicesRes = await fetch("https://api.elevenlabs.io/v1/voices", { method: "GET", headers: { "xi-api-key": apiKey } }); if (voicesRes.ok) { const voicesData = await voicesRes.json(); if (voicesData.voices) { voiceList = voicesData.voices.map(v => ({ voice_id: v.voice_id, name: v.name })); sessionStorage.setItem('elevenlabs_voices', JSON.stringify(voiceList)); } } else { voiceList = [...BUILTIN_VOICES]; } updateVoiceNameDisplay(); document.getElementById("log").innerText = "✅ 获取成功！已更新额度和声音库"; saveApiHistory(apiKey); setTimeout(() => { if (document.getElementById("log").innerText.includes("获取成功")) document.getElementById("log").innerText = ""; }, 4000); } catch(e) { voiceList = [...BUILTIN_VOICES]; updateVoiceNameDisplay(); document.getElementById("log").innerText = "⚠️ 使用内置声音库"; } }
     
-    // ==================== 二维码/V2Ray 逻辑 ====================
+    // 二维码/V2Ray 逻辑 (精简保留)
     let qrInstance = null, selectedNode = null, nodeList = [], batchQRList = [];
     const correctLevelMap = { L: QRCode.CorrectLevel.L, M: QRCode.CorrectLevel.M, Q: QRCode.CorrectLevel.Q, H: QRCode.CorrectLevel.H };
     function getCorrectLevel() { const levelVal = document.getElementById("qr-correct").value; if (levelVal === "auto") { const content = document.getElementById("qr-content").value.trim(); return content.length < 50 ? QRCode.CorrectLevel.L : (content.length < 150 ? QRCode.CorrectLevel.M : QRCode.CorrectLevel.H); } return correctLevelMap[levelVal]; }
@@ -643,8 +550,6 @@
     updateCharCount();
     updateVoiceNameDisplay();
     setTimeout(autoResizeTextarea, 100);
-    const savedApiKey = localStorage.getItem("last_used_api_key");
-    if (savedApiKey && document.getElementById('apiKey').value === "") { document.getElementById('apiKey').value = savedApiKey; autoFetchQuota(savedApiKey); }
     
     const qrPanel = document.getElementById('qrToolPanel'), v2Panel = document.getElementById('v2rayToolPanel'), ttsPanel = document.getElementById('ttsToolPanel');
     document.getElementById('switchToV2Btn').addEventListener('click', () => { qrPanel.classList.add('hidden-panel'); v2Panel.classList.remove('hidden-panel'); ttsPanel.classList.add('hidden-panel'); });
