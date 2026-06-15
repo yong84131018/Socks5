@@ -276,7 +276,7 @@
         <!-- 面板2: V2Ray 格式转换工具 -->
         <div id="v2rayToolPanel" class="tool-panel hidden-panel">
             <div style="display:flex;justify-content:flex-start;margin-bottom:12px"><button id="backToQrBtn" class="switch-tool-btn">← 返回二维码生成器</button></div>
-            <div class="v2ray-card"><h3>V2Ray 标准格式转换</h3><div style="text-align:center"><span class="v2-sub">IP:端口:账号:密码 → socks:// 链接 (V2Ray/Clash 通用)</span></div><textarea id="v2Input" class="v2-textarea" placeholder="粘贴节点（一行一个）&#10;例如：&#10;45.145.98.36:12324:14a95c273f4fa:47525c2acd"></textarea><div class="v2-btn-group"><button id="v2ConvertBtn" class="v2-btn">一键转换格式</button><button id="v2CopyBtn" class="v2-btn v2-btn-copy">一键复制结果</button></div><div class="v2-result-area"><textarea id="v2Result" class="v2-textarea" readonly placeholder="转换结果将显示在这里..."></textarea></div><div class="red-disclaimer" style="margin-top:20px">仅支持 Socks5 格式转换 (IP:port:user:pass)，转换结果可直接导入V2Ray客户端。</div></div>
+            <div class="v2ray-card"><h3>V2Ray 标准格式转换</h3><div style="text-align:center"><span class="v2-sub">ip:端口:用户名:密码 → socks:// 链接 (V2Ray/Clash 通用)</span></div><textarea id="v2Input" class="v2-textarea" placeholder="粘贴节点（一行一个）&#10;例如：&#10;ip：端口：用户名：密码"></textarea><div class="v2-btn-group"><button id="v2ConvertBtn" class="v2-btn">一键转换格式</button><button id="v2CopyBtn" class="v2-btn v2-btn-copy">一键复制结果</button></div><div class="v2-result-area"><textarea id="v2Result" class="v2-textarea" readonly placeholder="转换结果将显示在这里..."></textarea></div><div class="red-disclaimer" style="margin-top:20px">仅支持 Socks5 格式转换 (ip:port:user:pass)，转换结果可直接导入V2Ray客户端。</div></div>
             <div class="red-disclaimer" style="margin-top:20px">本内容/工具仅作个人合法学习、研究及自用，严禁用于任何违反国家法律法规的非法活动。使用者在使用过程中产生的一切行为及法律责任，均由使用者自行承担，与内容/工具提供方无关。</div>
             <div class="footer-declare"><p class="title">【第三方开源组件引用声明】</p><p>本工具开发过程中，引用了以下开源社区的优秀免费组件，相关版权归原作者及开源组织所有，特此致谢：</p><p>1、二维码生成核心：QRCode.js (MIT开源协议) ；2、压缩打包核心：JSZip (MIT开源协议) ；3、文件下载核心：FileSaver.js (MIT开源协议)。</p><p>所有引用的第三方开源组件均遵循其原始开源协议，本工具未对其核心源码做任何侵权修改，仅做合理调用与适配。</p><br><p>© 2026 Gi虾米出品 版权所有 | 本工具为免费开源工具，请勿倒卖或篡改版权信息</p></div>
         </div>
@@ -379,7 +379,6 @@
     
     function playAudioFromBlob(blob) { const url = URL.createObjectURL(blob); const audioEl = document.getElementById('audio'); audioEl.src = url; audioEl.play().catch(e => console.log("播放失败:", e)); setTimeout(() => URL.revokeObjectURL(url), 5000); }
     
-    // 点击文本直接加载到输入框，无弹窗提示
     function loadTextToInput(content) { 
         document.getElementById("text").value = content; 
         updateCharCount(); 
@@ -429,7 +428,6 @@
         if (sortedDates.length === 0) html = '<div style="text-align:center; color:#94a3b8; padding:20px;">暂无历史记录</div>';
         container.innerHTML = html;
         
-        // 点击文本加载到输入框（无弹窗）
         container.querySelectorAll('.history-text').forEach(el => { 
             el.addEventListener('click', (e) => { 
                 e.stopPropagation(); 
@@ -438,7 +436,6 @@
                 if (item) loadTextToInput(item.content); 
             }); 
         });
-        // 播放按钮
         container.querySelectorAll('.history-play-btn').forEach(btn => { 
             btn.addEventListener('click', (e) => { 
                 e.stopPropagation(); 
@@ -454,7 +451,6 @@
                 } else { alert("无缓存的音频数据，请重新生成。"); } 
             }); 
         });
-        // 下载按钮
         container.querySelectorAll('.history-download-btn').forEach(btn => { 
             btn.addEventListener('click', (e) => { 
                 e.stopPropagation(); 
@@ -540,7 +536,7 @@
     async function downloadAllQRCode() { if (batchQRList.length === 0) { alert("请先批量生成二维码！"); return; } const zip = new JSZip(); for (let i = 0; i < batchQRList.length; i++) { const canvas = document.querySelector(`#batch_qr_${i} canvas`); if (canvas) zip.file(`${batchQRList[i].name}.png`, await new Promise(r => canvas.toBlob(r))); } const blob = await zip.generateAsync({ type: "blob" }); saveAs(blob, `所有节点二维码_${Date.now()}.zip`); document.getElementById("format-tip").innerText = `打包完成，共${batchQRList.length}个二维码`; }
     function clearQRCode() { document.getElementById("qr-content").value = ""; document.getElementById("file-input").value = ""; document.getElementById("qrcode").innerHTML = ""; document.getElementById("format-tip").innerText = ""; document.getElementById("batch-qr-result").style.display = "none"; qrInstance = null; selectedNode = null; nodeList = []; batchQRList = []; renderNodeList(); }
     function readTxtFile(fileInput) { const file = fileInput.files[0]; if (!file || !file.name.endsWith('.txt')) { alert("请上传 .txt 格式文件"); fileInput.value = ""; return; } const reader = new FileReader(); reader.onload = e => { document.getElementById("qr-content").value = e.target.result; parseNodeList(e.target.result); }; reader.readAsText(file, "UTF-8"); }
-    function v2Convert() { const raw = document.getElementById('v2Input').value.trim(); if (!raw) { alert("请输入节点 (格式 IP:端口:账号:密码)"); return; } const lines = raw.split(/\r?\n/).filter(l => l.trim()); const result = []; for (let l of lines) { const parts = l.split(':'); if (parts.length >= 4) { const [ip, port, user, pass] = parts; try { const base = btoa(user + ":" + pass); result.push(`socks://${base}@${ip}:${port}`); } catch(e) { result.push(`# 转换失败: ${l}`); } } else { result.push(`# 格式错误: ${l}`); } } document.getElementById('v2Result').value = result.join('\n'); }
+    function v2Convert() { const raw = document.getElementById('v2Input').value.trim(); if (!raw) { alert("请输入节点 (格式 ip:端口:用户名:密码)"); return; } const lines = raw.split(/\r?\n/).filter(l => l.trim()); const result = []; for (let l of lines) { const parts = l.split(':'); if (parts.length >= 4) { const [ip, port, user, pass] = parts; try { const base = btoa(user + ":" + pass); result.push(`socks://${base}@${ip}:${port}`); } catch(e) { result.push(`# 转换失败: ${l}`); } } else { result.push(`# 格式错误: ${l}`); } } document.getElementById('v2Result').value = result.join('\n'); }
     function v2Copy() { const textarea = document.getElementById('v2Result'); if (!textarea.value.trim() || textarea.value === "转换结果将显示在这里...") { alert("请先转换生成结果"); return; } textarea.select(); document.execCommand('copy'); const tipDiv = document.createElement('div'); tipDiv.innerText = '复制成功'; tipDiv.style.cssText = "position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#10b981; color:white; padding:8px 20px; border-radius:40px; z-index:10000; font-size:14px;"; document.body.appendChild(tipDiv); setTimeout(() => tipDiv.remove(), 1500); }
     
     document.getElementById("generate-selected-btn").onclick = generateSelectedQRCode;
