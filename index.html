@@ -87,6 +87,14 @@
             color: #e83e8c;
             text-decoration: underline;
         }
+        .history-no-audio {
+            font-size: 10px;
+            color: #94a3b8;
+            background: #f1f5f9;
+            padding: 2px 8px;
+            border-radius: 12px;
+            white-space: nowrap;
+        }
         @media (max-width: 768px) {
             .history-item { flex-wrap: wrap; }
             .history-item-buttons { margin-left: auto; }
@@ -296,7 +304,7 @@
                 <div class="tts-textarea-container"><textarea id="text" class="tts-textarea" placeholder="输入要朗读的文字，支持长文本自动换行...&#10;支持导入TXT文件" oninput="autoResizeTextarea(); updateCharCount();"></textarea><div class="tts-char-count" id="charCount">字数：0</div></div>
                 <div class="btn-group"><button id="generateAudioBtn" class="tts-btn-primary">🎙️ 生成音频+自动下载</button><button id="importTxtBtn" class="tts-btn-secondary">📄 导入TXT</button><button id="clearHistoryBtn" class="tts-btn-danger">🗑️ 清空历史</button></div>
                 <input type="file" id="ttsFileInput" accept=".txt" style="display:none"><div id="log"></div><audio id="audio" controls></audio>
-                <div class="history-box"><div class="history-header"><h4>📜 文本历史 (保存7天)</h4><a href="https://elevenlabs.io/app/home" target="_blank" class="history-link">官方链接 II ElevenLabs</a></div><div id="historyList"></div></div>
+                <div class="history-box"><div class="history-header"><h4>📜 文本历史 (保存7天 · 文本上限5000字 · 音频缓存最近3条)</h4><a href="https://elevenlabs.io/app/home" target="_blank" class="history-link">官方链接 II ElevenLabs</a></div><div id="historyList"></div></div>
             </div>
             <div class="red-disclaimer" style="margin-top:20px">本内容/工具仅作个人合法学习、研究及自用，严禁用于任何违反国家法律法规的非法活动。使用者在使用过程中产生的一切行为及法律责任，均由使用者自行承担，与内容/工具提供方无关。</div>
             <div class="footer-declare"><p class="title">【第三方开源组件引用声明】</p><p>本工具开发过程中，引用了以下开源社区的优秀免费组件，相关版权归原作者及开源组织所有，特此致谢：</p><p>1、二维码生成核心：QRCode.js (MIT开源协议) ；2、压缩打包核心：JSZip (MIT开源协议) ；3、文件下载核心：FileSaver.js (MIT开源协议)。</p><p>所有引用的第三方开源组件均遵循其原始开源协议，本工具未对其核心源码做任何侵权修改，仅做合理调用与适配。</p><br><p>© 2026 Gi虾米出品 版权所有 | 本工具为免费开源工具，请勿倒卖或篡改版权信息</p></div>
@@ -374,6 +382,12 @@
     ];
     voiceList = [...BUILTIN_VOICES];
     
+    // 配置常量
+    const MAX_TEXT_LENGTH = 5000;      // 文本最大保存5000字
+    const MAX_AUDIO_CACHE = 3;         // 只保留最近3条的音频Base64
+    const MAX_HISTORY_ITEMS = 200;     // 最多保存200条历史记录（纯文本）
+    const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+    
     function getVoiceNameById(voiceId) { if (!voiceId) return "未知声音"; const found = voiceList.find(v => v.voice_id === voiceId); return found ? found.name : (BUILTIN_VOICES.find(v => v.voice_id === voiceId)?.name || "自定义声音"); }
     function updateVoiceNameDisplay() { const voiceId = document.getElementById('voiceId').value.trim(); const displaySpan = document.getElementById('voiceNameDisplay'); displaySpan.innerHTML = voiceId ? `🎤 当前声音：${getVoiceNameById(voiceId)}` : `⚠️ 请输入声音ID`; displaySpan.style.color = voiceId ? "#e83e8c" : "#f59e0b"; }
     
@@ -385,11 +399,116 @@
         autoResizeTextarea(); 
     }
     
-    function loadTtsHistory() { const all = JSON.parse(localStorage.getItem("tts_history_v2")) || []; const now = Date.now(); const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000; ttsHistory = all.filter(item => now - item.time < SEVEN_DAYS); localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory)); renderTtsHistoryByDate(); }
+    // 截断文本到5000字
+    function truncateText(content) {
+        if (content.length <= MAX_TEXT_LENGTH) return content;
+        return content.substring(0, MAX_TEXT_LENGTH) + "\n\n... [文本已截断，原文超过5000字]";
+    }
     
-    function saveTtsHistory(content, blobData) { if (!content) return; if (blobData) { const reader = new FileReader(); reader.readAsDataURL(blobData); reader.onloadend = function() { ttsHistory.unshift({ content, time: Date.now(), blobBase64: reader.result }); if (ttsHistory.length > 100) ttsHistory = ttsHistory.slice(0, 100); localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory)); renderTtsHistoryByDate(); }; return; } ttsHistory.unshift({ content, time: Date.now(), blobBase64: null }); if (ttsHistory.length > 100) ttsHistory = ttsHistory.slice(0, 100); localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory)); renderTtsHistoryByDate(); }
+    function loadTtsHistory() { 
+        try {
+            const all = JSON.parse(localStorage.getItem("tts_history_v2")) || []; 
+            const now = Date.now();
+            // 只保留7天内的记录
+            ttsHistory = all.filter(item => now - item.time < SEVEN_DAYS);
+            // 限制最多200条
+            if (ttsHistory.length > MAX_HISTORY_ITEMS) {
+                ttsHistory = ttsHistory.slice(0, MAX_HISTORY_ITEMS);
+            }
+            // 确保只有最近3条有音频缓存
+            for (let i = 0; i < ttsHistory.length; i++) {
+                if (i >= MAX_AUDIO_CACHE) {
+                    ttsHistory[i].blobBase64 = null;
+                }
+            }
+            localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
+            renderTtsHistoryByDate();
+        } catch(e) {
+            console.warn("加载历史记录失败:", e);
+            ttsHistory = [];
+            renderTtsHistoryByDate();
+        }
+    }
     
-    async function reDownloadHistory(item) { if (item.blobBase64) { const byteString = atob(item.blobBase64.split(',')[1]); const ab = new ArrayBuffer(byteString.length); const ia = new Uint8Array(ab); for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i); const blob = new Blob([ab], { type: "audio/mpeg" }); const fileName = generateFileName(item.content); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = fileName; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 100); await showModalDialog("✅ 重新下载成功", `文件已保存：${fileName}`); } else { alert("该历史记录没有缓存音频，请重新生成。"); } }
+    function saveTtsHistory(content, blobData) { 
+        if (!content) return;
+        // 截断文本
+        const truncatedContent = truncateText(content);
+        
+        // 检查是否已存在相同内容（最近30天内）
+        const recentExists = ttsHistory.some(x => x.content === content && (Date.now() - x.time) < 30 * 24 * 60 * 60 * 1000);
+        if (recentExists) return;
+        
+        // 创建新记录
+        let newItem = { 
+            content: truncatedContent, 
+            time: Date.now(), 
+            blobBase64: null 
+        };
+        
+        // 如果有音频数据，保存为Base64
+        if (blobData) {
+            const reader = new FileReader();
+            reader.readAsDataURL(blobData);
+            reader.onloadend = function() {
+                newItem.blobBase64 = reader.result;
+                ttsHistory.unshift(newItem);
+                // 清理：只保留最近3条有音频，其余置空
+                cleanupAudioCache();
+                // 限制总条数
+                if (ttsHistory.length > MAX_HISTORY_ITEMS) {
+                    ttsHistory = ttsHistory.slice(0, MAX_HISTORY_ITEMS);
+                }
+                localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
+                renderTtsHistoryByDate();
+            };
+            return;
+        }
+        
+        ttsHistory.unshift(newItem);
+        cleanupAudioCache();
+        if (ttsHistory.length > MAX_HISTORY_ITEMS) {
+            ttsHistory = ttsHistory.slice(0, MAX_HISTORY_ITEMS);
+        }
+        localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
+        renderTtsHistoryByDate();
+    }
+    
+    // 清理音频缓存：只保留最近3条有音频
+    function cleanupAudioCache() {
+        let audioCount = 0;
+        for (let i = 0; i < ttsHistory.length; i++) {
+            if (ttsHistory[i].blobBase64) {
+                audioCount++;
+                if (audioCount > MAX_AUDIO_CACHE) {
+                    ttsHistory[i].blobBase64 = null;
+                }
+            }
+        }
+    }
+    
+    async function reDownloadHistory(item) { 
+        if (item.blobBase64) { 
+            try {
+                const byteString = atob(item.blobBase64.split(',')[1]); 
+                const ab = new ArrayBuffer(byteString.length); 
+                const ia = new Uint8Array(ab); 
+                for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i); 
+                const blob = new Blob([ab], { type: "audio/mpeg" }); 
+                const fileName = generateFileName(item.content); 
+                const a = document.createElement('a'); 
+                a.href = URL.createObjectURL(blob); 
+                a.download = fileName; 
+                a.click(); 
+                setTimeout(() => URL.revokeObjectURL(a.href), 100); 
+                await showModalDialog("✅ 重新下载成功", `文件已保存：${fileName}`); 
+            } catch(e) {
+                alert("音频数据已损坏，请重新生成。");
+            }
+        } else { 
+            alert("该历史记录的音频缓存已过期（仅保留最近3条），请重新生成。"); 
+        } 
+    }
     
     function renderTtsHistoryByDate() {
         const container = document.getElementById("historyList");
@@ -415,11 +534,14 @@
             html += `<div class="history-date-group"><div class="history-date-header">📅 ${group.displayDate} <span>(${group.items.length}条)</span></div>`;
             group.items.forEach(item => {
                 const displayText = item.content.length > 35 ? item.content.substring(0, 35) + "..." : item.content;
+                const hasAudio = item.blobBase64 ? true : false;
+                const audioTag = hasAudio ? '' : '<span class="history-no-audio">📁 仅文本</span>';
                 html += `<div class="history-item" data-time="${item.time}">
                             <span class="history-text" title="${escapeHtml(item.content)}">${escapeHtml(displayText)}</span>
                             <div class="history-item-buttons">
-                                <button class="history-play-btn" data-time="${item.time}">▶ 播放</button>
-                                <button class="history-download-btn" data-time="${item.time}">⬇ 下载</button>
+                                <button class="history-play-btn" data-time="${item.time}" ${hasAudio ? '' : 'disabled style="opacity:0.5;cursor:not-allowed;"'}>▶ 播放</button>
+                                <button class="history-download-btn" data-time="${item.time}" ${hasAudio ? '' : 'disabled style="opacity:0.5;cursor:not-allowed;"'}>⬇ 下载</button>
+                                ${audioTag}
                             </div>
                          </div>`;
             });
@@ -428,6 +550,7 @@
         if (sortedDates.length === 0) html = '<div style="text-align:center; color:#94a3b8; padding:20px;">暂无历史记录</div>';
         container.innerHTML = html;
         
+        // 点击文本加载到输入框
         container.querySelectorAll('.history-text').forEach(el => { 
             el.addEventListener('click', (e) => { 
                 e.stopPropagation(); 
@@ -436,22 +559,30 @@
                 if (item) loadTextToInput(item.content); 
             }); 
         });
-        container.querySelectorAll('.history-play-btn').forEach(btn => { 
+        // 播放按钮
+        container.querySelectorAll('.history-play-btn:not([disabled])').forEach(btn => { 
             btn.addEventListener('click', (e) => { 
                 e.stopPropagation(); 
                 const time = parseInt(btn.getAttribute('data-time')); 
                 const item = ttsHistory.find(i => i.time === time); 
                 if (item && item.blobBase64) { 
-                    const byteString = atob(item.blobBase64.split(',')[1]); 
-                    const ab = new ArrayBuffer(byteString.length); 
-                    const ia = new Uint8Array(ab); 
-                    for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i); 
-                    const blob = new Blob([ab], { type: "audio/mpeg" }); 
-                    playAudioFromBlob(blob); 
-                } else { alert("无缓存的音频数据，请重新生成。"); } 
+                    try {
+                        const byteString = atob(item.blobBase64.split(',')[1]); 
+                        const ab = new ArrayBuffer(byteString.length); 
+                        const ia = new Uint8Array(ab); 
+                        for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i); 
+                        const blob = new Blob([ab], { type: "audio/mpeg" }); 
+                        playAudioFromBlob(blob); 
+                    } catch(e) {
+                        alert("音频数据已损坏，请重新生成。");
+                    }
+                } else { 
+                    alert("该历史记录的音频缓存已过期（仅保留最近3条），请重新生成。"); 
+                } 
             }); 
         });
-        container.querySelectorAll('.history-download-btn').forEach(btn => { 
+        // 下载按钮
+        container.querySelectorAll('.history-download-btn:not([disabled])').forEach(btn => { 
             btn.addEventListener('click', (e) => { 
                 e.stopPropagation(); 
                 const time = parseInt(btn.getAttribute('data-time')); 
@@ -472,11 +603,18 @@
     async function startGenerate() {
         const key = document.getElementById("apiKey").value.trim();
         const vid = document.getElementById("voiceId").value.trim();
-        const txt = document.getElementById("text").value.trim();
+        let txt = document.getElementById("text").value.trim();
         const log = document.getElementById("log");
         if (!key) { log.innerText = "❌ 请输入API Key"; return; }
         if (!vid) { log.innerText = "❌ 请输入声音ID"; return; }
         if (!txt) { log.innerText = "❌ 请输入要转换的文字"; return; }
+        
+        // 如果文本超过5000字，提示用户
+        if (txt.length > MAX_TEXT_LENGTH) {
+            const confirmMsg = `文本长度 ${txt.length} 字，超过保存上限 ${MAX_TEXT_LENGTH} 字。\n\n历史记录中将截断保存，但生成的音频不受影响。\n是否继续？`;
+            if (!confirm(confirmMsg)) return;
+        }
+        
         saveApiHistory(key);
         log.innerText = "🔄 正在生成音频，请稍候...";
         try {
@@ -500,9 +638,10 @@
             a.click();
             document.body.removeChild(a);
             setTimeout(() => { URL.revokeObjectURL(downloadUrl); URL.revokeObjectURL(audioUrl); }, 1000);
-            const reader = new FileReader();
-            reader.readAsDataURL(blob);
-            reader.onloadend = function() { saveTtsHistory(txt, blob); };
+            
+            // 保存到历史记录（自动截断文本）
+            saveTtsHistory(txt, blob);
+            
             log.innerText = "✅ 生成成功！音频已自动播放并下载";
             await showModalDialog("✅ 下载成功", `文件已保存：${fileName}\n\n文件命名规则：文本第一行_日期时间.mp3`);
             setTimeout(() => fetchQuotaOnly(key), 1000);
