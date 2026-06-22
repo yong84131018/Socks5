@@ -95,10 +95,88 @@
             border-radius: 12px;
             white-space: nowrap;
         }
+        /* 文本域展开/收起 */
+        .tts-textarea-wrapper {
+            position: relative;
+            width: 100%;
+            margin: 10px 0;
+        }
+        .tts-textarea {
+            width: 100%;
+            min-height: 120px;
+            max-height: 360px;
+            padding: 14px;
+            font-size: 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            background: #fff;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            line-height: 1.5;
+            transition: .2s;
+            overflow-y: auto;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            word-break: break-all;
+            resize: vertical;
+        }
+        .tts-textarea:focus {
+            border-color: #e83e8c;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(232,62,140,0.1);
+        }
+        .tts-textarea.expanded {
+            max-height: none;
+            min-height: 400px;
+        }
+        .tts-char-count {
+            position: absolute;
+            bottom: 12px;
+            right: 14px;
+            font-size: 12px;
+            color: #94a3b8;
+            background: rgba(255,255,255,0.9);
+            padding: 2px 8px;
+            border-radius: 20px;
+            pointer-events: none;
+        }
+        .tts-expand-btn {
+            position: absolute;
+            bottom: 12px;
+            left: 14px;
+            font-size: 12px;
+            color: #4f46e5;
+            background: rgba(255,255,255,0.95);
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            padding: 2px 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            pointer-events: auto;
+        }
+        .tts-expand-btn:hover {
+            background: #eef2ff;
+            border-color: #4f46e5;
+        }
+        .tts-textarea-container {
+            position: relative;
+            width: 100%;
+            margin: 10px 0;
+        }
+        /* 按钮组内复制按钮 */
+        .btn-copy-text {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: #fff;
+        }
+        .btn-copy-text:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(139,92,246,0.35);
+        }
         @media (max-width: 768px) {
             .history-item { flex-wrap: wrap; }
             .history-item-buttons { margin-left: auto; }
             .history-play-btn, .history-download-btn { padding: 4px 8px; font-size: 10px; }
+            .tts-textarea { min-height: 100px; max-height: 260px; }
         }
     </style>
 </head>
@@ -231,10 +309,72 @@
         .history-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px}
         .history-link{font-size:13px;color:#e83e8c;text-decoration:none}
         .history-link:hover{text-decoration:underline}
-        .tts-textarea-container{position:relative;width:100%;margin:10px 0}
-        .tts-textarea{width:100%;min-height:120px;padding:14px;font-size:15px;border:1px solid #cbd5e1;border-radius:20px;background:#fff;box-sizing:border-box;font-family:"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.5;transition:.2s;overflow:hidden;resize:none;word-wrap:break-word;white-space:pre-wrap;word-break:break-all}
-        .tts-textarea:focus{border-color:#e83e8c;outline:none;box-shadow:0 0 0 3px rgba(232,62,140,0.1)}
-        .tts-char-count{position:absolute;bottom:12px;right:14px;font-size:12px;color:#94a3b8;background:rgba(255,255,255,0.9);padding:2px 8px;border-radius:20px;pointer-events:none}
+        .tts-textarea-container {
+            position: relative;
+            width: 100%;
+            margin: 10px 0;
+        }
+        .tts-textarea {
+            width: 100%;
+            min-height: 120px;
+            max-height: 360px;
+            padding: 14px;
+            font-size: 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            background: #fff;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            line-height: 1.5;
+            transition: .2s;
+            overflow-y: auto;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            word-break: break-all;
+            resize: vertical;
+        }
+        .tts-textarea:focus {
+            border-color: #e83e8c;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(232,62,140,0.1);
+        }
+        .tts-textarea.expanded {
+            max-height: none;
+            min-height: 400px;
+        }
+        .tts-char-count {
+            position: absolute;
+            bottom: 12px;
+            right: 14px;
+            font-size: 12px;
+            color: #94a3b8;
+            background: rgba(255,255,255,0.9);
+            padding: 2px 8px;
+            border-radius: 20px;
+            pointer-events: none;
+        }
+        .tts-expand-btn {
+            position: absolute;
+            bottom: 12px;
+            left: 14px;
+            font-size: 12px;
+            color: #4f46e5;
+            background: rgba(255,255,255,0.95);
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            padding: 2px 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            pointer-events: auto;
+            display: none;
+        }
+        .tts-expand-btn:hover {
+            background: #eef2ff;
+            border-color: #4f46e5;
+        }
+        .tts-expand-btn.visible {
+            display: block;
+        }
         #log{color:#e83e8c;margin:10px 0;font-size:14px;text-align:center}
         #audio{width:100%;margin-top:10px;border-radius:40px}
         .tts-btn-primary{background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff;box-shadow:0 2px 8px rgba(13,148,136,0.3)}
@@ -243,6 +383,8 @@
         .tts-btn-secondary:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(79,70,229,0.35)}
         .tts-btn-danger{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff}
         .tts-btn-danger:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(245,158,11,0.35)}
+        .btn-copy-text{background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff}
+        .btn-copy-text:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(139,92,246,0.35)}
         .switch-tool-btn{background:#475569;color:#fff;border-radius:40px;padding:10px 20px;font-weight:600;margin-bottom:18px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
         .switch-tool-btn:hover{background:#334155;transform:scale(0.98)}
         .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(3px);z-index:10001;display:flex;align-items:center;justify-content:center}
@@ -263,6 +405,7 @@
             .quota-card{flex-direction:column;align-items:stretch;text-align:center}
             .right-link-wrap{right:-160px;width:145px}
             .link-item-btn,.contact-link-btn{padding:18px 12px;font-size:14px}
+            .tts-textarea{min-height:100px;max-height:260px}
         }
     </style>
 </head>
@@ -301,8 +444,17 @@
                 <div class="param-item"><div class="param-label">Similarity</div><div class="param-desc">Low</div><input type="range" id="similarity" min="0" max="1" step="0.01" value="0.75" class="param-slider"><div class="param-value" id="similarityVal">75%</div></div>
                 <div class="param-item"><div class="param-label">Style Exaggeration</div><div class="param-desc">None</div><input type="range" id="style" min="0" max="1" step="0.01" value="0" class="param-slider"><div class="param-value" id="styleVal">0</div></div>
                 <hr style="margin:15px 0">
-                <div class="tts-textarea-container"><textarea id="text" class="tts-textarea" placeholder="输入要朗读的文字，支持长文本自动换行...&#10;支持导入TXT文件" oninput="autoResizeTextarea(); updateCharCount();"></textarea><div class="tts-char-count" id="charCount">字数：0</div></div>
-                <div class="btn-group"><button id="generateAudioBtn" class="tts-btn-primary">🎙️ 生成音频+自动下载</button><button id="importTxtBtn" class="tts-btn-secondary">📄 导入TXT</button><button id="clearHistoryBtn" class="tts-btn-danger">🗑️ 清空历史</button></div>
+                <div class="tts-textarea-container">
+                    <textarea id="text" class="tts-textarea" placeholder="输入要朗读的文字，支持长文本自动换行...&#10;支持导入TXT文件" oninput="updateCharCount(); autoResizeTextarea(); checkExpandButton();"></textarea>
+                    <button class="tts-expand-btn" id="expandBtn" onclick="toggleExpand()">展开 ▼</button>
+                    <div class="tts-char-count" id="charCount">字数：0</div>
+                </div>
+                <div class="btn-group">
+                    <button id="generateAudioBtn" class="tts-btn-primary">🎙️ 生成音频+自动下载</button>
+                    <button id="copyTextBtn" class="btn-copy-text">📋 复制文本</button>
+                    <button id="importTxtBtn" class="tts-btn-secondary">📄 导入TXT</button>
+                    <button id="clearHistoryBtn" class="tts-btn-danger">🗑️ 清空历史</button>
+                </div>
                 <input type="file" id="ttsFileInput" accept=".txt" style="display:none"><div id="log"></div><audio id="audio" controls></audio>
                 <div class="history-box"><div class="history-header"><h4>📜 文本历史 (保存7天 · 文本上限5000字 · 音频缓存最近3条)</h4><a href="https://elevenlabs.io/app/home" target="_blank" class="history-link">官方链接 II ElevenLabs</a></div><div id="historyList"></div></div>
             </div>
@@ -369,6 +521,29 @@
         return errorText.length > 100 ? "生成失败：" + errorText.substring(0, 100) + "..." : "生成失败：" + errorText;
     }
     
+    // ==================== 预计等待时间计算 ====================
+    function estimateWaitTime(text) {
+        // 统计中文字符数（中文占比较多）
+        const chineseChars = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
+        const otherChars = text.length - chineseChars;
+        // 中文约0.5秒/字，英文约0.3秒/字，API生成速度约12-15倍速
+        // 等待时间 ≈ (中文*0.5 + 英文*0.3) / 13
+        const audioSeconds = chineseChars * 0.5 + otherChars * 0.3;
+        const waitSeconds = Math.round(audioSeconds / 13);
+        return Math.max(5, waitSeconds); // 最少5秒
+    }
+    
+    function formatWaitTime(seconds) {
+        if (seconds < 60) {
+            return seconds + "秒";
+        } else {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            if (secs === 0) return mins + "分钟";
+            return mins + "分" + secs + "秒";
+        }
+    }
+    
     let ttsHistory = [];
     let voiceList = [];
     const BUILTIN_VOICES = [
@@ -397,9 +572,13 @@
         document.getElementById("text").value = content; 
         updateCharCount(); 
         autoResizeTextarea(); 
+        checkExpandButton();
+        // 滚动到底部
+        const ta = document.getElementById("text");
+        ta.scrollTop = ta.scrollHeight;
     }
     
-    // 截断文本到5000字
+    // 截断文本到5000字（无弹窗）
     function truncateText(content) {
         if (content.length <= MAX_TEXT_LENGTH) return content;
         return content.substring(0, MAX_TEXT_LENGTH) + "\n\n... [文本已截断，原文超过5000字]";
@@ -409,13 +588,10 @@
         try {
             const all = JSON.parse(localStorage.getItem("tts_history_v2")) || []; 
             const now = Date.now();
-            // 只保留7天内的记录
             ttsHistory = all.filter(item => now - item.time < SEVEN_DAYS);
-            // 限制最多200条
             if (ttsHistory.length > MAX_HISTORY_ITEMS) {
                 ttsHistory = ttsHistory.slice(0, MAX_HISTORY_ITEMS);
             }
-            // 确保只有最近3条有音频缓存
             for (let i = 0; i < ttsHistory.length; i++) {
                 if (i >= MAX_AUDIO_CACHE) {
                     ttsHistory[i].blobBase64 = null;
@@ -432,30 +608,24 @@
     
     function saveTtsHistory(content, blobData) { 
         if (!content) return;
-        // 截断文本
         const truncatedContent = truncateText(content);
         
-        // 检查是否已存在相同内容（最近30天内）
         const recentExists = ttsHistory.some(x => x.content === content && (Date.now() - x.time) < 30 * 24 * 60 * 60 * 1000);
         if (recentExists) return;
         
-        // 创建新记录
         let newItem = { 
             content: truncatedContent, 
             time: Date.now(), 
             blobBase64: null 
         };
         
-        // 如果有音频数据，保存为Base64
         if (blobData) {
             const reader = new FileReader();
             reader.readAsDataURL(blobData);
             reader.onloadend = function() {
                 newItem.blobBase64 = reader.result;
                 ttsHistory.unshift(newItem);
-                // 清理：只保留最近3条有音频，其余置空
                 cleanupAudioCache();
-                // 限制总条数
                 if (ttsHistory.length > MAX_HISTORY_ITEMS) {
                     ttsHistory = ttsHistory.slice(0, MAX_HISTORY_ITEMS);
                 }
@@ -474,7 +644,6 @@
         renderTtsHistoryByDate();
     }
     
-    // 清理音频缓存：只保留最近3条有音频
     function cleanupAudioCache() {
         let audioCount = 0;
         for (let i = 0; i < ttsHistory.length; i++) {
@@ -550,7 +719,6 @@
         if (sortedDates.length === 0) html = '<div style="text-align:center; color:#94a3b8; padding:20px;">暂无历史记录</div>';
         container.innerHTML = html;
         
-        // 点击文本加载到输入框
         container.querySelectorAll('.history-text').forEach(el => { 
             el.addEventListener('click', (e) => { 
                 e.stopPropagation(); 
@@ -559,7 +727,6 @@
                 if (item) loadTextToInput(item.content); 
             }); 
         });
-        // 播放按钮
         container.querySelectorAll('.history-play-btn:not([disabled])').forEach(btn => { 
             btn.addEventListener('click', (e) => { 
                 e.stopPropagation(); 
@@ -581,7 +748,6 @@
                 } 
             }); 
         });
-        // 下载按钮
         container.querySelectorAll('.history-download-btn:not([disabled])').forEach(btn => { 
             btn.addEventListener('click', (e) => { 
                 e.stopPropagation(); 
@@ -600,6 +766,58 @@
     async function fetchQuotaOnly(apiKey) { if (!apiKey) return; try { const res = await fetch("https://api.elevenlabs.io/v1/user", { method: "GET", headers: { "xi-api-key": apiKey } }); const quotaCard = document.getElementById('quotaCard'); const quotaAmountSpan = document.getElementById('quotaAmount'); if (res.ok) { const data = await res.json(); if (data.subscription) { const remaining = Math.max(0, (data.subscription.character_limit || 0) - (data.subscription.character_count || 0)); quotaAmountSpan.innerText = remaining.toLocaleString(); quotaCard.style.display = 'flex'; if (remaining < 10000) quotaCard.classList.add('quota-warning'); else quotaCard.classList.remove('quota-warning'); } } else if (res.status === 401) quotaCard.style.display = 'none'; } catch(e) { console.warn(e); } }
     function autoFetchQuota(apiKey) { if (autoQuotaTimer) clearTimeout(autoQuotaTimer); autoQuotaTimer = setTimeout(() => { if (apiKey && apiKey.length > 10) fetchQuotaOnly(apiKey); }, 800); }
     
+    // ==================== 展开/收起功能 ====================
+    function checkExpandButton() {
+        const ta = document.getElementById('text');
+        const btn = document.getElementById('expandBtn');
+        // 当行数超过10行（约240px高度）时显示按钮
+        const lineHeight = parseInt(getComputedStyle(ta).lineHeight) || 24;
+        const minExpandHeight = lineHeight * 10 + 20;
+        if (ta.scrollHeight > minExpandHeight && !ta.classList.contains('expanded')) {
+            btn.classList.add('visible');
+        } else {
+            btn.classList.remove('visible');
+        }
+    }
+    
+    function toggleExpand() {
+        const ta = document.getElementById('text');
+        const btn = document.getElementById('expandBtn');
+        ta.classList.toggle('expanded');
+        if (ta.classList.contains('expanded')) {
+            btn.textContent = '收起 ▲';
+            ta.style.maxHeight = 'none';
+            ta.scrollTop = ta.scrollHeight;
+        } else {
+            btn.textContent = '展开 ▼';
+            ta.style.maxHeight = '360px';
+            ta.scrollTop = 0;
+        }
+        // 重新计算按钮显示状态
+        setTimeout(() => checkExpandButton(), 100);
+    }
+    
+    // ==================== 复制文本功能 ====================
+    function copyTextContent() {
+        const text = document.getElementById('text').value;
+        if (!text.trim()) {
+            document.getElementById('log').innerText = "⚠️ 文本为空，无法复制";
+            setTimeout(() => { if (document.getElementById('log').innerText.includes("无法复制")) document.getElementById('log').innerText = ""; }, 2000);
+            return;
+        }
+        navigator.clipboard.writeText(text).then(() => {
+            document.getElementById('log').innerText = "✅ 文本已复制到剪贴板";
+            setTimeout(() => { if (document.getElementById('log').innerText.includes("复制到剪贴板")) document.getElementById('log').innerText = ""; }, 2000);
+        }).catch(() => {
+            // fallback
+            const ta = document.getElementById('text');
+            ta.select();
+            document.execCommand('copy');
+            document.getElementById('log').innerText = "✅ 文本已复制到剪贴板";
+            setTimeout(() => { if (document.getElementById('log').innerText.includes("复制到剪贴板")) document.getElementById('log').innerText = ""; }, 2000);
+        });
+    }
+    
     async function startGenerate() {
         const key = document.getElementById("apiKey").value.trim();
         const vid = document.getElementById("voiceId").value.trim();
@@ -609,14 +827,15 @@
         if (!vid) { log.innerText = "❌ 请输入声音ID"; return; }
         if (!txt) { log.innerText = "❌ 请输入要转换的文字"; return; }
         
-        // 如果文本超过5000字，提示用户
-        if (txt.length > MAX_TEXT_LENGTH) {
-            const confirmMsg = `文本长度 ${txt.length} 字，超过保存上限 ${MAX_TEXT_LENGTH} 字。\n\n历史记录中将截断保存，但生成的音频不受影响。\n是否继续？`;
-            if (!confirm(confirmMsg)) return;
-        }
+        // 计算预计等待时间
+        const waitSeconds = estimateWaitTime(txt);
+        const waitText = formatWaitTime(waitSeconds);
+        const charCount = txt.length;
+        log.innerText = `🔄 正在生成音频，预计等待约 ${waitText} (当前 ${charCount} 字)...`;
         
         saveApiHistory(key);
-        log.innerText = "🔄 正在生成音频，请稍候...";
+        const startTime = Date.now();
+        
         try {
             const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${vid}`, {
                 method: "POST", headers: { "xi-api-key": key, "Content-Type": "application/json" },
@@ -624,6 +843,7 @@
             });
             if (!res.ok) { let errorMsg = ""; try { const errorData = await res.json(); errorMsg = errorData.detail?.message || errorData.detail || JSON.stringify(errorData); } catch(e) { errorMsg = await res.text(); } throw new Error(errorMsg); }
             const buf = await res.arrayBuffer();
+            const elapsed = Math.round((Date.now() - startTime) / 1000);
             const blob = new Blob([buf], { type: "audio/mpeg" });
             const audioUrl = URL.createObjectURL(blob);
             document.getElementById("audio").src = audioUrl;
@@ -639,17 +859,30 @@
             document.body.removeChild(a);
             setTimeout(() => { URL.revokeObjectURL(downloadUrl); URL.revokeObjectURL(audioUrl); }, 1000);
             
-            // 保存到历史记录（自动截断文本）
             saveTtsHistory(txt, blob);
             
-            log.innerText = "✅ 生成成功！音频已自动播放并下载";
+            log.innerText = `✅ 生成成功！耗时 ${elapsed} 秒，音频已自动播放并下载`;
             await showModalDialog("✅ 下载成功", `文件已保存：${fileName}\n\n文件命名规则：文本第一行_日期时间.mp3`);
             setTimeout(() => fetchQuotaOnly(key), 1000);
         } catch (error) { const chineseMsg = translateErrorMessage(error.message); log.innerText = `❌ ${chineseMsg}`; console.error(error); }
     }
     
-    function autoResizeTextarea() { const ta = document.getElementById('text'); if (ta) { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; } }
-    function updateCharCount() { const text = document.getElementById('text').value; document.getElementById('charCount').textContent = `字数：${text.length}`; autoResizeTextarea(); }
+    function autoResizeTextarea() { 
+        const ta = document.getElementById('text'); 
+        if (ta) { 
+            ta.style.height = 'auto'; 
+            ta.style.height = ta.scrollHeight + 'px'; 
+        } 
+        checkExpandButton();
+    }
+    function updateCharCount() { 
+        const text = document.getElementById('text').value; 
+        document.getElementById('charCount').textContent = `字数：${text.length}`; 
+        autoResizeTextarea(); 
+        // 自动滚动到底部
+        const ta = document.getElementById('text');
+        if (ta) ta.scrollTop = ta.scrollHeight;
+    }
     function formatTime(timestamp) { const d = new Date(timestamp); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
     
     function loadApiHistory() { let list = JSON.parse(localStorage.getItem("api_key_history")) || []; localStorage.setItem("api_key_history", JSON.stringify(list)); const groups = {}; list.forEach(item => { const date = new Date(item.time); const dateKey = formatDateKey(date); if (!groups[dateKey]) groups[dateKey] = { date, items: [] }; groups[dateKey].items.push(item); }); const apiSelect = document.getElementById("apiHistorySelect"); const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a)); apiSelect.innerHTML = '<option value="">📅 历史记录</option>'; sortedDates.forEach(dateKey => { const group = groups[dateKey]; const daysAgoText = getDaysAgo(group.date); const optgroup = document.createElement("optgroup"); optgroup.label = `📅 ${dateKey} (${daysAgoText})`; group.items.forEach(item => { const option = document.createElement("option"); option.value = item.key; option.textContent = `${item.key.substring(0, 12)}...  ${formatTime(item.time)}`; optgroup.appendChild(option); }); apiSelect.appendChild(optgroup); }); }
@@ -657,7 +890,7 @@
     function saveApiHistory(key) { if (!key) return; let list = JSON.parse(localStorage.getItem("api_key_history")) || []; list = list.filter(i => i.key !== key); list.unshift({ key, time: Date.now() }); if (list.length > 200) list = list.slice(0, 200); localStorage.setItem("api_key_history", JSON.stringify(list)); loadApiHistory(); }
     function onApiKeyInput() { autoFetchQuota(document.getElementById("apiKey").value.trim()); }
     function updateSlider(slider) { const v = parseFloat(slider.value); const el = document.getElementById(slider.id+"Val"); if (slider.id === "stability" || slider.id === "similarity") el.innerText = Math.round(v*100)+"%"; else if (slider.id === "speed") el.innerText = v.toFixed(1); else el.innerText = v; }
-    function loadTtsTxtFile(e) { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = ev => { document.getElementById("text").value = ev.target.result; updateCharCount(); autoResizeTextarea(); document.getElementById("log").innerText = "✅ 文件已导入"; setTimeout(() => { if (document.getElementById("log").innerText === "✅ 文件已导入") document.getElementById("log").innerText = ""; }, 3000); }; r.readAsText(f, "UTF-8"); e.target.value = ""; }
+    function loadTtsTxtFile(e) { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = ev => { document.getElementById("text").value = ev.target.result; updateCharCount(); autoResizeTextarea(); checkExpandButton(); document.getElementById("log").innerText = "✅ 文件已导入"; setTimeout(() => { if (document.getElementById("log").innerText === "✅ 文件已导入") document.getElementById("log").innerText = ""; }, 3000); }; r.readAsText(f, "UTF-8"); e.target.value = ""; }
     async function fetchApiInfo() { const apiKey = document.getElementById('apiKey').value.trim(); if (!apiKey) { document.getElementById("log").innerText = "❌ 请先输入API Key"; return; } document.getElementById("log").innerText = "🔄 正在获取API信息..."; try { const userRes = await fetch("https://api.elevenlabs.io/v1/user", { method: "GET", headers: { "xi-api-key": apiKey } }); if (userRes.ok) { const data = await userRes.json(); if (data.subscription) { const remaining = Math.max(0, (data.subscription.character_limit || 0) - (data.subscription.character_count || 0)); document.getElementById("quotaAmount").innerText = remaining.toLocaleString(); document.getElementById("quotaCard").style.display = 'flex'; if (remaining < 10000) document.getElementById("quotaCard").classList.add('quota-warning'); else document.getElementById("quotaCard").classList.remove('quota-warning'); } } else if (userRes.status === 401) { document.getElementById("log").innerText = "❌ API Key 无效或已过期"; document.getElementById("quotaCard").style.display = 'none'; setTimeout(() => { if (document.getElementById("log").innerText.includes("无效")) document.getElementById("log").innerText = ""; }, 3000); return; } const voicesRes = await fetch("https://api.elevenlabs.io/v1/voices", { method: "GET", headers: { "xi-api-key": apiKey } }); if (voicesRes.ok) { const voicesData = await voicesRes.json(); if (voicesData.voices) { voiceList = voicesData.voices.map(v => ({ voice_id: v.voice_id, name: v.name })); sessionStorage.setItem('elevenlabs_voices', JSON.stringify(voiceList)); } } else { voiceList = [...BUILTIN_VOICES]; } updateVoiceNameDisplay(); document.getElementById("log").innerText = "✅ 获取成功！已更新额度和声音库"; saveApiHistory(apiKey); setTimeout(() => { if (document.getElementById("log").innerText.includes("获取成功")) document.getElementById("log").innerText = ""; }, 4000); } catch(e) { voiceList = [...BUILTIN_VOICES]; updateVoiceNameDisplay(); document.getElementById("log").innerText = "⚠️ 使用内置声音库"; } }
     
     // 二维码/V2Ray 逻辑 (精简保留)
@@ -688,6 +921,7 @@
     document.getElementById('v2ConvertBtn').addEventListener('click', v2Convert);
     document.getElementById('v2CopyBtn').addEventListener('click', v2Copy);
     document.getElementById('generateAudioBtn').addEventListener('click', startGenerate);
+    document.getElementById('copyTextBtn').addEventListener('click', copyTextContent);
     document.getElementById('importTxtBtn').addEventListener('click', () => document.getElementById('ttsFileInput').click());
     document.getElementById('clearHistoryBtn').addEventListener('click', clearTtsHistory);
     document.getElementById('ttsFileInput').addEventListener('change', loadTtsTxtFile);
@@ -703,11 +937,17 @@
     loadTtsHistory();
     updateCharCount();
     updateVoiceNameDisplay();
-    setTimeout(autoResizeTextarea, 100);
+    setTimeout(() => {
+        autoResizeTextarea();
+        checkExpandButton();
+    }, 100);
+    
+    // 监听窗口变化重新检查展开按钮
+    window.addEventListener('resize', checkExpandButton);
     
     const qrPanel = document.getElementById('qrToolPanel'), v2Panel = document.getElementById('v2rayToolPanel'), ttsPanel = document.getElementById('ttsToolPanel');
     document.getElementById('switchToV2Btn').addEventListener('click', () => { qrPanel.classList.add('hidden-panel'); v2Panel.classList.remove('hidden-panel'); ttsPanel.classList.add('hidden-panel'); });
-    document.getElementById('switchToTtsBtn').addEventListener('click', () => { qrPanel.classList.add('hidden-panel'); v2Panel.classList.add('hidden-panel'); ttsPanel.classList.remove('hidden-panel'); setTimeout(autoResizeTextarea, 50); });
+    document.getElementById('switchToTtsBtn').addEventListener('click', () => { qrPanel.classList.add('hidden-panel'); v2Panel.classList.add('hidden-panel'); ttsPanel.classList.remove('hidden-panel'); setTimeout(() => { autoResizeTextarea(); checkExpandButton(); }, 50); });
     document.getElementById('backToQrBtn').addEventListener('click', () => { v2Panel.classList.add('hidden-panel'); ttsPanel.classList.add('hidden-panel'); qrPanel.classList.remove('hidden-panel'); });
     document.getElementById('backToQrFromTtsBtn').addEventListener('click', () => { ttsPanel.classList.add('hidden-panel'); v2Panel.classList.add('hidden-panel'); qrPanel.classList.remove('hidden-panel'); });
     
