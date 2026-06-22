@@ -30,7 +30,8 @@
             gap: 8px;
             flex-shrink: 0;
         }
-        .history-play-btn, .history-download-btn {
+        .history-play-btn,
+        .history-download-btn {
             border: none;
             border-radius: 20px;
             padding: 4px 12px;
@@ -95,255 +96,774 @@
             border-radius: 12px;
             white-space: nowrap;
         }
-        /* 文本域展开/收起 */
-        .tts-textarea-wrapper {
-            position: relative;
-            width: 100%;
-            margin: 10px 0;
-        }
-        .tts-textarea {
-            width: 100%;
-            min-height: 120px;
-            max-height: 360px;
-            padding: 14px;
-            padding-bottom: 48px;
-            font-size: 15px;
-            border: 1px solid #cbd5e1;
-            border-radius: 20px;
-            background: #fff;
-            box-sizing: border-box;
-            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-            line-height: 1.5;
-            transition: .2s;
-            overflow-y: auto;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-            word-break: break-all;
-            resize: vertical;
-        }
-        .tts-textarea:focus {
-            border-color: #e83e8c;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(232,62,140,0.1);
-        }
-        .tts-textarea.expanded {
-            max-height: none;
-            min-height: 400px;
-        }
-        .tts-char-count {
-            position: absolute;
-            bottom: 12px;
-            right: 14px;
-            font-size: 12px;
-            color: #94a3b8;
-            background: rgba(255,255,255,0.9);
-            padding: 2px 8px;
-            border-radius: 20px;
-            pointer-events: none;
-        }
-        .tts-expand-btn {
-            position: absolute;
-            bottom: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 20px;
-            line-height: 1.1;
-            color: #4f46e5;
-            background: rgba(255,255,255,0.95);
-            border: 2px solid #cbd5e1;
-            border-radius: 40px;
-            padding: 2px 28px;
-            cursor: pointer;
-            transition: all 0.25s;
-            pointer-events: auto;
-            display: none;
-            font-weight: 400;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            width: auto;
-            min-width: 70px;
-            text-align: center;
-            user-select: none;
-        }
-        .tts-expand-btn:hover {
-            background: #eef2ff;
-            border-color: #4f46e5;
-            box-shadow: 0 4px 12px rgba(79,70,229,0.2);
-            transform: translateX(-50%) scale(1.05);
-        }
-        .tts-expand-btn.visible {
-            display: block;
-        }
-        .tts-textarea-container {
-            position: relative;
-            width: 100%;
-            margin: 10px 0;
-        }
-        /* 按钮组内复制按钮 */
-        .btn-copy-text {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-            color: #fff;
-        }
-        .btn-copy-text:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(139,92,246,0.35);
-        }
-        .btn-clear-input {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: #fff;
-        }
-        .btn-clear-input:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(239,68,68,0.35);
-        }
         @media (max-width: 768px) {
             .history-item { flex-wrap: wrap; }
             .history-item-buttons { margin-left: auto; }
-            .history-play-btn, .history-download-btn { padding: 4px 8px; font-size: 10px; }
-            .tts-textarea { min-height: 100px; max-height: 260px; padding-bottom: 48px; }
-            .tts-expand-btn { font-size: 18px; padding: 2px 20px; min-width: 56px; }
+            .history-play-btn,
+            .history-download-btn { padding: 4px 8px; font-size: 10px; }
         }
     </style>
 </head>
 <body>
-<script>
-    // ==================== 最顶层的域名校验（立即执行，彻底拦截） ====================
-    (function() {
-        var protocol = window.location.protocol;
-        var host = window.location.hostname;
-        var ALLOWED_DOMAINS = ['ciuok.com', 'www.ciuok.com'];
-        if (protocol === 'file:') {
-            document.documentElement.innerHTML = '';
-            document.write('<div class="block-page"><div class="block-card"><div class="emoji">🔒</div><h1>未经授权</h1><p>此工具无法在本地运行，请通过官方域名访问。</p><p style="font-size:12px; color:#666;">' + window.location.href + '</p></div></div>');
-            throw new Error("Access Denied: File protocol.");
-        }
-        var isAllowed = false;
-        for (var i = 0; i < ALLOWED_DOMAINS.length; i++) {
-            if (host === ALLOWED_DOMAINS[i]) { isAllowed = true; break; }
-        }
-        if (host === 'localhost' || host === '127.0.0.1') { isAllowed = true; }
-        if (!isAllowed) {
-            document.documentElement.innerHTML = '';
-            document.write('<div class="block-page"><div class="block-card"><div class="emoji">🔒</div><h1>未经授权</h1><p>本工具仅授权在 <strong style="color:#e94560;">ciuok.com</strong> 使用</p><p style="font-size:12px; color:#666;">当前域名：' + host + '</p><p style="font-size:12px; color:#666;">请通过官方域名访问</p></div></div>');
-            throw new Error("Access Denied: Domain " + host);
-        }
-    })();
-</script>
+    <script>
+        // ==================== 最顶层的域名校验（立即执行，彻底拦截） ====================
+        (function() {
+            var protocol = window.location.protocol;
+            var host = window.location.hostname;
+            var ALLOWED_DOMAINS = ['ciuok.com', 'www.ciuok.com'];
+            if (protocol === 'file:') {
+                document.documentElement.innerHTML = '';
+                document.write('<div class="block-page"><div class="block-card"><div class="emoji">🔒</div><h1>未经授权</h1><p>此工具无法在本地运行，请通过官方域名访问。</p><p style="font-size:12px; color:#666;">' +
+                    window.location.href + '</p></div></div>');
+                throw new Error("Access Denied: File protocol.");
+            }
+            var isAllowed = false;
+            for (var i = 0; i < ALLOWED_DOMAINS.length; i++) {
+                if (host === ALLOWED_DOMAINS[i]) { isAllowed = true; break; }
+            }
+            if (host === 'localhost' || host === '127.0.0.1') { isAllowed = true; }
+            if (!isAllowed) {
+                document.documentElement.innerHTML = '';
+                document.write('<div class="block-page"><div class="block-card"><div class="emoji">🔒</div><h1>未经授权</h1><p>本工具仅授权在 <strong style="color:#e94560;">ciuok.com</strong> 使用</p><p style="font-size:12px; color:#666;">当前域名：' +
+                    host + '</p><p style="font-size:12px; color:#666;">请通过官方域名访问</p></div></div>');
+                throw new Error("Access Denied: Domain " + host);
+            }
+        })();
+    </script>
     <!-- 核心第三方库 -->
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js">
+    </script>
     <style>
-        *{margin:0;padding:0;box-sizing:border-box;font-family:"PingFang SC","Microsoft YaHei",sans-serif}
-        body{background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2070&auto=format');background-size:cover;background-attachment:fixed;background-position:center;background-repeat:no-repeat;position:relative;min-height:100vh;padding:20px 0}
-        body::before{content:"";position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(15,23,42,0.4);backdrop-filter:blur(2px);z-index:-1;pointer-events:none}
-        .outer-container{width:90%;max-width:1000px;margin:0 auto;display:flex;justify-content:center;align-items:flex-start;position:relative}
-        .right-link-wrap{position:absolute;right:-160px;top:0;display:flex;flex-direction:column;gap:12px;width:145px}
-        .link-item-btn{padding:18px 12px;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:all .3s;text-align:center;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,0.2);width:100%;line-height:1.4}
-        .btn-tiktok{background:#ed8936}.btn-tiktok:hover{background:#dd6b20;transform:translateY(-2px)}
-        .btn-tool{background:#38b2ac}.btn-tool:hover{background:#2c7a7b;transform:translateY(-2px)}
-        .btn-node{background:#9f7aea}.btn-node:hover{background:#794acf;transform:translateY(-2px)}
-        .btn-tts{background:#e83e8c}.btn-tts:hover{background:#c8236b;transform:translateY(-2px)}
-        .link-dropdown{position:relative;width:100%}
-        .dropdown-content{display:none;position:absolute;top:0;left:100%;min-width:180px;background:#fff;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,0.15);z-index:9999;margin-left:8px;overflow:hidden}
-        .link-dropdown.active .dropdown-content{display:block}
-        .dropdown-item{padding:14px 12px;color:#2d3748;text-decoration:none;display:block;text-align:left;transition:.25s;font-size:14px;font-weight:500}
-        .contact-link-btn{padding:18px 12px;background:#4299e1;color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;transition:all .3s;text-align:center;text-decoration:none;box-shadow:0 2px 8px rgba(66,153,225,0.3);width:100%;line-height:1.4;margin-top:0}
-        .contact-link-btn:hover{background:#3182ce;transform:translateY(-2px)}
-        .container{width:100%;max-width:1000px;background:rgba(255,255,255,0.96);padding:30px;border-radius:28px;box-shadow:0 20px 35px -12px rgba(0,0,0,0.2);overflow:hidden;transition:all .2s;border:1px solid rgba(255,255,240,0.6)}
-        .tool-panel{display:block}.tool-panel.hidden-panel{display:none}
-        .header{text-align:center;margin-bottom:25px;padding-bottom:15px;border-bottom:1px solid #eef2f6}
-        .header .brand{font-size:24px;color:#1e293b;margin-bottom:8px;font-weight:600}
-        .header .tool-title{font-size:36px;color:#0f172a;font-weight:800;margin:10px 0;background:linear-gradient(135deg,#2b6cb0,#805ad5);-webkit-background-clip:text;background-clip:text;color:transparent}
-        .header .protocol-tip{font-size:14px;color:#475569;margin:8px 0}
-        .header .contact{font-size:13px;color:#64748b}
-        .input-area{margin-bottom:20px}
-        #qr-content{width:100%;padding:14px;border:1px solid #cbd5e1;border-radius:16px;resize:vertical;min-height:160px;font-size:14px;background:#fff}
-        #qr-content:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,0.1);outline:none}
-        .node-list-area{margin:15px 0;min-height:60px;max-height:800px;overflow-y:auto;border:1px solid #e2e8f0;border-radius:20px;background:#fefefe}
-        .node-item{padding:12px 16px;cursor:pointer;border-bottom:1px solid #f1f5f9;transition:all .2s;display:flex;justify-content:space-between;align-items:center}
-        .node-item.active{background:#eef2ff;border-left:4px solid #3b82f6;font-weight:500}
-        .node-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-right:10px}
-        .node-gen-btn{padding:5px 12px;font-size:12px;background:#3b82f6;color:#fff;border-radius:30px;border:none;cursor:pointer}
-        .file-import-area{margin:15px 0;padding:18px;border:2px dashed #b9d0f0;border-radius:20px;text-align:center;cursor:pointer;background:#f8fafc}
-        .file-import-area:hover{background:#eef2ff;border-color:#3b82f6}
-        .options{margin:20px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:15px}
-        .option-item label{font-size:14px;font-weight:600;color:#334155}
-        .option-item input,.option-item select{padding:10px;border-radius:14px;border:1px solid #cbd5e1}
-        .btn-group{display:flex;flex-wrap:wrap;gap:12px;margin:20px 0}
-        button{flex:1;min-width:100px;padding:12px;border-radius:40px;font-weight:600;transition:all .2s;border:none;cursor:pointer;font-size:14px}
-        #generate-selected-btn{background:#10b981;color:#fff}
-        #batch-generate-btn{background:#3b82f6;color:#fff}
-        #download-btn{background:#8b5cf6;color:#fff}
-        #download-all-btn{background:#f59e0b;color:#fff}
-        #clear-btn{background:#64748b;color:#fff}
-        .qr-wrap{display:grid;grid-template-columns:1fr 2fr;gap:25px;align-items:start;margin:25px 0}
-        .qr-result{text-align:center;padding:20px;border-radius:24px;background:#fff;border:1px solid #eef2ff}
-        #qrcode canvas{max-width:100%;height:auto;border-radius:12px}
-        .batch-qr-result{padding:20px;border-radius:24px;background:#fff;display:none;border:1px solid #eef2ff}
-        .qr-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:25px;justify-items:center}
-        .qr-item{background:#fff;border-radius:20px;padding:12px;box-shadow:0 2px 8px rgba(0,0,0,0.03);width:100%;text-align:center}
-        .tip{color:#10b981;margin-top:12px;font-size:14px}
-        .red-disclaimer{background:#fef2f2;border-radius:20px;padding:14px 20px;margin:20px 0;font-size:13px;color:#b91c1c;border:1px solid #fee2e2;text-align:center}
-        .footer-declare{margin-top:24px;padding-top:20px;border-top:1px solid #eef2f6;font-size:12px;color:#5b6e8c;line-height:1.6;text-align:justify}
-        .footer-declare .title{font-size:14px;font-weight:700;color:#1f2a44;margin-bottom:8px}
-        .v2ray-card{background:#fffcc;backdrop-filter:blur(2px);border-radius:28px;padding:20px 24px;box-shadow:0 4px 20px rgba(0,0,0,0.02);border:1px solid rgba(203,213,225,0.4)}
-        .v2ray-card h3{font-size:26px;font-weight:700;text-align:center;background:linear-gradient(120deg,#1e293b,#4f46e5);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:8px}
-        .v2-sub{display:block;text-align:center;color:#4b5563;font-size:13px;margin-bottom:24px;border-bottom:1px dashed #e2e8f0;padding-bottom:10px;width:fit-content;margin-left:auto;margin-right:auto}
-        .v2-textarea{width:100%;padding:14px;border-radius:20px;border:1px solid #cbd5e1;background:#fff;font-size:14px;resize:vertical;font-family:monospace;margin-bottom:16px}
-        .v2-textarea:focus{border-color:#3b82f6;outline:none;box-shadow:0 0 0 3px rgba(59,130,246,0.1)}
-        .v2-btn-group{display:flex;gap:14px;margin-bottom:22px;flex-wrap:wrap}
-        .v2-btn{flex:1;padding:12px 0;background:#2d8cf0;color:#fff;border-radius:40px;font-weight:700;font-size:15px;cursor:pointer;border:none}
-        .v2-btn-copy{background:#10b981}
-        .v2-btn-copy:hover{background:#059669;transform:translateY(-2px)}
-        .v2-btn:hover{background:#1f6fcf;transform:translateY(-2px)}
-        .tts-card{background:#fffcc;backdrop-filter:blur(2px);border-radius:28px;padding:20px 24px;box-shadow:0 4px 20px rgba(0,0,0,0.02);border:1px solid rgba(203,213,225,0.4)}
-        .tts-card h3{font-size:26px;font-weight:700;text-align:center;background:linear-gradient(120deg,#1e293b,#e83e8c);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:8px}
-        .api-row{display:flex;gap:10px;align-items:center;margin-bottom:15px;flex-wrap:wrap}
-        .api-row span{font-weight:600;color:#334155}
-        #apiKey{flex:2.5;min-width:200px;padding:12px 14px;border-radius:14px;border:1px solid #cbd5e1;font-size:14px;background:#fff}
-        #apiKey:focus{border-color:#e83e8c;outline:none;box-shadow:0 0 0 3px rgba(232,62,140,0.1)}
-        .api-history-select{flex:1.5;min-width:180px;padding:12px;border-radius:14px;border:1px solid #cbd5e1;font-size:13px;background-color:#fff;cursor:pointer;font-family:monospace;color:#1f2937}
-        .api-history-select optgroup{font-weight:700;color:#e83e8c;background-color:#fff;font-size:13px;padding:8px 0}
-        .api-history-select option{font-family:monospace;font-size:12px;padding:6px 8px;background-color:#fff;color:#374151}
-        .btn-clear-all-history{flex:0.7;min-width:100px;background:linear-gradient(135deg,#dc2626,#b91c1c);color:#fff;border:none;border-radius:40px;padding:12px 10px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
-        .btn-clear-all-history:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(220,38,38,0.3)}
-        .quota-card{background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:16px;padding:12px 18px;margin:10px 0 15px 0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;border:1px solid #bbf7d0}
-        .quota-label{font-size:13px;font-weight:600;color:#166534;display:flex;align-items:center;gap:6px}
-        .quota-value{font-size:18px;font-weight:800;color:#15803d;font-family:monospace}
-        .quota-unit{font-size:12px;font-weight:400;color:#4ade80}
-        .quota-warning{background:linear-gradient(135deg,#fef3c7,#fde68a);border-color:#fcd34d}
-        .quota-warning .quota-label{color:#92400e}
-        .quota-warning .quota-value{color:#b45309}
-        .voice-row{display:flex;gap:10px;align-items:center;margin:10px 0 5px 0;flex-wrap:wrap}
-        .voice-id-input{flex:2;padding:12px;border-radius:14px;border:1px solid #cbd5e1;font-size:14px}
-        .btn-fetch-api-info{flex:0.9;background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff;border:none;border-radius:40px;padding:12px 10px;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
-        .btn-fetch-api-info:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(79,70,229,0.35)}
-        .voice-name-display{font-size:13px;color:#e83e8c;background:#fef2f2;padding:6px 12px;border-radius:40px;display:inline-block;margin-top:5px}
-        .param-item{display:flex;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px}
-        .param-label{width:130px;font-size:14px;font-weight:700;color:#334155}
-        .param-desc{width:80px;font-size:12px;color:#94a3b8}
-        .param-slider{flex:1;max-width:350px;-webkit-appearance:none;appearance:none;height:5px;background:linear-gradient(90deg,#9ca3af,#4b5563);border-radius:5px;outline:none;cursor:pointer}
-        .param-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:16px;height:16px;background:#374151;border-radius:50%;cursor:pointer;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,0.2)}
-        .param-slider::-webkit-slider-thumb:hover{background:#1f2937;transform:scale(1.15)}
-        .param-value{width:50px;text-align:right;font-size:14px;color:#374151;font-weight:500;background:#f1f5f9;padding:4px 8px;border-radius:20px}
-        .history-box{margin-top:20px;max-height:300px;overflow-y:auto}
-        .history-date-group{margin-top:12px}
-        .history-date-header{font-size:13px;font-weight:600;color:#475569;padding:6px 8px;background:#f1f5f9;border-radius:8px;margin-bottom:6px;display:flex;align-items:center;gap:8px}
-        .history-date-header span{font-size:11px;color:#94a3b8;font-weight:400}
-        .history-header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:10px}
-        .history-link{font-size:13px;color:#e83e8c;text-decoration:none}
-        .history-link:hover{text-decoration:underline}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif
+        }
+        body {
+            background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2070&auto=format');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+            min-height: 100vh;
+            padding: 20px 0
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(2px);
+            z-index: -1;
+            pointer-events: none
+        }
+        .outer-container {
+            width: 90%;
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            position: relative
+        }
+        .right-link-wrap {
+            position: absolute;
+            right: -160px;
+            top: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            width: 145px
+        }
+        .link-item-btn {
+            padding: 18px 12px;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .3s;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            line-height: 1.4
+        }
+        .btn-tiktok {
+            background: #ed8936
+        }
+        .btn-tiktok:hover {
+            background: #dd6b20;
+            transform: translateY(-2px)
+        }
+        .btn-tool {
+            background: #38b2ac
+        }
+        .btn-tool:hover {
+            background: #2c7a7b;
+            transform: translateY(-2px)
+        }
+        .btn-node {
+            background: #9f7aea
+        }
+        .btn-node:hover {
+            background: #794acf;
+            transform: translateY(-2px)
+        }
+        .btn-tts {
+            background: #e83e8c
+        }
+        .btn-tts:hover {
+            background: #c8236b;
+            transform: translateY(-2px)
+        }
+        .link-dropdown {
+            position: relative;
+            width: 100%
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 100%;
+            min-width: 180px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            z-index: 9999;
+            margin-left: 8px;
+            overflow: hidden
+        }
+        .link-dropdown.active .dropdown-content {
+            display: block
+        }
+        .dropdown-item {
+            padding: 14px 12px;
+            color: #2d3748;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+            transition: .25s;
+            font-size: 14px;
+            font-weight: 500
+        }
+        .contact-link-btn {
+            padding: 18px 12px;
+            background: #4299e1;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .3s;
+            text-align: center;
+            text-decoration: none;
+            box-shadow: 0 2px 8px rgba(66, 153, 225, 0.3);
+            width: 100%;
+            line-height: 1.4;
+            margin-top: 0
+        }
+        .contact-link-btn:hover {
+            background: #3182ce;
+            transform: translateY(-2px)
+        }
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: rgba(255, 255, 255, 0.96);
+            padding: 30px;
+            border-radius: 28px;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: all .2s;
+            border: 1px solid rgba(255, 255, 240, 0.6)
+        }
+        .tool-panel {
+            display: block
+        }
+        .tool-panel.hidden-panel {
+            display: none
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eef2f6
+        }
+        .header .brand {
+            font-size: 24px;
+            color: #1e293b;
+            margin-bottom: 8px;
+            font-weight: 600
+        }
+        .header .tool-title {
+            font-size: 36px;
+            color: #0f172a;
+            font-weight: 800;
+            margin: 10px 0;
+            background: linear-gradient(135deg, #2b6cb0, #805ad5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent
+        }
+        .header .protocol-tip {
+            font-size: 14px;
+            color: #475569;
+            margin: 8px 0
+        }
+        .header .contact {
+            font-size: 13px;
+            color: #64748b
+        }
+        .input-area {
+            margin-bottom: 20px
+        }
+        #qr-content {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 16px;
+            resize: vertical;
+            min-height: 160px;
+            font-size: 14px;
+            background: #fff
+        }
+        #qr-content:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            outline: none
+        }
+        .node-list-area {
+            margin: 15px 0;
+            min-height: 60px;
+            max-height: 800px;
+            overflow-y: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 20px;
+            background: #fefefe
+        }
+        .node-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f1f5f9;
+            transition: all .2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+        .node-item.active {
+            background: #eef2ff;
+            border-left: 4px solid #3b82f6;
+            font-weight: 500
+        }
+        .node-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 10px
+        }
+        .node-gen-btn {
+            padding: 5px 12px;
+            font-size: 12px;
+            background: #3b82f6;
+            color: #fff;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer
+        }
+        .file-import-area {
+            margin: 15px 0;
+            padding: 18px;
+            border: 2px dashed #b9d0f0;
+            border-radius: 20px;
+            text-align: center;
+            cursor: pointer;
+            background: #f8fafc
+        }
+        .file-import-area:hover {
+            background: #eef2ff;
+            border-color: #3b82f6
+        }
+        .options {
+            margin: 20px 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px
+        }
+        .option-item label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155
+        }
+        .option-item input,
+        .option-item select {
+            padding: 10px;
+            border-radius: 14px;
+            border: 1px solid #cbd5e1
+        }
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 20px 0
+        }
+        button {
+            flex: 1;
+            min-width: 100px;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: 600;
+            transition: all .2s;
+            border: none;
+            cursor: pointer;
+            font-size: 14px
+        }
+        #generate-selected-btn {
+            background: #10b981;
+            color: #fff
+        }
+        #batch-generate-btn {
+            background: #3b82f6;
+            color: #fff
+        }
+        #download-btn {
+            background: #8b5cf6;
+            color: #fff
+        }
+        #download-all-btn {
+            background: #f59e0b;
+            color: #fff
+        }
+        #clear-btn {
+            background: #64748b;
+            color: #fff
+        }
+        .qr-wrap {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 25px;
+            align-items: start;
+            margin: 25px 0
+        }
+        .qr-result {
+            text-align: center;
+            padding: 20px;
+            border-radius: 24px;
+            background: #fff;
+            border: 1px solid #eef2ff
+        }
+        #qrcode canvas {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px
+        }
+        .batch-qr-result {
+            padding: 20px;
+            border-radius: 24px;
+            background: #fff;
+            display: none;
+            border: 1px solid #eef2ff
+        }
+        .qr-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            justify-items: center
+        }
+        .qr-item {
+            background: #fff;
+            border-radius: 20px;
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            width: 100%;
+            text-align: center
+        }
+        .tip {
+            color: #10b981;
+            margin-top: 12px;
+            font-size: 14px
+        }
+        .red-disclaimer {
+            background: #fef2f2;
+            border-radius: 20px;
+            padding: 14px 20px;
+            margin: 20px 0;
+            font-size: 13px;
+            color: #b91c1c;
+            border: 1px solid #fee2e2;
+            text-align: center
+        }
+        .footer-declare {
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid #eef2f6;
+            font-size: 12px;
+            color: #5b6e8c;
+            line-height: 1.6;
+            text-align: justify
+        }
+        .footer-declare .title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1f2a44;
+            margin-bottom: 8px
+        }
+        .v2ray-card {
+            background: #fffcc;
+            backdrop-filter: blur(2px);
+            border-radius: 28px;
+            padding: 20px 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(203, 213, 225, 0.4)
+        }
+        .v2ray-card h3 {
+            font-size: 26px;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(120deg, #1e293b, #4f46e5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px
+        }
+        .v2-sub {
+            display: block;
+            text-align: center;
+            color: #4b5563;
+            font-size: 13px;
+            margin-bottom: 24px;
+            border-bottom: 1px dashed #e2e8f0;
+            padding-bottom: 10px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto
+        }
+        .v2-textarea {
+            width: 100%;
+            padding: 14px;
+            border-radius: 20px;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            font-size: 14px;
+            resize: vertical;
+            font-family: monospace;
+            margin-bottom: 16px
+        }
+        .v2-textarea:focus {
+            border-color: #3b82f6;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1)
+        }
+        .v2-btn-group {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 22px;
+            flex-wrap: wrap
+        }
+        .v2-btn {
+            flex: 1;
+            padding: 12px 0;
+            background: #2d8cf0;
+            color: #fff;
+            border-radius: 40px;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            border: none
+        }
+        .v2-btn-copy {
+            background: #10b981
+        }
+        .v2-btn-copy:hover {
+            background: #059669;
+            transform: translateY(-2px)
+        }
+        .v2-btn:hover {
+            background: #1f6fcf;
+            transform: translateY(-2px)
+        }
+        .tts-card {
+            background: #fffcc;
+            backdrop-filter: blur(2px);
+            border-radius: 28px;
+            padding: 20px 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(203, 213, 225, 0.4)
+        }
+        .tts-card h3 {
+            font-size: 26px;
+            font-weight: 700;
+            text-align: center;
+            background: linear-gradient(120deg, #1e293b, #e83e8c);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px
+        }
+        .api-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap
+        }
+        .api-row span {
+            font-weight: 600;
+            color: #334155
+        }
+        #apiKey {
+            flex: 2.5;
+            min-width: 200px;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1px solid #cbd5e1;
+            font-size: 14px;
+            background: #fff
+        }
+        #apiKey:focus {
+            border-color: #e83e8c;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(232, 62, 140, 0.1)
+        }
+        .api-history-select {
+            flex: 1.5;
+            min-width: 180px;
+            padding: 12px;
+            border-radius: 14px;
+            border: 1px solid #cbd5e1;
+            font-size: 13px;
+            background-color: #fff;
+            cursor: pointer;
+            font-family: monospace;
+            color: #1f2937
+        }
+        .api-history-select optgroup {
+            font-weight: 700;
+            color: #e83e8c;
+            background-color: #fff;
+            font-size: 13px;
+            padding: 8px 0
+        }
+        .api-history-select option {
+            font-family: monospace;
+            font-size: 12px;
+            padding: 6px 8px;
+            background-color: #fff;
+            color: #374151
+        }
+        .btn-clear-api {
+            flex: 0.6;
+            min-width: 90px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #fff;
+            border: none;
+            border-radius: 40px;
+            padding: 12px 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap
+        }
+        .btn-clear-api:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3)
+        }
+        .quota-card {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border-radius: 16px;
+            padding: 12px 18px;
+            margin: 10px 0 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            border: 1px solid #bbf7d0
+        }
+        .quota-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #166534;
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+        .quota-value {
+            font-size: 18px;
+            font-weight: 800;
+            color: #15803d;
+            font-family: monospace
+        }
+        .quota-unit {
+            font-size: 12px;
+            font-weight: 400;
+            color: #4ade80
+        }
+        .quota-warning {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-color: #fcd34d
+        }
+        .quota-warning .quota-label {
+            color: #92400e
+        }
+        .quota-warning .quota-value {
+            color: #b45309
+        }
+        .voice-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin: 10px 0 5px 0;
+            flex-wrap: wrap
+        }
+        .voice-id-input {
+            flex: 2;
+            padding: 12px;
+            border-radius: 14px;
+            border: 1px solid #cbd5e1;
+            font-size: 14px
+        }
+        .btn-fetch-api-info {
+            flex: 0.9;
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: #fff;
+            border: none;
+            border-radius: 40px;
+            padding: 12px 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap
+        }
+        .btn-fetch-api-info:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35)
+        }
+        .voice-name-display {
+            font-size: 13px;
+            color: #e83e8c;
+            background: #fef2f2;
+            padding: 6px 12px;
+            border-radius: 40px;
+            display: inline-block;
+            margin-top: 5px
+        }
+        .param-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+            gap: 8px
+        }
+        .param-label {
+            width: 130px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #334155
+        }
+        .param-desc {
+            width: 80px;
+            font-size: 12px;
+            color: #94a3b8
+        }
+        .param-slider {
+            flex: 1;
+            max-width: 350px;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 5px;
+            background: linear-gradient(90deg, #9ca3af, #4b5563);
+            border-radius: 5px;
+            outline: none;
+            cursor: pointer
+        }
+        .param-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: #374151;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2)
+        }
+        .param-slider::-webkit-slider-thumb:hover {
+            background: #1f2937;
+            transform: scale(1.15)
+        }
+        .param-value {
+            width: 50px;
+            text-align: right;
+            font-size: 14px;
+            color: #374151;
+            font-weight: 500;
+            background: #f1f5f9;
+            padding: 4px 8px;
+            border-radius: 20px
+        }
+        .history-box {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto
+        }
+        .history-date-group {
+            margin-top: 12px
+        }
+        .history-date-header {
+            font-size: 13px;
+            font-weight: 600;
+            color: #475569;
+            padding: 6px 8px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+        .history-date-header span {
+            font-size: 11px;
+            color: #94a3b8;
+            font-weight: 400
+        }
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 10px
+        }
+        .history-link {
+            font-size: 13px;
+            color: #e83e8c;
+            text-decoration: none
+        }
+        .history-link:hover {
+            text-decoration: underline
+        }
         .tts-textarea-container {
             position: relative;
             width: 100%;
-            margin: 10px 0;
+            margin: 10px 0
         }
         .tts-textarea {
             width: 100%;
             min-height: 120px;
-            max-height: 360px;
             padding: 14px;
-            padding-bottom: 48px;
             font-size: 15px;
             border: 1px solid #cbd5e1;
             border-radius: 20px;
@@ -352,20 +872,16 @@
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
             line-height: 1.5;
             transition: .2s;
-            overflow-y: auto;
+            overflow: hidden;
+            resize: none;
             word-wrap: break-word;
             white-space: pre-wrap;
-            word-break: break-all;
-            resize: vertical;
+            word-break: break-all
         }
         .tts-textarea:focus {
             border-color: #e83e8c;
             outline: none;
-            box-shadow: 0 0 0 3px rgba(232,62,140,0.1);
-        }
-        .tts-textarea.expanded {
-            max-height: none;
-            min-height: 400px;
+            box-shadow: 0 0 0 3px rgba(232, 62, 140, 0.1)
         }
         .tts-char-count {
             position: absolute;
@@ -373,632 +889,1209 @@
             right: 14px;
             font-size: 12px;
             color: #94a3b8;
-            background: rgba(255,255,255,0.9);
+            background: rgba(255, 255, 255, 0.9);
             padding: 2px 8px;
             border-radius: 20px;
-            pointer-events: none;
+            pointer-events: none
         }
-        .tts-expand-btn {
-            position: absolute;
-            bottom: 8px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 20px;
-            line-height: 1.1;
-            color: #4f46e5;
-            background: rgba(255,255,255,0.95);
-            border: 2px solid #cbd5e1;
+        #log {
+            color: #e83e8c;
+            margin: 10px 0;
+            font-size: 14px;
+            text-align: center
+        }
+        #audio {
+            width: 100%;
+            margin-top: 10px;
+            border-radius: 40px
+        }
+        .tts-btn-primary {
+            background: linear-gradient(135deg, #0d9488, #0f766e);
+            color: #fff;
+            box-shadow: 0 2px 8px rgba(13, 148, 136, 0.3)
+        }
+        .tts-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(13, 148, 136, 0.4);
+            background: linear-gradient(135deg, #0f766e, #0d5c54)
+        }
+        .tts-btn-secondary {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: #fff
+        }
+        .tts-btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35)
+        }
+        .tts-btn-danger {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #fff
+        }
+        .tts-btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.35)
+        }
+        .switch-tool-btn {
+            background: #475569;
+            color: #fff;
             border-radius: 40px;
-            padding: 2px 28px;
+            padding: 10px 20px;
+            font-weight: 600;
+            margin-bottom: 18px;
+            border: none;
             cursor: pointer;
-            transition: all 0.25s;
-            pointer-events: auto;
-            display: none;
-            font-weight: 400;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            width: auto;
-            min-width: 70px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px
+        }
+        .switch-tool-btn:hover {
+            background: #334155;
+            transform: scale(0.98)
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(3px);
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+        .modal-content {
+            background: #fff;
+            border-radius: 28px;
+            padding: 28px 32px;
+            max-width: 400px;
+            width: 90%;
             text-align: center;
-            user-select: none;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.2s ease
         }
-        .tts-expand-btn:hover {
-            background: #eef2ff;
-            border-color: #4f46e5;
-            box-shadow: 0 4px 12px rgba(79,70,229,0.2);
-            transform: translateX(-50%) scale(1.05);
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95)
+            }
+            to {
+                opacity: 1;
+                transform: scale(1)
+            }
         }
-        .tts-expand-btn.visible {
-            display: block;
+        .modal-content h3 {
+            font-size: 24px;
+            margin-bottom: 12px;
+            color: #1e293b
         }
-        #log{color:#e83e8c;margin:10px 0;font-size:14px;text-align:center}
-        #audio{width:100%;margin-top:10px;border-radius:40px}
-        .tts-btn-primary{background:linear-gradient(135deg,#0d9488,#0f766e);color:#fff;box-shadow:0 2px 8px rgba(13,148,136,0.3)}
-        .tts-btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(13,148,136,0.4);background:linear-gradient(135deg,#0f766e,#0d5c54)}
-        .tts-btn-secondary{background:linear-gradient(135deg,#4f46e5,#6366f1);color:#fff}
-        .tts-btn-secondary:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(79,70,229,0.35)}
-        .btn-copy-text{background:linear-gradient(135deg,#8b5cf6,#7c3aed);color:#fff}
-        .btn-copy-text:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(139,92,246,0.35)}
-        .btn-clear-input{background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff}
-        .btn-clear-input:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(239,68,68,0.35)}
-        .switch-tool-btn{background:#475569;color:#fff;border-radius:40px;padding:10px 20px;font-weight:600;margin-bottom:18px;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
-        .switch-tool-btn:hover{background:#334155;transform:scale(0.98)}
-        .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(3px);z-index:10001;display:flex;align-items:center;justify-content:center}
-        .modal-content{background:#fff;border-radius:28px;padding:28px 32px;max-width:400px;width:90%;text-align:center;box-shadow:0 20px 35px -12px rgba(0,0,0,0.3);animation:modalFadeIn 0.2s ease}
-        @keyframes modalFadeIn{from{opacity:0;transform:scale(0.95)}to{opacity:1;transform:scale(1)}}
-        .modal-content h3{font-size:24px;margin-bottom:12px;color:#1e293b}
-        .modal-content p{font-size:15px;color:#475569;margin-bottom:24px;line-height:1.5;word-break:break-all}
-        .modal-content button{background:linear-gradient(135deg,#e83e8c,#c8236b);color:#fff;border:none;border-radius:40px;padding:12px 28px;font-size:16px;font-weight:600;cursor:pointer;transition:all .2s}
-        .modal-content button:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(232,62,140,0.35)}
-        @media (max-width:768px){
-            .container{width:100%;padding:18px}
-            .qr-wrap{grid-template-columns:1fr}
-            .qr-grid{grid-template-columns:1fr !important}
-            .param-label{width:100%}
-            .param-slider{max-width:100%}
-            .api-row,.voice-row{flex-direction:column;align-items:stretch}
-            #apiKey,.api-history-select,.btn-clear-all-history,.voice-id-input,.btn-fetch-api-info{width:100%;min-width:auto}
-            .quota-card{flex-direction:column;align-items:stretch;text-align:center}
-            .right-link-wrap{right:-160px;width:145px}
-            .link-item-btn,.contact-link-btn{padding:18px 12px;font-size:14px}
-            .tts-textarea{min-height:100px;max-height:260px;padding-bottom:48px}
-            .tts-expand-btn{font-size:18px;padding:2px 20px;min-width:56px}
+        .modal-content p {
+            font-size: 15px;
+            color: #475569;
+            margin-bottom: 24px;
+            line-height: 1.5;
+            word-break: break-all
+        }
+        .modal-content button {
+            background: linear-gradient(135deg, #e83e8c, #c8236b);
+            color: #fff;
+            border: none;
+            border-radius: 40px;
+            padding: 12px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s
+        }
+        .modal-content button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(232, 62, 140, 0.35)
+        }
+        @media (max-width:768px) {
+            .container {
+                width: 100%;
+                padding: 18px
+            }
+            .qr-wrap {
+                grid-template-columns: 1fr
+            }
+            .qr-grid {
+                grid-template-columns: 1fr !important
+            }
+            .param-label {
+                width: 100%
+            }
+            .param-slider {
+                max-width: 100%
+            }
+            .api-row,
+            .voice-row {
+                flex-direction: column;
+                align-items: stretch
+            }
+            #apiKey,
+            .api-history-select,
+            .btn-clear-api,
+            .voice-id-input,
+            .btn-fetch-api-info {
+                width: 100%;
+                min-width: auto
+            }
+            .quota-card {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center
+            }
+            .right-link-wrap {
+                right: -160px;
+                width: 145px
+            }
+            .link-item-btn,
+            .contact-link-btn {
+                padding: 18px 12px;
+                font-size: 14px
+            }
         }
     </style>
 </head>
+
 <body>
-<div class="outer-container">
-    <div class="container" id="mainContainer">
-        <!-- 面板1: 二维码生成工具 -->
-        <div id="qrToolPanel" class="tool-panel">
-            <div class="header"><h1 class="brand">Gi虾米出品/TikTok出海全渠道服务</h1><h2 class="tool-title">二维码生成工具</h2><p class="protocol-tip">（支持 Socks5/VMess/VLess/Trojan/SS）</p><p class="contact">制作不易，感谢支持 · 联系：QQ/VX:84131018</p></div>
-            <div class="input-area"><textarea id="qr-content" placeholder="支持所有主流协议（每行一个节点）：&#10;Socks5 格式：IP:端口:用户名:密码&#10;VMess/VLess/Trojan/SS ：直接粘贴原始链接&#10;支持导入TXT文件，自动解析每行节点"></textarea></div>
-            <div class="node-list-area" id="node-list"><p class="node-list-tip">输入节点内容后，自动解析为可选列表（每行一个）</p></div>
-            <div class="file-import-area" onclick="document.getElementById('file-input').click()"><input type="file" id="file-input" accept=".txt" onchange="readTxtFile(this)"><p class="import-tip">点击导入TXT文件（每行一个节点）</p></div>
-            <div class="options"><div class="option-item"><label>二维码尺寸</label><input type="number" id="qr-size" value="256" min="128" max="400"></div><div class="option-item"><label>容错级别</label><select id="qr-correct"><option value="auto">自动调节</option><option value="L">L 7%</option><option value="M">M 15%</option><option value="Q">Q 25%</option><option value="H">H 30%</option></select></div><div class="option-item"><label>二维码颜色</label><input type="color" id="qr-dark" value="#000000"></div><div class="option-item"><label>背景颜色</label><input type="color" id="qr-light" value="#ffffff"></div></div>
-            <div class="btn-group"><button id="generate-selected-btn">生成选中节点二维码</button><button id="batch-generate-btn">批量生成所有节点二维码</button><button id="download-btn">下载当前二维码</button><button id="download-all-btn">下载所有节点二维码</button><button id="clear-btn">清空重置</button></div>
-            <div class="qr-wrap"><div class="qr-result"><div id="qrcode"></div><p class="tip" id="format-tip"></p></div><div class="batch-qr-result" id="batch-qr-result"><h3 class="batch-title">所有节点二维码列表</h3><div class="qr-grid" id="qr-grid"></div></div></div>
-            <div class="red-disclaimer">本内容/工具仅作个人合法学习、研究及自用，严禁用于任何违反国家法律法规的非法活动。使用者在使用过程中产生的一切行为及法律责任，均由使用者自行承担，与内容/工具提供方无关。</div>
-            <div class="footer-declare"><p class="title">【第三方开源组件引用声明】</p><p>本工具开发过程中，引用了以下开源社区的优秀免费组件，相关版权归原作者及开源组织所有，特此致谢：</p><p>1、二维码生成核心：QRCode.js (MIT开源协议) ；2、压缩打包核心：JSZip (MIT开源协议) ；3、文件下载核心：FileSaver.js (MIT开源协议)。</p><p>所有引用的第三方开源组件均遵循其原始开源协议，本工具未对其核心源码做任何侵权修改，仅做合理调用与适配。</p><br><p>© 2026 Gi虾米出品 版权所有 | 本工具为免费开源工具，请勿倒卖或篡改版权信息</p></div>
-        </div>
-        <!-- 面板2: V2Ray 格式转换工具 -->
-        <div id="v2rayToolPanel" class="tool-panel hidden-panel">
-            <div style="display:flex;justify-content:flex-start;margin-bottom:12px"><button id="backToQrBtn" class="switch-tool-btn">← 返回二维码生成器</button></div>
-            <div class="v2ray-card"><h3>V2Ray 标准格式转换</h3><div style="text-align:center"><span class="v2-sub">ip:端口:用户名:密码 → socks:// 链接 (V2Ray/Clash 通用)</span></div><textarea id="v2Input" class="v2-textarea" placeholder="粘贴节点（一行一个）&#10;例如：&#10;ip：端口：用户名：密码"></textarea><div class="v2-btn-group"><button id="v2ConvertBtn" class="v2-btn">一键转换格式</button><button id="v2CopyBtn" class="v2-btn v2-btn-copy">一键复制结果</button></div><div class="v2-result-area"><textarea id="v2Result" class="v2-textarea" readonly placeholder="转换结果将显示在这里..."></textarea></div><div class="red-disclaimer" style="margin-top:20px">仅支持 Socks5 格式转换 (ip:port:user:pass)，转换结果可直接导入V2Ray客户端。</div></div>
-            <div class="red-disclaimer" style="margin-top:20px">本内容/工具仅作个人合法学习、研究及自用，严禁用于任何违反国家法律法规的非法活动。使用者在使用过程中产生的一切行为及法律责任，均由使用者自行承担，与内容/工具提供方无关。</div>
-            <div class="footer-declare"><p class="title">【第三方开源组件引用声明】</p><p>本工具开发过程中，引用了以下开源社区的优秀免费组件，相关版权归原作者及开源组织所有，特此致谢：</p><p>1、二维码生成核心：QRCode.js (MIT开源协议) ；2、压缩打包核心：JSZip (MIT开源协议) ；3、文件下载核心：FileSaver.js (MIT开源协议)。</p><p>所有引用的第三方开源组件均遵循其原始开源协议，本工具未对其核心源码做任何侵权修改，仅做合理调用与适配。</p><br><p>© 2026 Gi虾米出品 版权所有 | 本工具为免费开源工具，请勿倒卖或篡改版权信息</p></div>
-        </div>
-        <!-- 面板3: IIElevenLabs 文本转语音朗读器 -->
-        <div id="ttsToolPanel" class="tool-panel hidden-panel">
-            <div style="display:flex;justify-content:flex-start;margin-bottom:12px"><button id="backToQrFromTtsBtn" class="switch-tool-btn">← 返回二维码生成器</button></div>
-            <div class="tts-card"><h3>IIElevenLabs 文本转语音朗读器</h3>
-                <div class="api-row"><span>API Key：</span><input id="apiKey" type="text" placeholder="请输入 ElevenLabs API Key" value=""><select id="apiHistorySelect" class="api-history-select"><option value="">📅 API历史记录</option></select><button id="clearAllHistoryBtn" class="btn-clear-all-history">🗑️ 清空所有历史</button></div>
-                <div id="quotaCard" class="quota-card" style="display:none"><div class="quota-label">📊 剩余字符额度</div><div class="quota-value" id="quotaAmount">--</div><div class="quota-unit">字符</div></div>
-                <div class="voice-row"><span>声音 ID：</span><input id="voiceId" class="voice-id-input" type="text" placeholder="输入声音ID" value="bIHbv24MWmeRgasZH58o"><button id="fetchApiInfoBtn" class="btn-fetch-api-info">🔍 获取API信息</button></div>
-                <div id="voiceNameDisplay" class="voice-name-display">当前声音：Will - Relaxed Optimist</div><hr style="margin:15px 0">
-                <div class="param-item"><div class="param-label">Speed</div><div class="param-desc">Slower</div><input type="range" id="speed" min="0.5" max="2.0" step="0.05" value="1.0" class="param-slider"><div class="param-value" id="speedVal">1.0</div></div>
-                <div class="param-item"><div class="param-label">Stability</div><div class="param-desc">More variable</div><input type="range" id="stability" min="0" max="1" step="0.01" value="0.5" class="param-slider"><div class="param-value" id="stabilityVal">50%</div></div>
-                <div class="param-item"><div class="param-label">Similarity</div><div class="param-desc">Low</div><input type="range" id="similarity" min="0" max="1" step="0.01" value="0.75" class="param-slider"><div class="param-value" id="similarityVal">75%</div></div>
-                <div class="param-item"><div class="param-label">Style Exaggeration</div><div class="param-desc">None</div><input type="range" id="style" min="0" max="1" step="0.01" value="0" class="param-slider"><div class="param-value" id="styleVal">0</div></div>
-                <hr style="margin:15px 0">
-                <div class="tts-textarea-container">
-                    <textarea id="text" class="tts-textarea" placeholder="输入要朗读的文字，支持长文本自动换行...&#10;支持导入TXT文件" oninput="updateCharCount(); autoResizeTextarea(); checkExpandButton();"></textarea>
-                    <button class="tts-expand-btn" id="expandBtn" onclick="toggleExpand()">∨</button>
-                    <div class="tts-char-count" id="charCount">字数：0</div>
+    <div class="outer-container">
+        <div class="container" id="mainContainer">
+            <!-- 面板1: 二维码生成工具 -->
+            <div id="qrToolPanel" class="tool-panel">
+                <div class="header">
+                    <h1 class="brand">Gi虾米出品/TikTok出海全渠道服务</h1>
+                    <h2 class="tool-title">二维码生成工具</h2>
+                    <p class="protocol-tip">（支持 Socks5/VMess/VLess/Trojan/SS）</p>
+                    <p class="contact">制作不易，感谢支持 · 联系：QQ/VX:84131018</p>
                 </div>
-                <div class="btn-group">
-                    <button id="generateAudioBtn" class="tts-btn-primary">🎙️ 生成音频+自动下载</button>
-                    <button id="copyTextBtn" class="btn-copy-text">📋 复制文本</button>
-                    <button id="importTxtBtn" class="tts-btn-secondary">📄 导入TXT</button>
-                    <button id="clearInputBtn" class="btn-clear-input">🗑️ 清空输入框</button>
+                <div class="input-area"><textarea id="qr-content" placeholder="支持所有主流协议（每行一个节点）：&#10;Socks5 格式：IP:端口:用户名:密码&#10;VMess/VLess/Trojan/SS ：直接粘贴原始链接&#10;支持导入TXT文件，自动解析每行节点"></textarea></div>
+                <div class="node-list-area" id="node-list">
+                    <p class="node-list-tip">输入节点内容后，自动解析为可选列表（每行一个）</p>
                 </div>
-                <input type="file" id="ttsFileInput" accept=".txt" style="display:none"><div id="log"></div><audio id="audio" controls></audio>
-                <div class="history-box"><div class="history-header"><h4>📜 文本历史 (保存7天 · 文本上限5000字 · 音频缓存最近3条)</h4><a href="https://elevenlabs.io/app/home" target="_blank" class="history-link">官方链接 II ElevenLabs</a></div><div id="historyList"></div></div>
+                <div class="file-import-area" onclick="document.getElementById('file-input').click()"><input type="file" id="file-input" accept=".txt" onchange="readTxtFile(this)">
+                    <p class="import-tip">点击导入TXT文件（每行一个节点）</p>
+                </div>
+                <div class="options">
+                    <div class="option-item"><label>二维码尺寸</label><input type="number" id="qr-size" value="256" min="128" max="400"></div>
+                    <div class="option-item"><label>容错级别</label><select id="qr-correct"><option value="auto">自动调节</option><option value="L">L 7%</option><option value="M">M 15%</option><option value="Q">Q 25%</option><option value="H">H 30%</option></select></div>
+                    <div class="option-item"><label>二维码颜色</label><input type="color" id="qr-dark" value="#000000"></div>
+                    <div class="option-item"><label>背景颜色</label><input type="color" id="qr-light" value="#ffffff"></div>
+                </div>
+                <div class="btn-group"><button id="generate-selected-btn">生成选中节点二维码</button><button id="batch-generate-btn">批量生成所有节点二维码</button><button id="download-btn">下载当前二维码</button><button id="download-all-btn">下载所有节点二维码</button><button id="clear-btn">清空重置</button></div>
+                <div class="qr-wrap">
+                    <div class="qr-result">
+                        <div id="qrcode"></div>
+                        <p class="tip" id="format-tip"></p>
+                    </div>
+                    <div class="batch-qr-result" id="batch-qr-result">
+                        <h3 class="batch-title">所有节点二维码列表</h3>
+                        <div class="qr-grid" id="qr-grid"></div>
+                    </div>
+                </div>
+                <div class="red-disclaimer">本内容/工具仅作个人合法学习、研究及自用，严禁用于任何违反国家法律法规的非法活动。使用者在使用过程中产生的一切行为及法律责任，均由使用者自行承担，与内容/工具提供方无关。</div>
+                <div class="footer-declare">
+                    <p class="title">【第三方开源组件引用声明】</p>
+                    <p>本工具开发过程中，引用了以下开源社区的优秀免费组件，相关版权归原作者及开源组织所有，特此致谢：</p>
+                    <p>1、二维码生成核心：QRCode.js (MIT开源协议) ；2、压缩打包核心：JSZip (MIT开源协议) ；3、文件下载核心：FileSaver.js (MIT开源协议)。</p>
+                    <p>所有引用的第三方开源组件均遵循其原始开源协议，本工具未对其核心源码做任何侵权修改，仅做合理调用与适配。</p><br>
+                    <p>© 2026 Gi虾米出品 版权所有 | 本工具为免费开源工具，请勿倒卖或篡改版权信息</p>
+                </div>
             </div>
-            <div class="red-disclaimer" style="margin-top:20px">本内容/工具仅作个人合法学习、研究及自用，严禁用于任何违反国家法律法规的非法活动。使用者在使用过程中产生的一切行为及法律责任，均由使用者自行承担，与内容/工具提供方无关。</div>
-            <div class="footer-declare"><p class="title">【第三方开源组件引用声明】</p><p>本工具开发过程中，引用了以下开源社区的优秀免费组件，相关版权归原作者及开源组织所有，特此致谢：</p><p>1、二维码生成核心：QRCode.js (MIT开源协议) ；2、压缩打包核心：JSZip (MIT开源协议) ；3、文件下载核心：FileSaver.js (MIT开源协议)。</p><p>所有引用的第三方开源组件均遵循其原始开源协议，本工具未对其核心源码做任何侵权修改，仅做合理调用与适配。</p><br><p>© 2026 Gi虾米出品 版权所有 | 本工具为免费开源工具，请勿倒卖或篡改版权信息</p></div>
+            <!-- 面板2: V2Ray 格式转换工具 -->
+            <div id="v2rayToolPanel" class="tool-panel hidden-panel">
+                <div style="display:flex;justify-content:flex-start;margin-bottom:12px"><button id="backToQrBtn" class="switch-tool-btn">← 返回二维码生成器</button></div>
+                <div class="v2ray-card">
+                    <h3>V2Ray 标准格式转换</h3>
+                    <div style="text-align:center"><span class="v2-sub">ip:端口:用户名:密码 → socks:// 链接 (V2Ray/Clash 通用)</span></div>
+                    <textarea id="v2Input" class="v2-textarea" placeholder="粘贴节点（一行一个）&#10;例如：&#10;ip：端口：用户名：密码"></textarea>
+                    <div class="v2-btn-group"><button id="v2ConvertBtn" class="v2-btn">一键转换格式</button><button id="v2CopyBtn" class="v2-btn v2-btn-copy">一键复制结果</button></div>
+                    <div class="v2-result-area"><textarea id="v2Result" class="v2-textarea" readonly placeholder="转换结果将显示在这里..."></textarea></div>
+                    <div class="red-disclaimer" style="margin-top:20px">仅支持 Socks5 格式转换 (ip:port:user:pass)，转换结果可直接导入V2Ray客户端。</div>
+                </div>
+                <div class="red-disclaimer" style="margin-top:20px">本内容/工具仅作个人合法学习、研究及自用，严禁用于任何违反国家法律法规的非法活动。使用者在使用过程中产生的一切行为及法律责任，均由使用者自行承担，与内容/工具提供方无关。</div>
+                <div class="footer-declare">
+                    <p class="title">【第三方开源组件引用声明】</p>
+                    <p>本工具开发过程中，引用了以下开源社区的优秀免费组件，相关版权归原作者及开源组织所有，特此致谢：</p>
+                    <p>1、二维码生成核心：QRCode.js (MIT开源协议) ；2、压缩打包核心：JSZip (MIT开源协议) ；3、文件下载核心：FileSaver.js (MIT开源协议)。</p>
+                    <p>所有引用的第三方开源组件均遵循其原始开源协议，本工具未对其核心源码做任何侵权修改，仅做合理调用与适配。</p><br>
+                    <p>© 2026 Gi虾米出品 版权所有 | 本工具为免费开源工具，请勿倒卖或篡改版权信息</p>
+                </div>
+            </div>
+            <!-- 面板3: IIElevenLabs 文本转语音朗读器 -->
+            <div id="ttsToolPanel" class="tool-panel hidden-panel">
+                <div style="display:flex;justify-content:flex-start;margin-bottom:12px"><button id="backToQrFromTtsBtn" class="switch-tool-btn">← 返回二维码生成器</button></div>
+                <div class="tts-card">
+                    <h3>IIElevenLabs 文本转语音朗读器</h3>
+                    <div class="api-row"><span>API Key：</span><input id="apiKey" type="text" placeholder="请输入 ElevenLabs API Key" value=""><select id="apiHistorySelect" class="api-history-select"><option value="">📅 API历史记录</option></select><button id="clearApiHistoryBtn" class="btn-clear-api">🗑️ 清空API历史</button></div>
+                    <div id="quotaCard" class="quota-card" style="display:none">
+                        <div class="quota-label">📊 剩余字符额度</div>
+                        <div class="quota-value" id="quotaAmount">--</div>
+                        <div class="quota-unit">字符</div>
+                    </div>
+                    <div class="voice-row"><span>声音 ID：</span><input id="voiceId" class="voice-id-input" type="text" placeholder="输入声音ID" value="bIHbv24MWmeRgasZH58o"><button id="fetchApiInfoBtn" class="btn-fetch-api-info">🔍 获取API信息</button></div>
+                    <div id="voiceNameDisplay" class="voice-name-display">当前声音：Will - Relaxed Optimist</div>
+                    <hr style="margin:15px 0">
+                    <div class="param-item">
+                        <div class="param-label">Speed</div>
+                        <div class="param-desc">Slower</div><input type="range" id="speed" min="0.5" max="2.0" step="0.05" value="1.0" class="param-slider">
+                        <div class="param-value" id="speedVal">1.0</div>
+                    </div>
+                    <div class="param-item">
+                        <div class="param-label">Stability</div>
+                        <div class="param-desc">More variable</div><input type="range" id="stability" min="0" max="1" step="0.01" value="0.5" class="param-slider">
+                        <div class="param-value" id="stabilityVal">50%</div>
+                    </div>
+                    <div class="param-item">
+                        <div class="param-label">Similarity</div>
+                        <div class="param-desc">Low</div><input type="range" id="similarity" min="0" max="1" step="0.01" value="0.75" class="param-slider">
+                        <div class="param-value" id="similarityVal">75%</div>
+                    </div>
+                    <div class="param-item">
+                        <div class="param-label">Style Exaggeration</div>
+                        <div class="param-desc">None</div><input type="range" id="style" min="0" max="1" step="0.01" value="0" class="param-slider">
+                        <div class="param-value" id="styleVal">0</div>
+                    </div>
+                    <hr style="margin:15px 0">
+                    <div class="tts-textarea-container"><textarea id="text" class="tts-textarea" placeholder="输入要朗读的文字，支持长文本自动换行...&#10;支持导入TXT文件" oninput="autoResizeTextarea(); updateCharCount();"></textarea>
+                        <div class="tts-char-count" id="charCount">字数：0</div>
+                    </div>
+                    <div class="btn-group">
+                        <button id="generateAudioBtn" class="tts-btn-primary">🎙️ 生成音频+自动下载</button>
+                        <button id="copyTextBtn" class="btn-copy-text">📋 复制文本</button>
+                        <button id="importTxtBtn" class="tts-btn-secondary">📄 导入TXT</button>
+                        <button id="clearHistoryBtn" class="tts-btn-danger">🗑️ 清空历史</button>
+                    </div>
+                    <input type="file" id="ttsFileInput" accept=".txt" style="display:none">
+                    <div id="log"></div>
+                    <audio id="audio" controls></audio>
+                    <div class="history-box">
+                        <div class="history-header">
+                            <h4>📜 文本历史 (保存7天 · 文本上限5000字 · 音频缓存最近3条)</h4>
+                            <a href="https://elevenlabs.io/app/home" target="_blank" class="history-link">官方链接 II ElevenLabs</a>
+                        </div>
+                        <div id="historyList"></div>
+                    </div>
+                </div>
+                <div class="red-disclaimer" style="margin-top:20px">本内容/工具仅作个人合法学习、研究及自用，严禁用于任何违反国家法律法规的非法活动。使用者在使用过程中产生的一切行为及法律责任，均由使用者自行承担，与内容/工具提供方无关。</div>
+                <div class="footer-declare">
+                    <p class="title">【第三方开源组件引用声明】</p>
+                    <p>本工具开发过程中，引用了以下开源社区的优秀免费组件，相关版权归原作者及开源组织所有，特此致谢：</p>
+                    <p>1、二维码生成核心：QRCode.js (MIT开源协议) ；2、压缩打包核心：JSZip (MIT开源协议) ；3、文件下载核心：FileSaver.js (MIT开源协议)。</p>
+                    <p>所有引用的第三方开源组件均遵循其原始开源协议，本工具未对其核心源码做任何侵权修改，仅做合理调用与适配。</p><br>
+                    <p>© 2026 Gi虾米出品 版权所有 | 本工具为免费开源工具，请勿倒卖或篡改版权信息</p>
+                </div>
+            </div>
+        </div>
+        <div class="right-link-wrap">
+            <div class="link-dropdown"><button class="link-item-btn btn-tiktok">TikTok出海服务</button>
+                <div class="dropdown-content"><a href="https://www.tiktok.com/" target="_blank" class="dropdown-item">TikTok官网</a><a href="https://leadsmm.com/ref/rd9n3" target="_blank" class="dropdown-item">TikTok粉丝/投流服务</a><a href="https://snapany.com/zh" target="_blank" class="dropdown-item">全网视频解析下载</a><a href="https://chromewebstore.google.com/detail/tiktok-download-influence/penohjgblobinadflplocjekaclnoemh" target="_blank" class="dropdown-item">TikTok达人精灵</a></div>
+            </div>
+            <div class="link-dropdown"><button class="link-item-btn btn-tool">上网工具</button>
+                <div class="dropdown-content"><a href="https://github.com/2dust/v2rayN" target="_blank" class="dropdown-item">V2rayN官网</a><a href="https://www.clashverg.com/" target="_blank" class="dropdown-item">Clash Verge小猫咪</a><a href="https://www.fast.com" target="_blank" class="dropdown-item">节点在线测速</a><a href="https://ipleak.net/" target="_blank" class="dropdown-item">IP/DNS查询</a><a href="https://ipinfo.io/" target="_blank" class="dropdown-item">IP查询</a></div>
+            </div>
+            <div class="link-dropdown"><button class="link-item-btn btn-node">TikTok节点推荐</button>
+                <div class="dropdown-content"><a href="https://app.aait.io/login" target="_blank" class="dropdown-item">AaIT（住宅IP）</a><a href="https://www.onetechcloud.com/aff/CFERKEWW" target="_blank" class="dropdown-item">易颗云（独享）</a><a href="https://iproyal.cn/?r=537561" target="_blank" class="dropdown-item">IPRoyal（静态IP）</a><a href="https://www.ipfoxy.com/invite/nhIafP" target="_blank" class="dropdown-item">IPFoxy全球纯净代理</a></div>
+            </div>
+            <button id="switchToV2Btn" class="contact-link-btn" style="background:#2c5282; margin-bottom:8px;">V2Ray格式转换</button>
+            <button id="switchToTtsBtn" class="link-item-btn btn-tts">IIElevenLabs TTS</button>
+            <a href="https://gist.githubusercontent.com/yong84131018/5369dc7764ce5a93756cbd9fe9cbba14/raw" target="_blank" class="contact-link-btn">商务合作</a>
         </div>
     </div>
-    <div class="right-link-wrap">
-        <div class="link-dropdown"><button class="link-item-btn btn-tiktok">TikTok出海服务</button><div class="dropdown-content"><a href="https://www.tiktok.com/" target="_blank" class="dropdown-item">TikTok官网</a><a href="https://leadsmm.com/ref/rd9n3" target="_blank" class="dropdown-item">TikTok粉丝/投流服务</a><a href="https://snapany.com/zh" target="_blank" class="dropdown-item">全网视频解析下载</a><a href="https://chromewebstore.google.com/detail/tiktok-download-influence/penohjgblobinadflplocjekaclnoemh" target="_blank" class="dropdown-item">TikTok达人精灵</a></div></div>
-        <div class="link-dropdown"><button class="link-item-btn btn-tool">上网工具</button><div class="dropdown-content"><a href="https://github.com/2dust/v2rayN" target="_blank" class="dropdown-item">V2rayN官网</a><a href="https://www.clashverg.com/" target="_blank" class="dropdown-item">Clash Verge小猫咪</a><a href="https://www.fast.com" target="_blank" class="dropdown-item">节点在线测速</a><a href="https://ipleak.net/" target="_blank" class="dropdown-item">IP/DNS查询</a><a href="https://ipinfo.io/" target="_blank" class="dropdown-item">IP查询</a></div></div>
-        <div class="link-dropdown"><button class="link-item-btn btn-node">TikTok节点推荐</button><div class="dropdown-content"><a href="https://app.aait.io/login" target="_blank" class="dropdown-item">AaIT（住宅IP）</a><a href="https://www.onetechcloud.com/aff/CFERKEWW" target="_blank" class="dropdown-item">易颗云（独享）</a><a href="https://iproyal.cn/?r=537561" target="_blank" class="dropdown-item">IPRoyal（静态IP）</a><a href="https://www.ipfoxy.com/invite/nhIafP" target="_blank" class="dropdown-item">IPFoxy全球纯净代理</a></div></div>
-        <button id="switchToV2Btn" class="contact-link-btn" style="background:#2c5282; margin-bottom:8px;">V2Ray格式转换</button>
-        <button id="switchToTtsBtn" class="link-item-btn btn-tts">IIElevenLabs TTS</button>
-        <a href="https://gist.githubusercontent.com/yong84131018/5369dc7764ce5a93756cbd9fe9cbba14/raw" target="_blank" class="contact-link-btn">商务合作</a>
-    </div>
-</div>
-<script>
-    // ==================== 域名校验已在最顶部完成 ====================
-    function showModalDialog(title, message) {
-        return new Promise((resolve) => {
-            const overlay = document.createElement('div');
-            overlay.className = 'modal-overlay';
-            overlay.onclick = (e) => { if (e.target === overlay) { overlay.remove(); resolve(); } };
-            const modal = document.createElement('div');
-            modal.className = 'modal-content';
-            modal.innerHTML = `<h3>${title}</h3><p>${message}</p><button class="modal-confirm">确认</button>`;
-            overlay.appendChild(modal);
-            document.body.appendChild(overlay);
-            modal.querySelector('.modal-confirm').onclick = () => { overlay.remove(); resolve(); };
-        });
-    }
-    
-    function generateFileName(textContent) {
-        let firstLine = textContent.split(/\r?\n/)[0].trim();
-        if (!firstLine) firstLine = "语音";
-        if (firstLine.length > 30) firstLine = firstLine.substring(0, 30);
-        firstLine = firstLine.replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, '_');
-        if (firstLine === "") firstLine = "语音";
-        const now = new Date();
-        const dateTime = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}-${String(now.getMinutes()).padStart(2,'0')}-${String(now.getSeconds()).padStart(2,'0')}`;
-        return `${firstLine}_${dateTime}.mp3`;
-    }
-    
-    function getDaysAgo(date) {
-        const now = new Date();
-        const diffTime = now.getTime() - date.getTime();
-        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-        if (diffDays === 0) return "0天前";
-        return `${diffDays}天前`;
-    }
-    
-    function translateErrorMessage(errorText) {
-        const errorMap = {
-            "Failed to fetch": "网络连接失败，请检查网络后重试","NetworkError": "网络错误","Invalid API key": "API Key 无效",
-            "API key is invalid": "API Key 无效","missing_api_key": "缺少 API Key","unauthorized": "API Key 认证失败",
-            "Voice not found": "声音 ID 不存在","text is required": "请输入要转换的文字内容",
-            "text too long": "文本内容过长","quota exceeded": "字符额度已用完","character limit exceeded": "超过字符限额",
-            "monthly limit reached": "本月额度已用完","Internal server error": "服务器内部错误","Service unavailable": "服务暂时不可用"
-        };
-        let lowerError = errorText.toLowerCase();
-        for (let [eng, chn] of Object.entries(errorMap)) {
-            if (lowerError.includes(eng.toLowerCase())) return chn;
+    <script>
+        // ==================== 域名校验已在最顶部完成 ====================
+        function showModalDialog(title, message) {
+            return new Promise((resolve) => {
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay';
+                overlay.onclick = (e) => { if (e.target === overlay) { overlay.remove();
+                        resolve(); } };
+                const modal = document.createElement('div');
+                modal.className = 'modal-content';
+                modal.innerHTML = `<h3>${title}</h3><p>${message}</p><button class="modal-confirm">确认</button>`;
+                overlay.appendChild(modal);
+                document.body.appendChild(overlay);
+                modal.querySelector('.modal-confirm').onclick = () => { overlay.remove();
+                        resolve(); };
+            });
         }
-        return errorText.length > 100 ? "生成失败：" + errorText.substring(0, 100) + "..." : "生成失败：" + errorText;
-    }
-    
-    // ==================== 预计等待时间计算 ====================
-    function estimateWaitTime(text) {
-        const chineseChars = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
-        const otherChars = text.length - chineseChars;
-        const audioSeconds = chineseChars * 0.5 + otherChars * 0.3;
-        const waitSeconds = Math.round(audioSeconds / 13);
-        return Math.max(5, waitSeconds);
-    }
-    
-    function formatWaitTime(seconds) {
-        if (seconds < 60) {
-            return seconds + "秒";
-        } else {
-            const mins = Math.floor(seconds / 60);
-            const secs = seconds % 60;
-            if (secs === 0) return mins + "分钟";
-            return mins + "分" + secs + "秒";
+
+        function generateFileName(textContent) {
+            let firstLine = textContent.split(/\r?\n/)[0].trim();
+            if (!firstLine) firstLine = "语音";
+            if (firstLine.length > 30) firstLine = firstLine.substring(0, 30);
+            firstLine = firstLine.replace(/[\\/:*?"<>|]/g, '').replace(/\s+/g, '_');
+            if (firstLine === "") firstLine = "语音";
+            const now = new Date();
+            const dateTime =
+                `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}-${String(now.getMinutes()).padStart(2,'0')}-${String(now.getSeconds()).padStart(2,'0')}`;
+            return `${firstLine}_${dateTime}.mp3`;
         }
-    }
-    
-    let ttsHistory = [];
-    let voiceList = [];
-    const BUILTIN_VOICES = [
-        { voice_id: "bIHbv24MWmeRgasZH58o", name: "Will - Relaxed Optimist" },
-        { voice_id: "21m00Tcm4TlvDq8ikWAM", name: "Rachel" }, { voice_id: "AZnzlk1Xvd90eVPlC3gNE", name: "Drew" },
-        { voice_id: "29vD33N1CtxCmqQRPOHJ", name: "Clyde" }, { voice_id: "D38z5RcWu1voky8WS1ja", name: "Paul" },
-        { voice_id: "7Ego4wtoOJQ4V8ZNgT0V", name: "Thomas" }, { voice_id: "5Q0OrxXNIxTkr9FmX9Rl", name: "Josh" },
-        { voice_id: "ZkEQUQ5ZkK0zJmQpHY0V", name: "Emily" }, { voice_id: "LbR1DRY1cJmQkEaH0R1V", name: "Elli" },
-        { voice_id: "f3ffn1QvNt4Jh8zJzZ9G", name: "Dorothy" }, { voice_id: "r6o4XrHjWqf1nVvZpQxG", name: "Charlotte" },
-        { voice_id: "VR6AewLTigWG4xSOukaG", name: "Arnold" }
-    ];
-    voiceList = [...BUILTIN_VOICES];
-    
-    const MAX_TEXT_LENGTH = 5000;
-    const MAX_AUDIO_CACHE = 3;
-    const MAX_HISTORY_ITEMS = 200;
-    const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
-    
-    function getVoiceNameById(voiceId) { if (!voiceId) return "未知声音"; const found = voiceList.find(v => v.voice_id === voiceId); return found ? found.name : (BUILTIN_VOICES.find(v => v.voice_id === voiceId)?.name || "自定义声音"); }
-    function updateVoiceNameDisplay() { const voiceId = document.getElementById('voiceId').value.trim(); const displaySpan = document.getElementById('voiceNameDisplay'); displaySpan.innerHTML = voiceId ? `🎤 当前声音：${getVoiceNameById(voiceId)}` : `⚠️ 请输入声音ID`; displaySpan.style.color = voiceId ? "#e83e8c" : "#f59e0b"; }
-    
-    function playAudioFromBlob(blob) { const url = URL.createObjectURL(blob); const audioEl = document.getElementById('audio'); audioEl.src = url; audioEl.play().catch(e => console.log("播放失败:", e)); setTimeout(() => URL.revokeObjectURL(url), 5000); }
-    
-    function loadTextToInput(content) { 
-        document.getElementById("text").value = content; 
-        updateCharCount(); 
-        autoResizeTextarea(); 
-        checkExpandButton();
-        const ta = document.getElementById("text");
-        ta.scrollTop = ta.scrollHeight;
-    }
-    
-    function truncateText(content) {
-        if (content.length <= MAX_TEXT_LENGTH) return content;
-        return content.substring(0, MAX_TEXT_LENGTH) + "\n\n... [文本已截断，原文超过5000字]";
-    }
-    
-    function loadTtsHistory() { 
-        try {
-            const all = JSON.parse(localStorage.getItem("tts_history_v2")) || []; 
-            const now = Date.now();
-            ttsHistory = all.filter(item => now - item.time < SEVEN_DAYS);
-            if (ttsHistory.length > MAX_HISTORY_ITEMS) {
-                ttsHistory = ttsHistory.slice(0, MAX_HISTORY_ITEMS);
+
+        function getDaysAgo(date) {
+            const now = new Date();
+            const diffTime = now.getTime() - date.getTime();
+            const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            if (diffDays === 0) return "0天前";
+            return `${diffDays}天前`;
+        }
+
+        function translateErrorMessage(errorText) {
+            const errorMap = {
+                "Failed to fetch": "网络连接失败，请检查网络后重试",
+                "NetworkError": "网络错误",
+                "Invalid API key": "API Key 无效",
+                "API key is invalid": "API Key 无效",
+                "missing_api_key": "缺少 API Key",
+                "unauthorized": "API Key 认证失败",
+                "Voice not found": "声音 ID 不存在",
+                "text is required": "请输入要转换的文字内容",
+                "text too long": "文本内容过长",
+                "quota exceeded": "字符额度已用完",
+                "character limit exceeded": "超过字符限额",
+                "monthly limit reached": "本月额度已用完",
+                "Internal server error": "服务器内部错误",
+                "Service unavailable": "服务暂时不可用"
+            };
+            let lowerError = errorText.toLowerCase();
+            for (let [eng, chn] of Object.entries(errorMap)) {
+                if (lowerError.includes(eng.toLowerCase())) return chn;
             }
-            for (let i = 0; i < ttsHistory.length; i++) {
-                if (i >= MAX_AUDIO_CACHE) {
-                    ttsHistory[i].blobBase64 = null;
-                }
-            }
-            localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
-            renderTtsHistoryByDate();
-        } catch(e) {
-            console.warn("加载历史记录失败:", e);
-            ttsHistory = [];
-            renderTtsHistoryByDate();
+            return errorText.length > 100 ? "生成失败：" + errorText.substring(0, 100) + "..." : "生成失败：" + errorText;
         }
-    }
-    
-    function saveTtsHistory(content, blobData) { 
-        if (!content) return;
-        const truncatedContent = truncateText(content);
-        const recentExists = ttsHistory.some(x => x.content === content && (Date.now() - x.time) < 30 * 24 * 60 * 60 * 1000);
-        if (recentExists) return;
-        let newItem = { content: truncatedContent, time: Date.now(), blobBase64: null };
-        if (blobData) {
-            const reader = new FileReader();
-            reader.readAsDataURL(blobData);
-            reader.onloadend = function() {
-                newItem.blobBase64 = reader.result;
-                ttsHistory.unshift(newItem);
-                cleanupAudioCache();
+
+        let ttsHistory = [];
+        let voiceList = [];
+        const BUILTIN_VOICES = [
+            { voice_id: "bIHbv24MWmeRgasZH58o", name: "Will - Relaxed Optimist" },
+            { voice_id: "21m00Tcm4TlvDq8ikWAM", name: "Rachel" },
+            { voice_id: "AZnzlk1Xvd90eVPlC3gNE", name: "Drew" },
+            { voice_id: "29vD33N1CtxCmqQRPOHJ", name: "Clyde" },
+            { voice_id: "D38z5RcWu1voky8WS1ja", name: "Paul" },
+            { voice_id: "7Ego4wtoOJQ4V8ZNgT0V", name: "Thomas" },
+            { voice_id: "5Q0OrxXNIxTkr9FmX9Rl", name: "Josh" },
+            { voice_id: "ZkEQUQ5ZkK0zJmQpHY0V", name: "Emily" },
+            { voice_id: "LbR1DRY1cJmQkEaH0R1V", name: "Elli" },
+            { voice_id: "f3ffn1QvNt4Jh8zJzZ9G", name: "Dorothy" },
+            { voice_id: "r6o4XrHjWqf1nVvZpQxG", name: "Charlotte" },
+            { voice_id: "VR6AewLTigWG4xSOukaG", name: "Arnold" }
+        ];
+        voiceList = [...BUILTIN_VOICES];
+
+        const MAX_TEXT_LENGTH = 5000;
+        const MAX_AUDIO_CACHE = 3;
+        const MAX_HISTORY_ITEMS = 200;
+        const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
+
+        function getVoiceNameById(voiceId) {
+            if (!voiceId) return "未知声音";
+            const found = voiceList.find(v => v.voice_id === voiceId);
+            return found ? found.name : (BUILTIN_VOICES.find(v => v.voice_id === voiceId)?.name || "自定义声音");
+        }
+
+        function updateVoiceNameDisplay() {
+            const voiceId = document.getElementById('voiceId').value.trim();
+            const displaySpan = document.getElementById('voiceNameDisplay');
+            displaySpan.innerHTML = voiceId ? `🎤 当前声音：${getVoiceNameById(voiceId)}` : `⚠️ 请输入声音ID`;
+            displaySpan.style.color = voiceId ? "#e83e8c" : "#f59e0b";
+        }
+
+        function playAudioFromBlob(blob) {
+            const url = URL.createObjectURL(blob);
+            const audioEl = document.getElementById('audio');
+            audioEl.src = url;
+            audioEl.play().catch(e => console.log("播放失败:", e));
+            setTimeout(() => URL.revokeObjectURL(url), 5000);
+        }
+
+        function loadTextToInput(content) {
+            document.getElementById("text").value = content;
+            updateCharCount();
+            autoResizeTextarea();
+        }
+
+        // 截断文本到5000字（无弹窗）
+        function truncateText(content) {
+            if (content.length <= MAX_TEXT_LENGTH) return content;
+            return content.substring(0, MAX_TEXT_LENGTH) + "\n\n... [文本已截断，原文超过5000字]";
+        }
+
+        function loadTtsHistory() {
+            try {
+                const all = JSON.parse(localStorage.getItem("tts_history_v2")) || [];
+                const now = Date.now();
+                ttsHistory = all.filter(item => now - item.time < SEVEN_DAYS);
                 if (ttsHistory.length > MAX_HISTORY_ITEMS) {
                     ttsHistory = ttsHistory.slice(0, MAX_HISTORY_ITEMS);
                 }
+                for (let i = 0; i < ttsHistory.length; i++) {
+                    if (i >= MAX_AUDIO_CACHE) {
+                        ttsHistory[i].blobBase64 = null;
+                    }
+                }
                 localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
                 renderTtsHistoryByDate();
+            } catch (e) {
+                console.warn("加载历史记录失败:", e);
+                ttsHistory = [];
+                renderTtsHistoryByDate();
+            }
+        }
+
+        // ============================================================
+        //  saveTtsHistory - 已删除"相同内容不保存"的检查
+        //  用户可能重复生成相同音频（不同参数），所以不检查重复
+        // ============================================================
+        function saveTtsHistory(content, blobData) {
+            if (!content) return;
+
+            // 截断文本
+            const truncatedContent = truncateText(content);
+
+            // ❌ 已删除"相同内容不保存"的检查
+            // 用户可能重复生成相同音频（不同参数），所以不检查重复
+
+            let newItem = {
+                content: truncatedContent,
+                time: Date.now(),
+                blobBase64: null
             };
-            return;
+
+            if (blobData) {
+                const reader = new FileReader();
+                reader.readAsDataURL(blobData);
+                reader.onloadend = function() {
+                    newItem.blobBase64 = reader.result;
+                    ttsHistory.unshift(newItem);
+                    cleanupAudioCache();
+                    if (ttsHistory.length > MAX_HISTORY_ITEMS) {
+                        ttsHistory = ttsHistory.slice(0, MAX_HISTORY_ITEMS);
+                    }
+                    localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
+                    renderTtsHistoryByDate();
+                };
+                return;
+            }
+
+            ttsHistory.unshift(newItem);
+            cleanupAudioCache();
+            if (ttsHistory.length > MAX_HISTORY_ITEMS) {
+                ttsHistory = ttsHistory.slice(0, MAX_HISTORY_ITEMS);
+            }
+            localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
+            renderTtsHistoryByDate();
         }
-        ttsHistory.unshift(newItem);
-        cleanupAudioCache();
-        if (ttsHistory.length > MAX_HISTORY_ITEMS) {
-            ttsHistory = ttsHistory.slice(0, MAX_HISTORY_ITEMS);
-        }
-        localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
-        renderTtsHistoryByDate();
-    }
-    
-    function cleanupAudioCache() {
-        let audioCount = 0;
-        for (let i = 0; i < ttsHistory.length; i++) {
-            if (ttsHistory[i].blobBase64) {
-                audioCount++;
-                if (audioCount > MAX_AUDIO_CACHE) {
-                    ttsHistory[i].blobBase64 = null;
+
+        function cleanupAudioCache() {
+            let audioCount = 0;
+            for (let i = 0; i < ttsHistory.length; i++) {
+                if (ttsHistory[i].blobBase64) {
+                    audioCount++;
+                    if (audioCount > MAX_AUDIO_CACHE) {
+                        ttsHistory[i].blobBase64 = null;
+                    }
                 }
             }
         }
-    }
-    
-    // ==================== 清空所有历史（文本历史 + API历史） ====================
-    function clearAllHistory() {
-        if (!confirm("确定清空所有历史记录吗？\n\n这将同时清空：\n• 文本历史（7天内）\n• API Key 历史")) {
-            return;
-        }
-        ttsHistory = [];
-        localStorage.removeItem("tts_history_v2");
-        renderTtsHistoryByDate();
-        localStorage.removeItem("api_key_history");
-        loadApiHistory();
-        document.getElementById("apiKey").value = "";
-        document.getElementById("quotaCard").style.display = "none";
-        document.getElementById("log").innerText = "✅ 所有历史记录已清空";
-        setTimeout(() => { if (document.getElementById("log").innerText.includes("已清空")) document.getElementById("log").innerText = ""; }, 3000);
-    }
-    
-    // ==================== 清空输入框（无提示） ====================
-    function clearInputText() {
-        const ta = document.getElementById('text');
-        ta.value = "";
-        updateCharCount();
-        autoResizeTextarea();
-        checkExpandButton();
-    }
-    
-    async function reDownloadHistory(item) { 
-        if (item.blobBase64) { 
-            try {
-                const byteString = atob(item.blobBase64.split(',')[1]); 
-                const ab = new ArrayBuffer(byteString.length); 
-                const ia = new Uint8Array(ab); 
-                for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i); 
-                const blob = new Blob([ab], { type: "audio/mpeg" }); 
-                const fileName = generateFileName(item.content); 
-                const a = document.createElement('a'); 
-                a.href = URL.createObjectURL(blob); 
-                a.download = fileName; 
-                a.click(); 
-                setTimeout(() => URL.revokeObjectURL(a.href), 100); 
-                await showModalDialog("✅ 重新下载成功", `文件已保存：${fileName}`); 
-            } catch(e) {
-                alert("音频数据已损坏，请重新生成。");
+
+        async function reDownloadHistory(item) {
+            if (item.blobBase64) {
+                try {
+                    const byteString = atob(item.blobBase64.split(',')[1]);
+                    const ab = new ArrayBuffer(byteString.length);
+                    const ia = new Uint8Array(ab);
+                    for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+                    const blob = new Blob([ab], { type: "audio/mpeg" });
+                    const fileName = generateFileName(item.content);
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = fileName;
+                    a.click();
+                    setTimeout(() => URL.revokeObjectURL(a.href), 100);
+                    await showModalDialog("✅ 重新下载成功", `文件已保存：${fileName}`);
+                } catch (e) {
+                    alert("音频数据已损坏，请重新生成。");
+                }
+            } else {
+                alert("该历史记录的音频缓存已过期（仅保留最近3条），请重新生成。");
             }
-        } else { 
-            alert("该历史记录的音频缓存已过期（仅保留最近3条），请重新生成。"); 
-        } 
-    }
-    
-    function renderTtsHistoryByDate() {
-        const container = document.getElementById("historyList");
-        if (!container) return;
-        const groups = {};
-        const now = new Date();
-        const todayStr = formatDateKey(now);
-        const yesterdayStr = formatDateKey(new Date(now.getTime() - 86400000));
-        ttsHistory.forEach(item => {
-            const date = new Date(item.time);
-            let dateKey = formatDateKey(date);
-            let displayDate = dateKey;
-            if (dateKey === todayStr) displayDate = "今天";
-            else if (dateKey === yesterdayStr) displayDate = "昨天";
-            else { const diffDays = Math.floor((now.getTime() - date.getTime()) / 86400000); if (diffDays <= 7) displayDate = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][date.getDay()]; else displayDate = `${date.getMonth()+1}月${date.getDate()}日`; }
-            if (!groups[dateKey]) groups[dateKey] = { displayDate, items: [] };
-            groups[dateKey].items.push(item);
-        });
-        const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a));
-        let html = '';
-        sortedDates.forEach(dateKey => {
-            const group = groups[dateKey];
-            html += `<div class="history-date-group"><div class="history-date-header">📅 ${group.displayDate} <span>(${group.items.length}条)</span></div>`;
-            group.items.forEach(item => {
-                const displayText = item.content.length > 35 ? item.content.substring(0, 35) + "..." : item.content;
-                const hasAudio = item.blobBase64 ? true : false;
-                const audioTag = hasAudio ? '' : '<span class="history-no-audio">📁 仅文本</span>';
-                html += `<div class="history-item" data-time="${item.time}">
-                            <span class="history-text" title="${escapeHtml(item.content)}">${escapeHtml(displayText)}</span>
-                            <div class="history-item-buttons">
-                                <button class="history-play-btn" data-time="${item.time}" ${hasAudio ? '' : 'disabled style="opacity:0.5;cursor:not-allowed;"'}>▶ 播放</button>
-                                <button class="history-download-btn" data-time="${item.time}" ${hasAudio ? '' : 'disabled style="opacity:0.5;cursor:not-allowed;"'}>⬇ 下载</button>
-                                ${audioTag}
-                            </div>
-                         </div>`;
+        }
+
+        function renderTtsHistoryByDate() {
+            const container = document.getElementById("historyList");
+            if (!container) return;
+            const groups = {};
+            const now = new Date();
+            const todayStr = formatDateKey(now);
+            const yesterdayStr = formatDateKey(new Date(now.getTime() - 86400000));
+            ttsHistory.forEach(item => {
+                const date = new Date(item.time);
+                let dateKey = formatDateKey(date);
+                let displayDate = dateKey;
+                if (dateKey === todayStr) displayDate = "今天";
+                else if (dateKey === yesterdayStr) displayDate = "昨天";
+                else {
+                    const diffDays = Math.floor((now.getTime() - date.getTime()) / 86400000);
+                    if (diffDays <= 7) displayDate = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'][date
+                    .getDay()];
+                    else displayDate = `${date.getMonth()+1}月${date.getDate()}日`;
+                }
+                if (!groups[dateKey]) groups[dateKey] = { displayDate, items: [] };
+                groups[dateKey].items.push(item);
             });
-            html += `</div>`;
-        });
-        if (sortedDates.length === 0) html = '<div style="text-align:center; color:#94a3b8; padding:20px;">暂无历史记录</div>';
-        container.innerHTML = html;
-        
-        container.querySelectorAll('.history-text').forEach(el => { 
-            el.addEventListener('click', (e) => { 
-                e.stopPropagation(); 
-                const time = parseInt(el.parentElement.getAttribute('data-time')); 
-                const item = ttsHistory.find(i => i.time === time); 
-                if (item) loadTextToInput(item.content); 
-            }); 
-        });
-        container.querySelectorAll('.history-play-btn:not([disabled])').forEach(btn => { 
-            btn.addEventListener('click', (e) => { 
-                e.stopPropagation(); 
-                const time = parseInt(btn.getAttribute('data-time')); 
-                const item = ttsHistory.find(i => i.time === time); 
-                if (item && item.blobBase64) { 
-                    try {
-                        const byteString = atob(item.blobBase64.split(',')[1]); 
-                        const ab = new ArrayBuffer(byteString.length); 
-                        const ia = new Uint8Array(ab); 
-                        for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i); 
-                        const blob = new Blob([ab], { type: "audio/mpeg" }); 
-                        playAudioFromBlob(blob); 
-                    } catch(e) {
-                        alert("音频数据已损坏，请重新生成。");
+            const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a));
+            let html = '';
+            sortedDates.forEach(dateKey => {
+                const group = groups[dateKey];
+                html +=
+                    `<div class="history-date-group"><div class="history-date-header">📅 ${group.displayDate} <span>(${group.items.length}条)</span></div>`;
+                group.items.forEach(item => {
+                    const displayText = item.content.length > 35 ? item.content.substring(0, 35) + "..." :
+                        item.content;
+                    const hasAudio = item.blobBase64 ? true : false;
+                    const audioTag = hasAudio ? '' :
+                        '<span class="history-no-audio">📁 仅文本</span>';
+                    html += `<div class="history-item" data-time="${item.time}">
+                                <span class="history-text" title="${escapeHtml(item.content)}">${escapeHtml(displayText)}</span>
+                                <div class="history-item-buttons">
+                                    <button class="history-play-btn" data-time="${item.time}" ${hasAudio ? '' : 'disabled style="opacity:0.5;cursor:not-allowed;"'}>▶ 播放</button>
+                                    <button class="history-download-btn" data-time="${item.time}" ${hasAudio ? '' : 'disabled style="opacity:0.5;cursor:not-allowed;"'}>⬇ 下载</button>
+                                    ${audioTag}
+                                </div>
+                             </div>`;
+                });
+                html += `</div>`;
+            });
+            if (sortedDates.length === 0) html =
+                '<div style="text-align:center; color:#94a3b8; padding:20px;">暂无历史记录</div>';
+            container.innerHTML = html;
+
+            container.querySelectorAll('.history-text').forEach(el => {
+                el.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const time = parseInt(el.parentElement.getAttribute('data-time'));
+                    const item = ttsHistory.find(i => i.time === time);
+                    if (item) loadTextToInput(item.content);
+                });
+            });
+            container.querySelectorAll('.history-play-btn:not([disabled])').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const time = parseInt(btn.getAttribute('data-time'));
+                    const item = ttsHistory.find(i => i.time === time);
+                    if (item && item.blobBase64) {
+                        try {
+                            const byteString = atob(item.blobBase64.split(',')[1]);
+                            const ab = new ArrayBuffer(byteString.length);
+                            const ia = new Uint8Array(ab);
+                            for (let i = 0; i < byteString.length; i++) ia[i] = byteString
+                            .charCodeAt(i);
+                            const blob = new Blob([ab], { type: "audio/mpeg" });
+                            playAudioFromBlob(blob);
+                        } catch (e) {
+                            alert("音频数据已损坏，请重新生成。");
+                        }
+                    } else {
+                        alert("该历史记录的音频缓存已过期（仅保留最近3条），请重新生成。");
                     }
-                } else { 
-                    alert("该历史记录的音频缓存已过期（仅保留最近3条），请重新生成。"); 
-                } 
-            }); 
-        });
-        container.querySelectorAll('.history-download-btn:not([disabled])').forEach(btn => { 
-            btn.addEventListener('click', (e) => { 
-                e.stopPropagation(); 
-                const time = parseInt(btn.getAttribute('data-time')); 
-                const item = ttsHistory.find(i => i.time === time); 
-                if (item) reDownloadHistory(item); 
-            }); 
-        });
-    }
-    
-    function formatDateKey(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`; }
-    function escapeHtml(str) { if (!str) return ''; return str.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]); }
-    
-    let autoQuotaTimer = null;
-    async function fetchQuotaOnly(apiKey) { if (!apiKey) return; try { const res = await fetch("https://api.elevenlabs.io/v1/user", { method: "GET", headers: { "xi-api-key": apiKey } }); const quotaCard = document.getElementById('quotaCard'); const quotaAmountSpan = document.getElementById('quotaAmount'); if (res.ok) { const data = await res.json(); if (data.subscription) { const remaining = Math.max(0, (data.subscription.character_limit || 0) - (data.subscription.character_count || 0)); quotaAmountSpan.innerText = remaining.toLocaleString(); quotaCard.style.display = 'flex'; if (remaining < 10000) quotaCard.classList.add('quota-warning'); else quotaCard.classList.remove('quota-warning'); } } else if (res.status === 401) quotaCard.style.display = 'none'; } catch(e) { console.warn(e); } }
-    function autoFetchQuota(apiKey) { if (autoQuotaTimer) clearTimeout(autoQuotaTimer); autoQuotaTimer = setTimeout(() => { if (apiKey && apiKey.length > 10) fetchQuotaOnly(apiKey); }, 800); }
-    
-    // ==================== 展开/收起功能 ====================
-    function checkExpandButton() {
-        const ta = document.getElementById('text');
-        const btn = document.getElementById('expandBtn');
-        if (!ta || !btn) return;
-        const lineHeight = parseInt(getComputedStyle(ta).lineHeight) || 24;
-        const minExpandHeight = lineHeight * 10 + 20;
-        if (ta.scrollHeight > minExpandHeight) {
-            btn.classList.add('visible');
-        } else {
-            btn.classList.remove('visible');
-            if (ta.classList.contains('expanded')) {
-                ta.classList.remove('expanded');
-                ta.style.maxHeight = '360px';
-                btn.textContent = '∨';
+                });
+            });
+            container.querySelectorAll('.history-download-btn:not([disabled])').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const time = parseInt(btn.getAttribute('data-time'));
+                    const item = ttsHistory.find(i => i.time === time);
+                    if (item) reDownloadHistory(item);
+                });
+            });
+        }
+
+        function formatDateKey(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`; }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]);
+        }
+
+        function clearTtsHistory() {
+            if (!confirm("确定清空所有文本历史？")) return;
+            ttsHistory = [];
+            localStorage.removeItem("tts_history_v2");
+            renderTtsHistoryByDate();
+            document.getElementById("log").innerText = "✅ 文本历史已清空";
+            setTimeout(() => { if (document.getElementById("log").innerText.includes("清空")) document.getElementById(
+                        "log").innerText = ""; }, 3000);
+        }
+
+        let autoQuotaTimer = null;
+
+        async function fetchQuotaOnly(apiKey) {
+            if (!apiKey) return;
+            try {
+                const res = await fetch("https://api.elevenlabs.io/v1/user", { method: "GET", headers: { "xi-api-key": apiKey } });
+                const quotaCard = document.getElementById('quotaCard');
+                const quotaAmountSpan = document.getElementById('quotaAmount');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.subscription) {
+                        const remaining = Math.max(0, (data.subscription.character_limit || 0) - (data.subscription
+                            .character_count || 0));
+                        quotaAmountSpan.innerText = remaining.toLocaleString();
+                        quotaCard.style.display = 'flex';
+                        if (remaining < 10000) quotaCard.classList.add('quota-warning');
+                        else quotaCard.classList.remove('quota-warning');
+                    }
+                } else if (res.status === 401) quotaCard.style.display = 'none';
+            } catch (e) { console.warn(e); }
+        }
+
+        function autoFetchQuota(apiKey) {
+            if (autoQuotaTimer) clearTimeout(autoQuotaTimer);
+            autoQuotaTimer = setTimeout(() => { if (apiKey && apiKey.length > 10) fetchQuotaOnly(apiKey); }, 800);
+        }
+
+        // ==================== 预计等待时间计算 ====================
+        function estimateWaitTime(text) {
+            const chineseChars = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
+            const otherChars = text.length - chineseChars;
+            const audioSeconds = chineseChars * 0.5 + otherChars * 0.3;
+            const waitSeconds = Math.round(audioSeconds / 13);
+            return Math.max(5, waitSeconds);
+        }
+
+        function formatWaitTime(seconds) {
+            if (seconds < 60) {
+                return seconds + "秒";
+            } else {
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                if (secs === 0) return mins + "分钟";
+                return mins + "分" + secs + "秒";
             }
         }
-    }
-    
-    function toggleExpand() {
-        const ta = document.getElementById('text');
-        const btn = document.getElementById('expandBtn');
-        if (!ta || !btn) return;
-        ta.classList.toggle('expanded');
-        if (ta.classList.contains('expanded')) {
-            btn.textContent = '∧';
-            ta.style.maxHeight = 'none';
-            ta.scrollTop = ta.scrollHeight;
-        } else {
-            btn.textContent = '∨';
-            ta.style.maxHeight = '360px';
-            ta.scrollTop = 0;
+
+        async function startGenerate() {
+            const key = document.getElementById("apiKey").value.trim();
+            const vid = document.getElementById("voiceId").value.trim();
+            let txt = document.getElementById("text").value.trim();
+            const log = document.getElementById("log");
+            if (!key) { log.innerText = "❌ 请输入API Key"; return; }
+            if (!vid) { log.innerText = "❌ 请输入声音ID"; return; }
+            if (!txt) { log.innerText = "❌ 请输入要转换的文字"; return; }
+
+            // 计算预计等待时间
+            const waitSeconds = estimateWaitTime(txt);
+            const waitText = formatWaitTime(waitSeconds);
+            const charCount = txt.length;
+            log.innerText = `🔄 正在生成音频，预计等待约 ${waitText} (当前 ${charCount} 字)...`;
+
+            saveApiHistory(key);
+            const startTime = Date.now();
+
+            try {
+                const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${vid}`, {
+                    method: "POST",
+                    headers: { "xi-api-key": key, "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        text: txt,
+                        model_id: "eleven_multilingual_v2",
+                        voice_settings: {
+                            stability: parseFloat(document.getElementById("stability").value),
+                            similarity_boost: parseFloat(document.getElementById("similarity").value),
+                            style: parseFloat(document.getElementById("style").value),
+                            use_speaker_boost: false
+                        },
+                        speed: parseFloat(document.getElementById("speed").value)
+                    })
+                });
+                if (!res.ok) {
+                    let errorMsg = "";
+                    try {
+                        const errorData = await res.json();
+                        errorMsg = errorData.detail?.message || errorData.detail || JSON.stringify(errorData);
+                    } catch (e) { errorMsg = await res.text(); }
+                    throw new Error(errorMsg);
+                }
+                const buf = await res.arrayBuffer();
+                const elapsed = Math.round((Date.now() - startTime) / 1000);
+                const blob = new Blob([buf], { type: "audio/mpeg" });
+                const audioUrl = URL.createObjectURL(blob);
+                document.getElementById("audio").src = audioUrl;
+                document.getElementById("audio").play().catch(e => console.log("自动播放被阻止"));
+                const fileName = generateFileName(txt);
+                const downloadUrl = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = downloadUrl;
+                a.download = fileName;
+                a.style.display = "none";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                setTimeout(() => { URL.revokeObjectURL(downloadUrl);
+                    URL.revokeObjectURL(audioUrl); }, 1000);
+
+                // ✅ 使用 saveTtsHistory 保存，已删除重复检查
+                saveTtsHistory(txt, blob);
+
+                log.innerText = `✅ 生成成功！耗时 ${elapsed} 秒，音频已自动播放并下载`;
+                await showModalDialog("✅ 下载成功", `文件已保存：${fileName}\n\n文件命名规则：文本第一行_日期时间.mp3`);
+                setTimeout(() => fetchQuotaOnly(key), 1000);
+            } catch (error) {
+                const chineseMsg = translateErrorMessage(error.message);
+                log.innerText = `❌ ${chineseMsg}`;
+                console.error(error);
+            }
         }
-        setTimeout(() => checkExpandButton(), 100);
-    }
-    
-    // ==================== 复制文本功能 ====================
-    function copyTextContent() {
-        const text = document.getElementById('text').value;
-        if (!text.trim()) {
-            document.getElementById('log').innerText = "⚠️ 文本为空，无法复制";
-            setTimeout(() => { if (document.getElementById('log').innerText.includes("无法复制")) document.getElementById('log').innerText = ""; }, 2000);
-            return;
-        }
-        navigator.clipboard.writeText(text).then(() => {
-            document.getElementById('log').innerText = "✅ 文本已复制到剪贴板";
-            setTimeout(() => { if (document.getElementById('log').innerText.includes("复制到剪贴板")) document.getElementById('log').innerText = ""; }, 2000);
-        }).catch(() => {
+
+        function autoResizeTextarea() {
             const ta = document.getElementById('text');
-            ta.select();
-            document.execCommand('copy');
-            document.getElementById('log').innerText = "✅ 文本已复制到剪贴板";
-            setTimeout(() => { if (document.getElementById('log').innerText.includes("复制到剪贴板")) document.getElementById('log').innerText = ""; }, 2000);
-        });
-    }
-    
-    async function startGenerate() {
-        const key = document.getElementById("apiKey").value.trim();
-        const vid = document.getElementById("voiceId").value.trim();
-        let txt = document.getElementById("text").value.trim();
-        const log = document.getElementById("log");
-        if (!key) { log.innerText = "❌ 请输入API Key"; return; }
-        if (!vid) { log.innerText = "❌ 请输入声音ID"; return; }
-        if (!txt) { log.innerText = "❌ 请输入要转换的文字"; return; }
-        
-        const waitSeconds = estimateWaitTime(txt);
-        const waitText = formatWaitTime(waitSeconds);
-        const charCount = txt.length;
-        log.innerText = `🔄 正在生成音频，预计等待约 ${waitText} (当前 ${charCount} 字)...`;
-        
-        saveApiHistory(key);
-        const startTime = Date.now();
-        
-        try {
-            const res = await fetch(`https://api.elevenlabs.io/v1/text-to-speech/${vid}`, {
-                method: "POST", headers: { "xi-api-key": key, "Content-Type": "application/json" },
-                body: JSON.stringify({ text: txt, model_id: "eleven_multilingual_v2", voice_settings: { stability: parseFloat(document.getElementById("stability").value), similarity_boost: parseFloat(document.getElementById("similarity").value), style: parseFloat(document.getElementById("style").value), use_speaker_boost: false }, speed: parseFloat(document.getElementById("speed").value) })
+            if (ta) {
+                ta.style.height = 'auto';
+                ta.style.height = ta.scrollHeight + 'px';
+            }
+        }
+
+        function updateCharCount() {
+            const text = document.getElementById('text').value;
+            document.getElementById('charCount').textContent = `字数：${text.length}`;
+            autoResizeTextarea();
+        }
+
+        function formatTime(timestamp) {
+            const d = new Date(timestamp);
+            return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+        }
+
+        // ============================================================
+        //  saveApiHistory - 保留"相同 Key 不重复保存"的逻辑
+        // ============================================================
+        function saveApiHistory(key) {
+            if (!key) return;
+            let list = JSON.parse(localStorage.getItem("api_key_history")) || [];
+            // ✅ 检查重复：如果已存在，先移除旧的
+            list = list.filter(i => i.key !== key);
+            list.unshift({ key, time: Date.now() });
+            if (list.length > 200) list = list.slice(0, 200);
+            localStorage.setItem("api_key_history", JSON.stringify(list));
+            loadApiHistory();
+        }
+
+        function loadApiHistory() {
+            let list = JSON.parse(localStorage.getItem("api_key_history")) || [];
+            localStorage.setItem("api_key_history", JSON.stringify(list));
+            const groups = {};
+            list.forEach(item => {
+                const date = new Date(item.time);
+                const dateKey = formatDateKey(date);
+                if (!groups[dateKey]) groups[dateKey] = { date, items: [] };
+                groups[dateKey].items.push(item);
             });
-            if (!res.ok) { let errorMsg = ""; try { const errorData = await res.json(); errorMsg = errorData.detail?.message || errorData.detail || JSON.stringify(errorData); } catch(e) { errorMsg = await res.text(); } throw new Error(errorMsg); }
-            const buf = await res.arrayBuffer();
-            const elapsed = Math.round((Date.now() - startTime) / 1000);
-            const blob = new Blob([buf], { type: "audio/mpeg" });
-            const audioUrl = URL.createObjectURL(blob);
-            document.getElementById("audio").src = audioUrl;
-            document.getElementById("audio").play().catch(e => console.log("自动播放被阻止"));
-            const fileName = generateFileName(txt);
-            const downloadUrl = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = downloadUrl;
-            a.download = fileName;
-            a.style.display = "none";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            setTimeout(() => { URL.revokeObjectURL(downloadUrl); URL.revokeObjectURL(audioUrl); }, 1000);
-            
-            saveTtsHistory(txt, blob);
-            
-            log.innerText = `✅ 生成成功！耗时 ${elapsed} 秒，音频已自动播放并下载`;
-            await showModalDialog("✅ 下载成功", `文件已保存：${fileName}\n\n文件命名规则：文本第一行_日期时间.mp3`);
-            setTimeout(() => fetchQuotaOnly(key), 1000);
-        } catch (error) { const chineseMsg = translateErrorMessage(error.message); log.innerText = `❌ ${chineseMsg}`; console.error(error); }
-    }
-    
-    function autoResizeTextarea() { 
-        const ta = document.getElementById('text'); 
-        if (ta) { 
-            ta.style.height = 'auto'; 
-            ta.style.height = ta.scrollHeight + 'px'; 
-        } 
-        checkExpandButton();
-    }
-    function updateCharCount() { 
-        const text = document.getElementById('text').value; 
-        document.getElementById('charCount').textContent = `字数：${text.length}`; 
-        autoResizeTextarea(); 
-        const ta = document.getElementById('text');
-        if (ta) ta.scrollTop = ta.scrollHeight;
-    }
-    function formatTime(timestamp) { const d = new Date(timestamp); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
-    
-    function loadApiHistory() { let list = JSON.parse(localStorage.getItem("api_key_history")) || []; localStorage.setItem("api_key_history", JSON.stringify(list)); const groups = {}; list.forEach(item => { const date = new Date(item.time); const dateKey = formatDateKey(date); if (!groups[dateKey]) groups[dateKey] = { date, items: [] }; groups[dateKey].items.push(item); }); const apiSelect = document.getElementById("apiHistorySelect"); const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a)); apiSelect.innerHTML = '<option value="">📅 API历史记录</option>'; sortedDates.forEach(dateKey => { const group = groups[dateKey]; const daysAgoText = getDaysAgo(group.date); const optgroup = document.createElement("optgroup"); optgroup.label = `📅 ${dateKey} (${daysAgoText})`; group.items.forEach(item => { const option = document.createElement("option"); option.value = item.key; option.textContent = `${item.key.substring(0, 12)}...  ${formatTime(item.time)}`; optgroup.appendChild(option); }); apiSelect.appendChild(optgroup); }); }
-    function saveApiHistory(key) { if (!key) return; let list = JSON.parse(localStorage.getItem("api_key_history")) || []; list = list.filter(i => i.key !== key); list.unshift({ key, time: Date.now() }); if (list.length > 200) list = list.slice(0, 200); localStorage.setItem("api_key_history", JSON.stringify(list)); loadApiHistory(); }
-    function onApiKeyInput() { autoFetchQuota(document.getElementById("apiKey").value.trim()); }
-    function updateSlider(slider) { const v = parseFloat(slider.value); const el = document.getElementById(slider.id+"Val"); if (slider.id === "stability" || slider.id === "similarity") el.innerText = Math.round(v*100)+"%"; else if (slider.id === "speed") el.innerText = v.toFixed(1); else el.innerText = v; }
-    function loadTtsTxtFile(e) { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = ev => { document.getElementById("text").value = ev.target.result; updateCharCount(); autoResizeTextarea(); checkExpandButton(); document.getElementById("log").innerText = "✅ 文件已导入"; setTimeout(() => { if (document.getElementById("log").innerText === "✅ 文件已导入") document.getElementById("log").innerText = ""; }, 3000); }; r.readAsText(f, "UTF-8"); e.target.value = ""; }
-    async function fetchApiInfo() { const apiKey = document.getElementById('apiKey').value.trim(); if (!apiKey) { document.getElementById("log").innerText = "❌ 请先输入API Key"; return; } document.getElementById("log").innerText = "🔄 正在获取API信息..."; try { const userRes = await fetch("https://api.elevenlabs.io/v1/user", { method: "GET", headers: { "xi-api-key": apiKey } }); if (userRes.ok) { const data = await userRes.json(); if (data.subscription) { const remaining = Math.max(0, (data.subscription.character_limit || 0) - (data.subscription.character_count || 0)); document.getElementById("quotaAmount").innerText = remaining.toLocaleString(); document.getElementById("quotaCard").style.display = 'flex'; if (remaining < 10000) document.getElementById("quotaCard").classList.add('quota-warning'); else document.getElementById("quotaCard").classList.remove('quota-warning'); } } else if (userRes.status === 401) { document.getElementById("log").innerText = "❌ API Key 无效或已过期"; document.getElementById("quotaCard").style.display = 'none'; setTimeout(() => { if (document.getElementById("log").innerText.includes("无效")) document.getElementById("log").innerText = ""; }, 3000); return; } const voicesRes = await fetch("https://api.elevenlabs.io/v1/voices", { method: "GET", headers: { "xi-api-key": apiKey } }); if (voicesRes.ok) { const voicesData = await voicesRes.json(); if (voicesData.voices) { voiceList = voicesData.voices.map(v => ({ voice_id: v.voice_id, name: v.name })); sessionStorage.setItem('elevenlabs_voices', JSON.stringify(voiceList)); } } else { voiceList = [...BUILTIN_VOICES]; } updateVoiceNameDisplay(); document.getElementById("log").innerText = "✅ 获取成功！已更新额度和声音库"; saveApiHistory(apiKey); setTimeout(() => { if (document.getElementById("log").innerText.includes("获取成功")) document.getElementById("log").innerText = ""; }, 4000); } catch(e) { voiceList = [...BUILTIN_VOICES]; updateVoiceNameDisplay(); document.getElementById("log").innerText = "⚠️ 使用内置声音库"; } }
-    
-    // 二维码/V2Ray 逻辑 (精简保留)
-    let qrInstance = null, selectedNode = null, nodeList = [], batchQRList = [];
-    const correctLevelMap = { L: QRCode.CorrectLevel.L, M: QRCode.CorrectLevel.M, Q: QRCode.CorrectLevel.Q, H: QRCode.CorrectLevel.H };
-    function getCorrectLevel() { const levelVal = document.getElementById("qr-correct").value; if (levelVal === "auto") { const content = document.getElementById("qr-content").value.trim(); return content.length < 50 ? QRCode.CorrectLevel.L : (content.length < 150 ? QRCode.CorrectLevel.M : QRCode.CorrectLevel.H); } return correctLevelMap[levelVal]; }
-    function getPureNodeContent(nodeStr) { const trimStr = nodeStr.trim(); const socks5Reg = /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\:(\d{1,6})\:([\s\S]+)\:([\s\S]+)$/; if (socks5Reg.test(trimStr)) { const [, ip, port, user, pass] = trimStr.match(socks5Reg); return `socks://${user}:${pass}@${ip}:${port}`; } return trimStr; }
-    function parseNodeList(content) { nodeList = content.split(/\r?\n/).filter(item => item.trim() !== ""); renderNodeList(); }
-    function renderNodeList() { const el = document.getElementById("node-list"); if (nodeList.length === 0) { el.innerHTML = '<p class="node-list-tip">输入节点内容后，自动解析为可选列表（每行一个）</p>'; return; } let html = ""; nodeList.forEach((node, idx) => { const active = selectedNode === node ? "active" : ""; html += `<div class="node-item ${active}" data-index="${idx}"><div class="node-name" title="${node}">${node.substring(0, 70)}</div><button class="node-gen-btn" onclick="generateNodeQr(${idx})">生成二维码</button></div>`; }); el.innerHTML = html; document.querySelectorAll(".node-item").forEach(item => { item.querySelector(".node-name").onclick = () => { document.querySelectorAll(".node-item").forEach(el => el.classList.remove("active")); item.classList.add("active"); selectedNode = nodeList[item.dataset.index]; }; }); }
-    window.generateNodeQr = function(idx) { const node = nodeList[idx]; document.querySelectorAll(".node-item").forEach(el => el.classList.remove("active")); document.querySelectorAll(".node-item")[idx].classList.add("active"); selectedNode = node; renderSingleQR(getPureNodeContent(node)); document.getElementById("format-tip").innerText = "生成成功 ✔ 手机扫码100%识别"; document.getElementById("batch-qr-result").style.display = "none"; };
-    function generateSelectedQRCode() { const target = selectedNode || document.getElementById("qr-content").value.trim(); if (!target) { alert("请选中节点或输入节点内容！"); return; } renderSingleQR(getPureNodeContent(target)); document.getElementById("format-tip").innerText = "生成成功 ✔ 手机扫码100%识别"; document.getElementById("batch-qr-result").style.display = "none"; }
-    function generateBatchQRCode() { if (nodeList.length === 0) { alert("暂无节点可批量生成！"); return; } batchQRList = []; const gridBox = document.getElementById("qr-grid"); gridBox.innerHTML = ""; document.getElementById("batch-qr-result").style.display = "block"; const allContent = nodeList.map(item => getPureNodeContent(item)).join("\n"); renderSingleQR(allContent); document.getElementById("format-tip").innerText = `批量生成成功，共${nodeList.length}个节点 ✔ 手机扫码全部识别`; const qrSizeVal = parseInt(document.getElementById("qr-size").value); const darkColorVal = document.getElementById("qr-dark").value; const lightColorVal = document.getElementById("qr-light").value; const correctLvl = getCorrectLevel(); nodeList.forEach((node, idx) => { const pure = getPureNodeContent(node); const shortName = (node.substring(0, 20).replace(/[\/:*?"<>|]/g, '-') || "节点") + "..."; const itemDiv = document.createElement("div"); itemDiv.className = "qr-item"; itemDiv.innerHTML = `<div class="qr-box" id="batch_qr_${idx}"></div><p title="${node}">${shortName}</p>`; gridBox.appendChild(itemDiv); new QRCode(document.getElementById(`batch_qr_${idx}`), { text: pure, width: qrSizeVal, height: qrSizeVal, colorDark: darkColorVal, colorLight: lightColorVal, correctLevel: correctLvl, margin: 2 }); batchQRList.push({ content: pure, name: shortName }); }); }
-    function renderSingleQR(content) { const el = document.getElementById("qrcode"); el.innerHTML = ""; qrInstance = new QRCode(el, { text: content, width: parseInt(document.getElementById("qr-size").value), height: parseInt(document.getElementById("qr-size").value), colorDark: document.getElementById("qr-dark").value, colorLight: document.getElementById("qr-light").value, correctLevel: getCorrectLevel(), margin: 2 }); }
-    function downloadQRCode() { const canvas = document.querySelector("#qrcode canvas"); if (!canvas) { alert("请先生成二维码！"); return; } const name = selectedNode ? (selectedNode.substring(0, 20).replace(/[\/:*?"<>|]/g,'-') || "二维码") : `聚合二维码`; canvas.toBlob(blob => saveAs(blob, `${name}.png`)); }
-    async function downloadAllQRCode() { if (batchQRList.length === 0) { alert("请先批量生成二维码！"); return; } const zip = new JSZip(); for (let i = 0; i < batchQRList.length; i++) { const canvas = document.querySelector(`#batch_qr_${i} canvas`); if (canvas) zip.file(`${batchQRList[i].name}.png`, await new Promise(r => canvas.toBlob(r))); } const blob = await zip.generateAsync({ type: "blob" }); saveAs(blob, `所有节点二维码_${Date.now()}.zip`); document.getElementById("format-tip").innerText = `打包完成，共${batchQRList.length}个二维码`; }
-    function clearQRCode() { document.getElementById("qr-content").value = ""; document.getElementById("file-input").value = ""; document.getElementById("qrcode").innerHTML = ""; document.getElementById("format-tip").innerText = ""; document.getElementById("batch-qr-result").style.display = "none"; qrInstance = null; selectedNode = null; nodeList = []; batchQRList = []; renderNodeList(); }
-    function readTxtFile(fileInput) { const file = fileInput.files[0]; if (!file || !file.name.endsWith('.txt')) { alert("请上传 .txt 格式文件"); fileInput.value = ""; return; } const reader = new FileReader(); reader.onload = e => { document.getElementById("qr-content").value = e.target.result; parseNodeList(e.target.result); }; reader.readAsText(file, "UTF-8"); }
-    function v2Convert() { const raw = document.getElementById('v2Input').value.trim(); if (!raw) { alert("请输入节点 (格式 ip:端口:用户名:密码)"); return; } const lines = raw.split(/\r?\n/).filter(l => l.trim()); const result = []; for (let l of lines) { const parts = l.split(':'); if (parts.length >= 4) { const [ip, port, user, pass] = parts; try { const base = btoa(user + ":" + pass); result.push(`socks://${base}@${ip}:${port}`); } catch(e) { result.push(`# 转换失败: ${l}`); } } else { result.push(`# 格式错误: ${l}`); } } document.getElementById('v2Result').value = result.join('\n'); }
-    function v2Copy() { const textarea = document.getElementById('v2Result'); if (!textarea.value.trim() || textarea.value === "转换结果将显示在这里...") { alert("请先转换生成结果"); return; } textarea.select(); document.execCommand('copy'); const tipDiv = document.createElement('div'); tipDiv.innerText = '复制成功'; tipDiv.style.cssText = "position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#10b981; color:white; padding:8px 20px; border-radius:40px; z-index:10000; font-size:14px;"; document.body.appendChild(tipDiv); setTimeout(() => tipDiv.remove(), 1500); }
-    
-    document.getElementById("generate-selected-btn").onclick = generateSelectedQRCode;
-    document.getElementById("batch-generate-btn").onclick = generateBatchQRCode;
-    document.getElementById("download-btn").onclick = downloadQRCode;
-    document.getElementById("download-all-btn").onclick = downloadAllQRCode;
-    document.getElementById("clear-btn").onclick = clearQRCode;
-    document.getElementById("qr-content").addEventListener("input", e => parseNodeList(e.target.value));
-    parseNodeList("");
-    document.getElementById('v2ConvertBtn').addEventListener('click', v2Convert);
-    document.getElementById('v2CopyBtn').addEventListener('click', v2Copy);
-    document.getElementById('generateAudioBtn').addEventListener('click', startGenerate);
-    document.getElementById('copyTextBtn').addEventListener('click', copyTextContent);
-    document.getElementById('importTxtBtn').addEventListener('click', () => document.getElementById('ttsFileInput').click());
-    document.getElementById('clearInputBtn').addEventListener('click', clearInputText);
-    document.getElementById('clearAllHistoryBtn').addEventListener('click', clearAllHistory);
-    document.getElementById('ttsFileInput').addEventListener('change', loadTtsTxtFile);
-    document.getElementById('fetchApiInfoBtn').addEventListener('click', fetchApiInfo);
-    document.getElementById('voiceId').addEventListener('input', updateVoiceNameDisplay);
-    document.getElementById('apiKey').addEventListener('input', onApiKeyInput);
-    document.getElementById('apiKey').addEventListener('change', onApiKeyInput);
-    document.getElementById("apiHistorySelect").addEventListener("change", (e) => { if (e.target.value) { document.getElementById("apiKey").value = e.target.value; autoFetchQuota(e.target.value); } });
-    document.querySelectorAll(".param-slider").forEach(s => { updateSlider(s); s.addEventListener("input", () => updateSlider(s)); });
-    
-    loadApiHistory();
-    loadTtsHistory();
-    updateCharCount();
-    updateVoiceNameDisplay();
-    setTimeout(() => {
-        autoResizeTextarea();
-        checkExpandButton();
-    }, 100);
-    
-    window.addEventListener('resize', checkExpandButton);
-    
-    const qrPanel = document.getElementById('qrToolPanel'), v2Panel = document.getElementById('v2rayToolPanel'), ttsPanel = document.getElementById('ttsToolPanel');
-    document.getElementById('switchToV2Btn').addEventListener('click', () => { qrPanel.classList.add('hidden-panel'); v2Panel.classList.remove('hidden-panel'); ttsPanel.classList.add('hidden-panel'); });
-    document.getElementById('switchToTtsBtn').addEventListener('click', () => { qrPanel.classList.add('hidden-panel'); v2Panel.classList.add('hidden-panel'); ttsPanel.classList.remove('hidden-panel'); setTimeout(() => { autoResizeTextarea(); checkExpandButton(); }, 50); });
-    document.getElementById('backToQrBtn').addEventListener('click', () => { v2Panel.classList.add('hidden-panel'); ttsPanel.classList.add('hidden-panel'); qrPanel.classList.remove('hidden-panel'); });
-    document.getElementById('backToQrFromTtsBtn').addEventListener('click', () => { ttsPanel.classList.add('hidden-panel'); v2Panel.classList.add('hidden-panel'); qrPanel.classList.remove('hidden-panel'); });
-    
-    document.querySelectorAll('.link-dropdown').forEach(dropdown => { const btn = dropdown.querySelector('.link-item-btn'); const content = dropdown.querySelector('.dropdown-content'); let timer; btn.addEventListener('click', (e) => { e.stopPropagation(); dropdown.classList.toggle('active'); }); content.addEventListener('mouseenter', () => clearTimeout(timer)); content.addEventListener('mouseleave', () => { timer = setTimeout(() => dropdown.classList.remove('active'), 1000); }); });
-    document.addEventListener('click', () => document.querySelectorAll('.link-dropdown').forEach(d => d.classList.remove('active')));
-</script>
+            const apiSelect = document.getElementById("apiHistorySelect");
+            const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a));
+            apiSelect.innerHTML = '<option value="">📅 API历史记录</option>';
+            sortedDates.forEach(dateKey => {
+                const group = groups[dateKey];
+                const daysAgoText = getDaysAgo(group.date);
+                const optgroup = document.createElement("optgroup");
+                optgroup.label = `📅 ${dateKey} (${daysAgoText})`;
+                group.items.forEach(item => {
+                    const option = document.createElement("option");
+                    option.value = item.key;
+                    option.textContent = `${item.key.substring(0, 12)}...  ${formatTime(item.time)}`;
+                    optgroup.appendChild(option);
+                });
+                apiSelect.appendChild(optgroup);
+            });
+        }
+
+        function clearApiHistory() {
+            if (confirm("确定清空所有API Key历史记录吗？")) {
+                localStorage.removeItem("api_key_history");
+                loadApiHistory();
+                document.getElementById("apiKey").value = "";
+                document.getElementById("quotaCard").style.display = "none";
+                document.getElementById("log").innerText = "✅ API历史记录已清空";
+                setTimeout(() => { if (document.getElementById("log").innerText.includes("清空")) document.getElementById(
+                            "log").innerText = ""; }, 3000);
+            }
+        }
+
+        function onApiKeyInput() { autoFetchQuota(document.getElementById("apiKey").value.trim()); }
+
+        function updateSlider(slider) {
+            const v = parseFloat(slider.value);
+            const el = document.getElementById(slider.id + "Val");
+            if (slider.id === "stability" || slider.id === "similarity") el.innerText = Math.round(v * 100) + "%";
+            else if (slider.id === "speed") el.innerText = v.toFixed(1);
+            else el.innerText = v;
+        }
+
+        function loadTtsTxtFile(e) {
+            const f = e.target.files[0];
+            if (!f) return;
+            const r = new FileReader();
+            r.onload = ev => {
+                document.getElementById("text").value = ev.target.result;
+                updateCharCount();
+                autoResizeTextarea();
+                document.getElementById("log").innerText = "✅ 文件已导入";
+                setTimeout(() => { if (document.getElementById("log").innerText === "✅ 文件已导入") document
+                        .getElementById("log").innerText = ""; }, 3000);
+            };
+            r.readAsText(f, "UTF-8");
+            e.target.value = "";
+        }
+
+        async function fetchApiInfo() {
+            const apiKey = document.getElementById('apiKey').value.trim();
+            if (!apiKey) { document.getElementById("log").innerText = "❌ 请先输入API Key"; return; }
+            document.getElementById("log").innerText = "🔄 正在获取API信息...";
+            try {
+                const userRes = await fetch("https://api.elevenlabs.io/v1/user", { method: "GET", headers: { "xi-api-key": apiKey } });
+                if (userRes.ok) {
+                    const data = await userRes.json();
+                    if (data.subscription) {
+                        const remaining = Math.max(0, (data.subscription.character_limit || 0) - (data.subscription
+                            .character_count || 0));
+                        document.getElementById("quotaAmount").innerText = remaining.toLocaleString();
+                        document.getElementById("quotaCard").style.display = 'flex';
+                        if (remaining < 10000) document.getElementById("quotaCard").classList.add('quota-warning');
+                        else document.getElementById("quotaCard").classList.remove('quota-warning');
+                    }
+                } else if (userRes.status === 401) {
+                    document.getElementById("log").innerText = "❌ API Key 无效或已过期";
+                    document.getElementById("quotaCard").style.display = 'none';
+                    setTimeout(() => { if (document.getElementById("log").innerText.includes("无效")) document
+                            .getElementById("log").innerText = ""; }, 3000);
+                    return;
+                }
+                const voicesRes = await fetch("https://api.elevenlabs.io/v1/voices", { method: "GET", headers: { "xi-api-key": apiKey } });
+                if (voicesRes.ok) {
+                    const voicesData = await voicesRes.json();
+                    if (voicesData.voices) {
+                        voiceList = voicesData.voices.map(v => ({ voice_id: v.voice_id, name: v.name }));
+                        sessionStorage.setItem('elevenlabs_voices', JSON.stringify(voiceList));
+                    }
+                } else {
+                    voiceList = [...BUILTIN_VOICES];
+                }
+                updateVoiceNameDisplay();
+                document.getElementById("log").innerText = "✅ 获取成功！已更新额度和声音库";
+                saveApiHistory(apiKey);
+                setTimeout(() => { if (document.getElementById("log").innerText.includes("获取成功")) document
+                        .getElementById("log").innerText = ""; }, 4000);
+            } catch (e) {
+                voiceList = [...BUILTIN_VOICES];
+                updateVoiceNameDisplay();
+                document.getElementById("log").innerText = "⚠️ 使用内置声音库";
+            }
+        }
+
+        // ==================== 复制文本功能 ====================
+        function copyTextContent() {
+            const text = document.getElementById('text').value;
+            if (!text.trim()) {
+                document.getElementById('log').innerText = "⚠️ 文本为空，无法复制";
+                setTimeout(() => { if (document.getElementById('log').innerText.includes("无法复制")) document
+                        .getElementById("log").innerText = ""; }, 2000);
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                document.getElementById('log').innerText = "✅ 文本已复制到剪贴板";
+                setTimeout(() => { if (document.getElementById('log').innerText.includes("复制到剪贴板")) document
+                        .getElementById("log").innerText = ""; }, 2000);
+            }).catch(() => {
+                const ta = document.getElementById('text');
+                ta.select();
+                document.execCommand('copy');
+                document.getElementById('log').innerText = "✅ 文本已复制到剪贴板";
+                setTimeout(() => { if (document.getElementById('log').innerText.includes("复制到剪贴板")) document
+                        .getElementById("log").innerText = ""; }, 2000);
+            });
+        }
+
+        // ============================================================
+        //  二维码/V2Ray 逻辑 (精简保留)
+        // ============================================================
+        let qrInstance = null,
+            selectedNode = null,
+            nodeList = [],
+            batchQRList = [];
+        const correctLevelMap = { L: QRCode.CorrectLevel.L, M: QRCode.CorrectLevel.M, Q: QRCode.CorrectLevel.Q,
+            H: QRCode.CorrectLevel.H };
+
+        function getCorrectLevel() {
+            const levelVal = document.getElementById("qr-correct").value;
+            if (levelVal === "auto") {
+                const content = document.getElementById("qr-content").value.trim();
+                return content.length < 50 ? QRCode.CorrectLevel.L : (content.length < 150 ? QRCode.CorrectLevel.M :
+                    QRCode.CorrectLevel.H);
+            }
+            return correctLevelMap[levelVal];
+        }
+
+        function getPureNodeContent(nodeStr) {
+            const trimStr = nodeStr.trim();
+            const socks5Reg = /^(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\:(\d{1,6})\:([\s\S]+)\:([\s\S]+)$/;
+            if (socks5Reg.test(trimStr)) {
+                const [, ip, port, user, pass] = trimStr.match(socks5Reg);
+                return `socks://${user}:${pass}@${ip}:${port}`;
+            }
+            return trimStr;
+        }
+
+        function parseNodeList(content) {
+            nodeList = content.split(/\r?\n/).filter(item => item.trim() !== "");
+            renderNodeList();
+        }
+
+        function renderNodeList() {
+            const el = document.getElementById("node-list");
+            if (nodeList.length === 0) {
+                el.innerHTML = '<p class="node-list-tip">输入节点内容后，自动解析为可选列表（每行一个）</p>';
+                return;
+            }
+            let html = "";
+            nodeList.forEach((node, idx) => {
+                const active = selectedNode === node ? "active" : "";
+                html +=
+                    `<div class="node-item ${active}" data-index="${idx}"><div class="node-name" title="${node}">${node.substring(0, 70)}</div><button class="node-gen-btn" onclick="generateNodeQr(${idx})">生成二维码</button></div>`;
+            });
+            el.innerHTML = html;
+            document.querySelectorAll(".node-item").forEach(item => {
+                item.querySelector(".node-name").onclick = () => {
+                    document.querySelectorAll(".node-item").forEach(el => el.classList.remove("active"));
+                    item.classList.add("active");
+                    selectedNode = nodeList[item.dataset.index];
+                };
+            });
+        }
+
+        window.generateNodeQr = function(idx) {
+            const node = nodeList[idx];
+            document.querySelectorAll(".node-item").forEach(el => el.classList.remove("active"));
+            document.querySelectorAll(".node-item")[idx].classList.add("active");
+            selectedNode = node;
+            renderSingleQR(getPureNodeContent(node));
+            document.getElementById("format-tip").innerText = "生成成功 ✔ 手机扫码100%识别";
+            document.getElementById("batch-qr-result").style.display = "none";
+        };
+
+        function generateSelectedQRCode() {
+            const target = selectedNode || document.getElementById("qr-content").value.trim();
+            if (!target) { alert("请选中节点或输入节点内容！"); return; }
+            renderSingleQR(getPureNodeContent(target));
+            document.getElementById("format-tip").innerText = "生成成功 ✔ 手机扫码100%识别";
+            document.getElementById("batch-qr-result").style.display = "none";
+        }
+
+        function generateBatchQRCode() {
+            if (nodeList.length === 0) { alert("暂无节点可批量生成！"); return; }
+            batchQRList = [];
+            const gridBox = document.getElementById("qr-grid");
+            gridBox.innerHTML = "";
+            document.getElementById("batch-qr-result").style.display = "block";
+            const allContent = nodeList.map(item => getPureNodeContent(item)).join("\n");
+            renderSingleQR(allContent);
+            document.getElementById("format-tip").innerText =
+                `批量生成成功，共${nodeList.length}个节点 ✔ 手机扫码全部识别`;
+            const qrSizeVal = parseInt(document.getElementById("qr-size").value);
+            const darkColorVal = document.getElementById("qr-dark").value;
+            const lightColorVal = document.getElementById("qr-light").value;
+            const correctLvl = getCorrectLevel();
+            nodeList.forEach((node, idx) => {
+                const pure = getPureNodeContent(node);
+                const shortName = (node.substring(0, 20).replace(/[\/:*?"<>|]/g, '-') || "节点") + "...";
+                const itemDiv = document.createElement("div");
+                itemDiv.className = "qr-item";
+                itemDiv.innerHTML =
+                    `<div class="qr-box" id="batch_qr_${idx}"></div><p title="${node}">${shortName}</p>`;
+                gridBox.appendChild(itemDiv);
+                new QRCode(document.getElementById(`batch_qr_${idx}`), {
+                    text: pure,
+                    width: qrSizeVal,
+                    height: qrSizeVal,
+                    colorDark: darkColorVal,
+                    colorLight: lightColorVal,
+                    correctLevel: correctLvl,
+                    margin: 2
+                });
+                batchQRList.push({ content: pure, name: shortName });
+            });
+        }
+
+        function renderSingleQR(content) {
+            const el = document.getElementById("qrcode");
+            el.innerHTML = "";
+            qrInstance = new QRCode(el, {
+                text: content,
+                width: parseInt(document.getElementById("qr-size").value),
+                height: parseInt(document.getElementById("qr-size").value),
+                colorDark: document.getElementById("qr-dark").value,
+                colorLight: document.getElementById("qr-light").value,
+                correctLevel: getCorrectLevel(),
+                margin: 2
+            });
+        }
+
+        function downloadQRCode() {
+            const canvas = document.querySelector("#qrcode canvas");
+            if (!canvas) { alert("请先生成二维码！"); return; }
+            const name = selectedNode ? (selectedNode.substring(0, 20).replace(/[\/:*?"<>|]/g, '-') || "二维码") :
+                `聚合二维码`;
+            canvas.toBlob(blob => saveAs(blob, `${name}.png`));
+        }
+
+        async function downloadAllQRCode() {
+            if (batchQRList.length === 0) { alert("请先批量生成二维码！"); return; }
+            const zip = new JSZip();
+            for (let i = 0; i < batchQRList.length; i++) {
+                const canvas = document.querySelector(`#batch_qr_${i} canvas`);
+                if (canvas) zip.file(`${batchQRList[i].name}.png`, await new Promise(r => canvas.toBlob(r)));
+            }
+            const blob = await zip.generateAsync({ type: "blob" });
+            saveAs(blob, `所有节点二维码_${Date.now()}.zip`);
+            document.getElementById("format-tip").innerText = `打包完成，共${batchQRList.length}个二维码`;
+        }
+
+        function clearQRCode() {
+            document.getElementById("qr-content").value = "";
+            document.getElementById("file-input").value = "";
+            document.getElementById("qrcode").innerHTML = "";
+            document.getElementById("format-tip").innerText = "";
+            document.getElementById("batch-qr-result").style.display = "none";
+            qrInstance = null;
+            selectedNode = null;
+            nodeList = [];
+            batchQRList = [];
+            renderNodeList();
+        }
+
+        function readTxtFile(fileInput) {
+            const file = fileInput.files[0];
+            if (!file || !file.name.endsWith('.txt')) { alert("请上传 .txt 格式文件");
+                fileInput.value = ""; return; }
+            const reader = new FileReader();
+            reader.onload = e => {
+                document.getElementById("qr-content").value = e.target.result;
+                parseNodeList(e.target.result);
+            };
+            reader.readAsText(file, "UTF-8");
+        }
+
+        function v2Convert() {
+            const raw = document.getElementById('v2Input').value.trim();
+            if (!raw) { alert("请输入节点 (格式 ip:端口:用户名:密码)"); return; }
+            const lines = raw.split(/\r?\n/).filter(l => l.trim());
+            const result = [];
+            for (let l of lines) {
+                const parts = l.split(':');
+                if (parts.length >= 4) {
+                    const [ip, port, user, pass] = parts;
+                    try {
+                        const base = btoa(user + ":" + pass);
+                        result.push(`socks://${base}@${ip}:${port}`);
+                    } catch (e) { result.push(`# 转换失败: ${l}`); }
+                } else { result.push(`# 格式错误: ${l}`); }
+            }
+            document.getElementById('v2Result').value = result.join('\n');
+        }
+
+        function v2Copy() {
+            const textarea = document.getElementById('v2Result');
+            if (!textarea.value.trim() || textarea.value === "转换结果将显示在这里...") { alert("请先转换生成结果"); return; }
+            textarea.select();
+            document.execCommand('copy');
+            const tipDiv = document.createElement('div');
+            tipDiv.innerText = '复制成功';
+            tipDiv.style.cssText =
+                "position:fixed; bottom:20px; left:50%; transform:translateX(-50%); background:#10b981; color:white; padding:8px 20px; border-radius:40px; z-index:10000; font-size:14px;";
+            document.body.appendChild(tipDiv);
+            setTimeout(() => tipDiv.remove(), 1500);
+        }
+
+        // ============================================================
+        //  事件绑定
+        // ============================================================
+        document.getElementById("generate-selected-btn").onclick = generateSelectedQRCode;
+        document.getElementById("batch-generate-btn").onclick = generateBatchQRCode;
+        document.getElementById("download-btn").onclick = downloadQRCode;
+        document.getElementById("download-all-btn").onclick = downloadAllQRCode;
+        document.getElementById("clear-btn").onclick = clearQRCode;
+        document.getElementById("qr-content").addEventListener("input", e => parseNodeList(e.target.value));
+        parseNodeList("");
+        document.getElementById('v2ConvertBtn').addEventListener('click', v2Convert);
+        document.getElementById('v2CopyBtn').addEventListener('click', v2Copy);
+        document.getElementById('generateAudioBtn').addEventListener('click', startGenerate);
+        document.getElementById('copyTextBtn').addEventListener('click', copyTextContent);
+        document.getElementById('importTxtBtn').addEventListener('click', () => document.getElementById('ttsFileInput')
+        .click());
+        document.getElementById('clearHistoryBtn').addEventListener('click', clearTtsHistory);
+        document.getElementById('ttsFileInput').addEventListener('change', loadTtsTxtFile);
+        document.getElementById('fetchApiInfoBtn').addEventListener('click', fetchApiInfo);
+        document.getElementById('voiceId').addEventListener('input', updateVoiceNameDisplay);
+        document.getElementById('apiKey').addEventListener('input', onApiKeyInput);
+        document.getElementById('apiKey').addEventListener('change', onApiKeyInput);
+        document.getElementById("apiHistorySelect").addEventListener("change", (e) => {
+            if (e.target.value) {
+                document.getElementById("apiKey").value = e.target.value;
+                autoFetchQuota(e.target.value);
+            }
+        });
+        document.getElementById("clearApiHistoryBtn").addEventListener("click", clearApiHistory);
+        document.querySelectorAll(".param-slider").forEach(s => {
+            updateSlider(s);
+            s.addEventListener("input", () => updateSlider(s));
+        });
+
+        loadApiHistory();
+        loadTtsHistory();
+        updateCharCount();
+        updateVoiceNameDisplay();
+        setTimeout(autoResizeTextarea, 100);
+
+        const qrPanel = document.getElementById('qrToolPanel'),
+            v2Panel = document.getElementById('v2rayToolPanel'),
+            ttsPanel = document.getElementById('ttsToolPanel');
+        document.getElementById('switchToV2Btn').addEventListener('click', () => {
+            qrPanel.classList.add('hidden-panel');
+            v2Panel.classList.remove('hidden-panel');
+            ttsPanel.classList.add('hidden-panel');
+        });
+        document.getElementById('switchToTtsBtn').addEventListener('click', () => {
+            qrPanel.classList.add('hidden-panel');
+            v2Panel.classList.add('hidden-panel');
+            ttsPanel.classList.remove('hidden-panel');
+            setTimeout(autoResizeTextarea, 50);
+        });
+        document.getElementById('backToQrBtn').addEventListener('click', () => {
+            v2Panel.classList.add('hidden-panel');
+            ttsPanel.classList.add('hidden-panel');
+            qrPanel.classList.remove('hidden-panel');
+        });
+        document.getElementById('backToQrFromTtsBtn').addEventListener('click', () => {
+            ttsPanel.classList.add('hidden-panel');
+            v2Panel.classList.add('hidden-panel');
+            qrPanel.classList.remove('hidden-panel');
+        });
+
+        document.querySelectorAll('.link-dropdown').forEach(dropdown => {
+            const btn = dropdown.querySelector('.link-item-btn');
+            const content = dropdown.querySelector('.dropdown-content');
+            let timer;
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dropdown.classList.toggle('active');
+            });
+            content.addEventListener('mouseenter', () => clearTimeout(timer));
+            content.addEventListener('mouseleave', () => {
+                timer = setTimeout(() => dropdown.classList.remove('active'), 1000);
+            });
+        });
+        document.addEventListener('click', () => document.querySelectorAll('.link-dropdown').forEach(d => d.classList
+            .remove('active')));
+    </script>
 </body>
 </html>
