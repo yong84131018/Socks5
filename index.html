@@ -146,21 +146,21 @@
             bottom: 8px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 28px;
-            line-height: 1;
+            font-size: 20px;
+            line-height: 1.1;
             color: #4f46e5;
             background: rgba(255,255,255,0.95);
             border: 2px solid #cbd5e1;
             border-radius: 40px;
-            padding: 4px 20px;
+            padding: 2px 28px;
             cursor: pointer;
             transition: all 0.25s;
             pointer-events: auto;
             display: none;
-            font-weight: 300;
+            font-weight: 400;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             width: auto;
-            min-width: 60px;
+            min-width: 70px;
             text-align: center;
             user-select: none;
         }
@@ -200,7 +200,7 @@
             .history-item-buttons { margin-left: auto; }
             .history-play-btn, .history-download-btn { padding: 4px 8px; font-size: 10px; }
             .tts-textarea { min-height: 100px; max-height: 260px; padding-bottom: 48px; }
-            .tts-expand-btn { font-size: 24px; padding: 3px 16px; min-width: 50px; }
+            .tts-expand-btn { font-size: 18px; padding: 2px 20px; min-width: 56px; }
         }
     </style>
 </head>
@@ -383,21 +383,21 @@
             bottom: 8px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 28px;
-            line-height: 1;
+            font-size: 20px;
+            line-height: 1.1;
             color: #4f46e5;
             background: rgba(255,255,255,0.95);
             border: 2px solid #cbd5e1;
             border-radius: 40px;
-            padding: 4px 20px;
+            padding: 2px 28px;
             cursor: pointer;
             transition: all 0.25s;
             pointer-events: auto;
             display: none;
-            font-weight: 300;
+            font-weight: 400;
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
             width: auto;
-            min-width: 60px;
+            min-width: 70px;
             text-align: center;
             user-select: none;
         }
@@ -441,7 +441,7 @@
             .right-link-wrap{right:-160px;width:145px}
             .link-item-btn,.contact-link-btn{padding:18px 12px;font-size:14px}
             .tts-textarea{min-height:100px;max-height:260px;padding-bottom:48px}
-            .tts-expand-btn{font-size:24px;padding:3px 16px;min-width:50px}
+            .tts-expand-btn{font-size:18px;padding:2px 20px;min-width:56px}
         }
     </style>
 </head>
@@ -471,7 +471,7 @@
         <div id="ttsToolPanel" class="tool-panel hidden-panel">
             <div style="display:flex;justify-content:flex-start;margin-bottom:12px"><button id="backToQrFromTtsBtn" class="switch-tool-btn">← 返回二维码生成器</button></div>
             <div class="tts-card"><h3>IIElevenLabs 文本转语音朗读器</h3>
-                <div class="api-row"><span>API Key：</span><input id="apiKey" type="text" placeholder="请输入 ElevenLabs API Key" value=""><select id="apiHistorySelect" class="api-history-select"><option value="">📅 历史记录</option></select><button id="clearAllHistoryBtn" class="btn-clear-all-history">🗑️ 清空所有历史</button></div>
+                <div class="api-row"><span>API Key：</span><input id="apiKey" type="text" placeholder="请输入 ElevenLabs API Key" value=""><select id="apiHistorySelect" class="api-history-select"><option value="">📅 API历史记录</option></select><button id="clearAllHistoryBtn" class="btn-clear-all-history">🗑️ 清空所有历史</button></div>
                 <div id="quotaCard" class="quota-card" style="display:none"><div class="quota-label">📊 剩余字符额度</div><div class="quota-value" id="quotaAmount">--</div><div class="quota-unit">字符</div></div>
                 <div class="voice-row"><span>声音 ID：</span><input id="voiceId" class="voice-id-input" type="text" placeholder="输入声音ID" value="bIHbv24MWmeRgasZH58o"><button id="fetchApiInfoBtn" class="btn-fetch-api-info">🔍 获取API信息</button></div>
                 <div id="voiceNameDisplay" class="voice-name-display">当前声音：Will - Relaxed Optimist</div><hr style="margin:15px 0">
@@ -482,7 +482,7 @@
                 <hr style="margin:15px 0">
                 <div class="tts-textarea-container">
                     <textarea id="text" class="tts-textarea" placeholder="输入要朗读的文字，支持长文本自动换行...&#10;支持导入TXT文件" oninput="updateCharCount(); autoResizeTextarea(); checkExpandButton();"></textarea>
-                    <button class="tts-expand-btn" id="expandBtn" onclick="toggleExpand()">▼</button>
+                    <button class="tts-expand-btn" id="expandBtn" onclick="toggleExpand()">∨</button>
                     <div class="tts-char-count" id="charCount">字数：0</div>
                 </div>
                 <div class="btn-group">
@@ -683,34 +683,24 @@
         if (!confirm("确定清空所有历史记录吗？\n\n这将同时清空：\n• 文本历史（7天内）\n• API Key 历史")) {
             return;
         }
-        // 清空文本历史
         ttsHistory = [];
         localStorage.removeItem("tts_history_v2");
         renderTtsHistoryByDate();
-        // 清空API历史
         localStorage.removeItem("api_key_history");
         loadApiHistory();
-        // 清空API Key输入框
         document.getElementById("apiKey").value = "";
         document.getElementById("quotaCard").style.display = "none";
         document.getElementById("log").innerText = "✅ 所有历史记录已清空";
         setTimeout(() => { if (document.getElementById("log").innerText.includes("已清空")) document.getElementById("log").innerText = ""; }, 3000);
     }
     
-    // ==================== 清空输入框 ====================
+    // ==================== 清空输入框（无提示） ====================
     function clearInputText() {
         const ta = document.getElementById('text');
-        if (!ta.value.trim()) {
-            document.getElementById('log').innerText = "⚠️ 输入框已为空";
-            setTimeout(() => { if (document.getElementById('log').innerText.includes("已为空")) document.getElementById('log').innerText = ""; }, 1500);
-            return;
-        }
         ta.value = "";
         updateCharCount();
         autoResizeTextarea();
         checkExpandButton();
-        document.getElementById('log').innerText = "✅ 输入框已清空";
-        setTimeout(() => { if (document.getElementById('log').innerText.includes("已清空")) document.getElementById('log').innerText = ""; }, 1500);
     }
     
     async function reDownloadHistory(item) { 
@@ -836,7 +826,7 @@
             if (ta.classList.contains('expanded')) {
                 ta.classList.remove('expanded');
                 ta.style.maxHeight = '360px';
-                btn.textContent = '▼';
+                btn.textContent = '∨';
             }
         }
     }
@@ -847,11 +837,11 @@
         if (!ta || !btn) return;
         ta.classList.toggle('expanded');
         if (ta.classList.contains('expanded')) {
-            btn.textContent = '▲';
+            btn.textContent = '∧';
             ta.style.maxHeight = 'none';
             ta.scrollTop = ta.scrollHeight;
         } else {
-            btn.textContent = '▼';
+            btn.textContent = '∨';
             ta.style.maxHeight = '360px';
             ta.scrollTop = 0;
         }
@@ -943,7 +933,7 @@
     }
     function formatTime(timestamp) { const d = new Date(timestamp); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`; }
     
-    function loadApiHistory() { let list = JSON.parse(localStorage.getItem("api_key_history")) || []; localStorage.setItem("api_key_history", JSON.stringify(list)); const groups = {}; list.forEach(item => { const date = new Date(item.time); const dateKey = formatDateKey(date); if (!groups[dateKey]) groups[dateKey] = { date, items: [] }; groups[dateKey].items.push(item); }); const apiSelect = document.getElementById("apiHistorySelect"); const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a)); apiSelect.innerHTML = '<option value="">📅 历史记录</option>'; sortedDates.forEach(dateKey => { const group = groups[dateKey]; const daysAgoText = getDaysAgo(group.date); const optgroup = document.createElement("optgroup"); optgroup.label = `📅 ${dateKey} (${daysAgoText})`; group.items.forEach(item => { const option = document.createElement("option"); option.value = item.key; option.textContent = `${item.key.substring(0, 12)}...  ${formatTime(item.time)}`; optgroup.appendChild(option); }); apiSelect.appendChild(optgroup); }); }
+    function loadApiHistory() { let list = JSON.parse(localStorage.getItem("api_key_history")) || []; localStorage.setItem("api_key_history", JSON.stringify(list)); const groups = {}; list.forEach(item => { const date = new Date(item.time); const dateKey = formatDateKey(date); if (!groups[dateKey]) groups[dateKey] = { date, items: [] }; groups[dateKey].items.push(item); }); const apiSelect = document.getElementById("apiHistorySelect"); const sortedDates = Object.keys(groups).sort((a, b) => b.localeCompare(a)); apiSelect.innerHTML = '<option value="">📅 API历史记录</option>'; sortedDates.forEach(dateKey => { const group = groups[dateKey]; const daysAgoText = getDaysAgo(group.date); const optgroup = document.createElement("optgroup"); optgroup.label = `📅 ${dateKey} (${daysAgoText})`; group.items.forEach(item => { const option = document.createElement("option"); option.value = item.key; option.textContent = `${item.key.substring(0, 12)}...  ${formatTime(item.time)}`; optgroup.appendChild(option); }); apiSelect.appendChild(optgroup); }); }
     function saveApiHistory(key) { if (!key) return; let list = JSON.parse(localStorage.getItem("api_key_history")) || []; list = list.filter(i => i.key !== key); list.unshift({ key, time: Date.now() }); if (list.length > 200) list = list.slice(0, 200); localStorage.setItem("api_key_history", JSON.stringify(list)); loadApiHistory(); }
     function onApiKeyInput() { autoFetchQuota(document.getElementById("apiKey").value.trim()); }
     function updateSlider(slider) { const v = parseFloat(slider.value); const el = document.getElementById(slider.id+"Val"); if (slider.id === "stability" || slider.id === "similarity") el.innerText = Math.round(v*100)+"%"; else if (slider.id === "speed") el.innerText = v.toFixed(1); else el.innerText = v; }
