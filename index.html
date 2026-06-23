@@ -102,6 +102,143 @@
             .history-play-btn,
             .history-download-btn { padding: 4px 8px; font-size: 10px; }
         }
+        /* 展开/收起按钮 - 居中 */
+        .tts-expand-btn {
+            position: absolute;
+            bottom: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 18px;
+            color: #4f46e5;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1.5px solid #cbd5e1;
+            border-radius: 40px;
+            padding: 2px 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            pointer-events: auto;
+            display: none;
+            font-weight: 700;
+            line-height: 1.4;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+            z-index: 5;
+        }
+        .tts-expand-btn:hover {
+            background: #eef2ff;
+            border-color: #4f46e5;
+        }
+        .tts-expand-btn.visible {
+            display: block;
+        }
+        .tts-textarea-container {
+            position: relative;
+            width: 100%;
+            margin: 10px 0;
+        }
+        .tts-textarea {
+            width: 100%;
+            min-height: 120px;
+            max-height: 360px;
+            padding: 14px;
+            padding-bottom: 48px;
+            font-size: 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            background: #fff;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+            line-height: 1.5;
+            transition: .2s;
+            overflow-y: auto;
+            resize: vertical;
+            word-wrap: break-word;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .tts-textarea:focus {
+            border-color: #e83e8c;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(232, 62, 140, 0.1);
+        }
+        .tts-textarea.expanded {
+            max-height: none;
+            min-height: 400px;
+        }
+        .tts-char-count {
+            position: absolute;
+            bottom: 12px;
+            right: 14px;
+            font-size: 12px;
+            color: #94a3b8;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 2px 8px;
+            border-radius: 20px;
+            pointer-events: none;
+            z-index: 5;
+        }
+        /* 复制文本按钮 */
+        .btn-copy-text {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+            color: #fff;
+        }
+        .btn-copy-text:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(139, 92, 246, 0.35);
+        }
+        /* 清空所有历史按钮 */
+        .btn-clear-all-history {
+            flex: 0.7;
+            min-width: 100px;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: #fff;
+            border: none;
+            border-radius: 40px;
+            padding: 12px 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-clear-all-history:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+        /* 清空文本按钮（无弹窗） */
+        .btn-clear-text {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #fff;
+        }
+        .btn-clear-text:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.35);
+        }
+        /* TTS 按钮样式 - 保留原有的，新增清空文本按钮覆盖 */
+        .tts-btn-danger {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #fff;
+        }
+        .tts-btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.35);
+        }
+        /* 清空API历史按钮（保留原有样式） */
+        .btn-clear-api {
+            flex: 0.6;
+            min-width: 90px;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #fff;
+            border: none;
+            border-radius: 40px;
+            padding: 12px 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-clear-api:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -680,6 +817,24 @@
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3)
         }
+        /* 清空所有历史按钮（红色） */
+        .btn-clear-all-history {
+            flex: 0.7;
+            min-width: 100px;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: #fff;
+            border: none;
+            border-radius: 40px;
+            padding: 12px 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-clear-all-history:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
         .quota-card {
             background: linear-gradient(135deg, #f0fdf4, #dcfce7);
             border-radius: 16px;
@@ -855,45 +1010,6 @@
         .history-link:hover {
             text-decoration: underline
         }
-        .tts-textarea-container {
-            position: relative;
-            width: 100%;
-            margin: 10px 0
-        }
-        .tts-textarea {
-            width: 100%;
-            min-height: 120px;
-            padding: 14px;
-            font-size: 15px;
-            border: 1px solid #cbd5e1;
-            border-radius: 20px;
-            background: #fff;
-            box-sizing: border-box;
-            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
-            line-height: 1.5;
-            transition: .2s;
-            overflow: hidden;
-            resize: none;
-            word-wrap: break-word;
-            white-space: pre-wrap;
-            word-break: break-all
-        }
-        .tts-textarea:focus {
-            border-color: #e83e8c;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(232, 62, 140, 0.1)
-        }
-        .tts-char-count {
-            position: absolute;
-            bottom: 12px;
-            right: 14px;
-            font-size: 12px;
-            color: #94a3b8;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 2px 8px;
-            border-radius: 20px;
-            pointer-events: none
-        }
         #log {
             color: #e83e8c;
             margin: 10px 0;
@@ -923,13 +1039,32 @@
             transform: translateY(-2px);
             box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35)
         }
-        .tts-btn-danger {
+        /* 清空文本按钮 - 橙色，无弹窗 */
+        .btn-clear-text {
             background: linear-gradient(135deg, #f59e0b, #d97706);
-            color: #fff
+            color: #fff;
         }
-        .tts-btn-danger:hover {
+        .btn-clear-text:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.35)
+            box-shadow: 0 6px 16px rgba(245, 158, 11, 0.35);
+        }
+        /* 清空所有历史按钮 - 红色，有弹窗 */
+        .btn-clear-all-history {
+            flex: 0.7;
+            min-width: 100px;
+            background: linear-gradient(135deg, #dc2626, #b91c1c);
+            color: #fff;
+            border: none;
+            border-radius: 40px;
+            padding: 12px 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .btn-clear-all-history:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
         }
         .switch-tool-btn {
             background: #475569;
@@ -1033,6 +1168,7 @@
             #apiKey,
             .api-history-select,
             .btn-clear-api,
+            .btn-clear-all-history,
             .voice-id-input,
             .btn-fetch-api-info {
                 width: 100%;
@@ -1051,6 +1187,15 @@
             .contact-link-btn {
                 padding: 18px 12px;
                 font-size: 14px
+            }
+            .tts-textarea {
+                min-height: 100px;
+                max-height: 260px;
+                padding-bottom: 48px;
+            }
+            .tts-expand-btn {
+                font-size: 16px;
+                padding: 2px 12px;
             }
         }
     </style>
@@ -1122,47 +1267,71 @@
             </div>
             <!-- 面板3: IIElevenLabs 文本转语音朗读器 -->
             <div id="ttsToolPanel" class="tool-panel hidden-panel">
-                <div style="display:flex;justify-content:flex-start;margin-bottom:12px"><button id="backToQrFromTtsBtn" class="switch-tool-btn">← 返回二维码生成器</button></div>
+                <div style="display:flex;justify-content:flex-start;margin-bottom:12px">
+                    <button id="backToQrFromTtsBtn" class="switch-tool-btn">← 返回二维码生成器</button>
+                </div>
                 <div class="tts-card">
                     <h3>IIElevenLabs 文本转语音朗读器</h3>
-                    <div class="api-row"><span>API Key：</span><input id="apiKey" type="text" placeholder="请输入 ElevenLabs API Key" value=""><select id="apiHistorySelect" class="api-history-select"><option value="">📅 API历史记录</option></select><button id="clearApiHistoryBtn" class="btn-clear-api">🗑️ 清空API历史</button></div>
+                    <div class="api-row">
+                        <span>API Key：</span>
+                        <input id="apiKey" type="text" placeholder="请输入 ElevenLabs API Key" value="">
+                        <select id="apiHistorySelect" class="api-history-select">
+                            <option value="">📅 API历史记录</option>
+                        </select>
+                        <!-- ✅ 改为：清空所有历史（红色，有弹窗） -->
+                        <button id="clearAllHistoryBtn" class="btn-clear-all-history">🗑️ 清空所有历史</button>
+                    </div>
                     <div id="quotaCard" class="quota-card" style="display:none">
                         <div class="quota-label">📊 剩余字符额度</div>
                         <div class="quota-value" id="quotaAmount">--</div>
                         <div class="quota-unit">字符</div>
                     </div>
-                    <div class="voice-row"><span>声音 ID：</span><input id="voiceId" class="voice-id-input" type="text" placeholder="输入声音ID" value="bIHbv24MWmeRgasZH58o"><button id="fetchApiInfoBtn" class="btn-fetch-api-info">🔍 获取API信息</button></div>
+                    <div class="voice-row">
+                        <span>声音 ID：</span>
+                        <input id="voiceId" class="voice-id-input" type="text" placeholder="输入声音ID" value="bIHbv24MWmeRgasZH58o">
+                        <button id="fetchApiInfoBtn" class="btn-fetch-api-info">🔍 获取API信息</button>
+                    </div>
                     <div id="voiceNameDisplay" class="voice-name-display">当前声音：Will - Relaxed Optimist</div>
                     <hr style="margin:15px 0">
                     <div class="param-item">
                         <div class="param-label">Speed</div>
-                        <div class="param-desc">Slower</div><input type="range" id="speed" min="0.5" max="2.0" step="0.05" value="1.0" class="param-slider">
+                        <div class="param-desc">Slower</div>
+                        <input type="range" id="speed" min="0.5" max="2.0" step="0.05" value="1.0" class="param-slider">
                         <div class="param-value" id="speedVal">1.0</div>
                     </div>
                     <div class="param-item">
                         <div class="param-label">Stability</div>
-                        <div class="param-desc">More variable</div><input type="range" id="stability" min="0" max="1" step="0.01" value="0.5" class="param-slider">
+                        <div class="param-desc">More variable</div>
+                        <input type="range" id="stability" min="0" max="1" step="0.01" value="0.5" class="param-slider">
                         <div class="param-value" id="stabilityVal">50%</div>
                     </div>
                     <div class="param-item">
                         <div class="param-label">Similarity</div>
-                        <div class="param-desc">Low</div><input type="range" id="similarity" min="0" max="1" step="0.01" value="0.75" class="param-slider">
+                        <div class="param-desc">Low</div>
+                        <input type="range" id="similarity" min="0" max="1" step="0.01" value="0.75" class="param-slider">
                         <div class="param-value" id="similarityVal">75%</div>
                     </div>
                     <div class="param-item">
                         <div class="param-label">Style Exaggeration</div>
-                        <div class="param-desc">None</div><input type="range" id="style" min="0" max="1" step="0.01" value="0" class="param-slider">
+                        <div class="param-desc">None</div>
+                        <input type="range" id="style" min="0" max="1" step="0.01" value="0" class="param-slider">
                         <div class="param-value" id="styleVal">0</div>
                     </div>
                     <hr style="margin:15px 0">
-                    <div class="tts-textarea-container"><textarea id="text" class="tts-textarea" placeholder="输入要朗读的文字，支持长文本自动换行...&#10;支持导入TXT文件" oninput="autoResizeTextarea(); updateCharCount();"></textarea>
+
+                    <!-- 文本域（含展开/收起按钮 + 字数统计） -->
+                    <div class="tts-textarea-container">
+                        <textarea id="text" class="tts-textarea" placeholder="输入要朗读的文字，支持长文本自动换行...&#10;支持导入TXT文件" oninput="updateCharCount(); autoResizeTextarea(); checkExpandButton();"></textarea>
+                        <button class="tts-expand-btn" id="expandBtn" onclick="toggleExpand()">▼</button>
                         <div class="tts-char-count" id="charCount">字数：0</div>
                     </div>
+
                     <div class="btn-group">
                         <button id="generateAudioBtn" class="tts-btn-primary">🎙️ 生成音频+自动下载</button>
                         <button id="copyTextBtn" class="btn-copy-text">📋 复制文本</button>
                         <button id="importTxtBtn" class="tts-btn-secondary">📄 导入TXT</button>
-                        <button id="clearHistoryBtn" class="tts-btn-danger">🗑️ 清空历史</button>
+                        <!-- ✅ 改为：清空文本（橙色，无弹窗，只清输入框） -->
+                        <button id="clearTextBtn" class="btn-clear-text">🗑️ 清空文本</button>
                     </div>
                     <input type="file" id="ttsFileInput" accept=".txt" style="display:none">
                     <div id="log"></div>
@@ -1310,6 +1479,7 @@
             document.getElementById("text").value = content;
             updateCharCount();
             autoResizeTextarea();
+            checkExpandButton();
         }
 
         // 截断文本到5000字（无弹窗）
@@ -1347,11 +1517,9 @@
         function saveTtsHistory(content, blobData) {
             if (!content) return;
 
-            // 截断文本
             const truncatedContent = truncateText(content);
 
             // ❌ 已删除"相同内容不保存"的检查
-            // 用户可能重复生成相同音频（不同参数），所以不检查重复
 
             let newItem = {
                 content: truncatedContent,
@@ -1515,13 +1683,34 @@
             return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]);
         }
 
-        function clearTtsHistory() {
-            if (!confirm("确定清空所有文本历史？")) return;
+        // ============================================================
+        //  🗑️ 清空文本（无弹窗，只清输入框）
+        // ============================================================
+        function clearTextOnly() {
+            document.getElementById("text").value = "";
+            updateCharCount();
+            autoResizeTextarea();
+            checkExpandButton();
+        }
+
+        // ============================================================
+        //  🗑️ 清空所有历史（有弹窗，清空文本历史 + API历史）
+        // ============================================================
+        function clearAllHistory() {
+            if (!confirm("确定清空所有历史记录吗？\n\n这将同时清空：\n• 文本历史（7天内）\n• API Key 历史")) {
+                return;
+            }
+            // 清空文本历史
             ttsHistory = [];
             localStorage.removeItem("tts_history_v2");
             renderTtsHistoryByDate();
-            document.getElementById("log").innerText = "✅ 文本历史已清空";
-            setTimeout(() => { if (document.getElementById("log").innerText.includes("清空")) document.getElementById(
+            // 清空API历史
+            localStorage.removeItem("api_key_history");
+            loadApiHistory();
+            document.getElementById("apiKey").value = "";
+            document.getElementById("quotaCard").style.display = "none";
+            document.getElementById("log").innerText = "✅ 所有历史记录已清空";
+            setTimeout(() => { if (document.getElementById("log").innerText.includes("已清空")) document.getElementById(
                         "log").innerText = ""; }, 3000);
         }
 
@@ -1570,6 +1759,65 @@
                 if (secs === 0) return mins + "分钟";
                 return mins + "分" + secs + "秒";
             }
+        }
+
+        // ==================== 展开/收起功能 ====================
+        function checkExpandButton() {
+            const ta = document.getElementById('text');
+            const btn = document.getElementById('expandBtn');
+            if (!ta || !btn) return;
+            const lineHeight = parseInt(getComputedStyle(ta).lineHeight) || 24;
+            const minExpandHeight = lineHeight * 10 + 20;
+            if (ta.scrollHeight > minExpandHeight) {
+                btn.classList.add('visible');
+            } else {
+                btn.classList.remove('visible');
+                if (ta.classList.contains('expanded')) {
+                    ta.classList.remove('expanded');
+                    ta.style.maxHeight = '360px';
+                    btn.textContent = '▼';
+                }
+            }
+        }
+
+        function toggleExpand() {
+            const ta = document.getElementById('text');
+            const btn = document.getElementById('expandBtn');
+            if (!ta || !btn) return;
+            ta.classList.toggle('expanded');
+            if (ta.classList.contains('expanded')) {
+                btn.textContent = '▲';
+                ta.style.maxHeight = 'none';
+                ta.scrollTop = ta.scrollHeight;
+            } else {
+                btn.textContent = '▼';
+                ta.style.maxHeight = '360px';
+                ta.scrollTop = 0;
+            }
+            setTimeout(() => checkExpandButton(), 100);
+        }
+
+        // ==================== 复制文本功能 ====================
+        function copyTextContent() {
+            const text = document.getElementById('text').value;
+            if (!text.trim()) {
+                document.getElementById('log').innerText = "⚠️ 文本为空，无法复制";
+                setTimeout(() => { if (document.getElementById('log').innerText.includes("无法复制")) document
+                        .getElementById("log").innerText = ""; }, 2000);
+                return;
+            }
+            navigator.clipboard.writeText(text).then(() => {
+                document.getElementById('log').innerText = "✅ 文本已复制到剪贴板";
+                setTimeout(() => { if (document.getElementById('log').innerText.includes("复制到剪贴板")) document
+                        .getElementById("log").innerText = ""; }, 2000);
+            }).catch(() => {
+                const ta = document.getElementById('text');
+                ta.select();
+                document.execCommand('copy');
+                document.getElementById('log').innerText = "✅ 文本已复制到剪贴板";
+                setTimeout(() => { if (document.getElementById('log').innerText.includes("复制到剪贴板")) document
+                        .getElementById("log").innerText = ""; }, 2000);
+            });
         }
 
         async function startGenerate() {
@@ -1651,6 +1899,7 @@
                 ta.style.height = 'auto';
                 ta.style.height = ta.scrollHeight + 'px';
             }
+            checkExpandButton();
         }
 
         function updateCharCount() {
@@ -1670,7 +1919,6 @@
         function saveApiHistory(key) {
             if (!key) return;
             let list = JSON.parse(localStorage.getItem("api_key_history")) || [];
-            // ✅ 检查重复：如果已存在，先移除旧的
             list = list.filter(i => i.key !== key);
             list.unshift({ key, time: Date.now() });
             if (list.length > 200) list = list.slice(0, 200);
@@ -1706,18 +1954,6 @@
             });
         }
 
-        function clearApiHistory() {
-            if (confirm("确定清空所有API Key历史记录吗？")) {
-                localStorage.removeItem("api_key_history");
-                loadApiHistory();
-                document.getElementById("apiKey").value = "";
-                document.getElementById("quotaCard").style.display = "none";
-                document.getElementById("log").innerText = "✅ API历史记录已清空";
-                setTimeout(() => { if (document.getElementById("log").innerText.includes("清空")) document.getElementById(
-                            "log").innerText = ""; }, 3000);
-            }
-        }
-
         function onApiKeyInput() { autoFetchQuota(document.getElementById("apiKey").value.trim()); }
 
         function updateSlider(slider) {
@@ -1736,6 +1972,7 @@
                 document.getElementById("text").value = ev.target.result;
                 updateCharCount();
                 autoResizeTextarea();
+                checkExpandButton();
                 document.getElementById("log").innerText = "✅ 文件已导入";
                 setTimeout(() => { if (document.getElementById("log").innerText === "✅ 文件已导入") document
                         .getElementById("log").innerText = ""; }, 3000);
@@ -1787,29 +2024,6 @@
                 updateVoiceNameDisplay();
                 document.getElementById("log").innerText = "⚠️ 使用内置声音库";
             }
-        }
-
-        // ==================== 复制文本功能 ====================
-        function copyTextContent() {
-            const text = document.getElementById('text').value;
-            if (!text.trim()) {
-                document.getElementById('log').innerText = "⚠️ 文本为空，无法复制";
-                setTimeout(() => { if (document.getElementById('log').innerText.includes("无法复制")) document
-                        .getElementById("log").innerText = ""; }, 2000);
-                return;
-            }
-            navigator.clipboard.writeText(text).then(() => {
-                document.getElementById('log').innerText = "✅ 文本已复制到剪贴板";
-                setTimeout(() => { if (document.getElementById('log').innerText.includes("复制到剪贴板")) document
-                        .getElementById("log").innerText = ""; }, 2000);
-            }).catch(() => {
-                const ta = document.getElementById('text');
-                ta.select();
-                document.execCommand('copy');
-                document.getElementById('log').innerText = "✅ 文本已复制到剪贴板";
-                setTimeout(() => { if (document.getElementById('log').innerText.includes("复制到剪贴板")) document
-                        .getElementById("log").innerText = ""; }, 2000);
-            });
         }
 
         // ============================================================
@@ -2028,7 +2242,13 @@
         document.getElementById('copyTextBtn').addEventListener('click', copyTextContent);
         document.getElementById('importTxtBtn').addEventListener('click', () => document.getElementById('ttsFileInput')
         .click());
-        document.getElementById('clearHistoryBtn').addEventListener('click', clearTtsHistory);
+
+        // ✅ 清空文本（无弹窗）
+        document.getElementById('clearTextBtn').addEventListener('click', clearTextOnly);
+
+        // ✅ 清空所有历史（有弹窗）
+        document.getElementById('clearAllHistoryBtn').addEventListener('click', clearAllHistory);
+
         document.getElementById('ttsFileInput').addEventListener('change', loadTtsTxtFile);
         document.getElementById('fetchApiInfoBtn').addEventListener('click', fetchApiInfo);
         document.getElementById('voiceId').addEventListener('input', updateVoiceNameDisplay);
@@ -2040,11 +2260,15 @@
                 autoFetchQuota(e.target.value);
             }
         });
-        document.getElementById("clearApiHistoryBtn").addEventListener("click", clearApiHistory);
         document.querySelectorAll(".param-slider").forEach(s => {
             updateSlider(s);
             s.addEventListener("input", () => updateSlider(s));
         });
+
+        // 初始化 - 检查展开按钮
+        setTimeout(() => {
+            checkExpandButton();
+        }, 100);
 
         loadApiHistory();
         loadTtsHistory();
@@ -2065,6 +2289,7 @@
             v2Panel.classList.add('hidden-panel');
             ttsPanel.classList.remove('hidden-panel');
             setTimeout(autoResizeTextarea, 50);
+            setTimeout(checkExpandButton, 100);
         });
         document.getElementById('backToQrBtn').addEventListener('click', () => {
             v2Panel.classList.add('hidden-panel');
