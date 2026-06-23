@@ -108,7 +108,7 @@
             bottom: 12px;
             left: 50%;
             transform: translateX(-50%);
-            font-size: 18px;
+            font-size: 20px;
             color: #4f46e5;
             background: rgba(255, 255, 255, 0.95);
             border: 1.5px solid #cbd5e1;
@@ -238,6 +238,17 @@
         .btn-clear-api:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+        /* 修复移动端样式 */
+        @media (max-width: 768px) {
+            .tts-textarea {
+                min-height: 160px;
+                max-height: 260px;
+            }
+            .tts-expand-btn {
+                font-size: 18px;
+                padding: 2px 14px;
+            }
         }
     </style>
 </head>
@@ -1189,13 +1200,13 @@
                 font-size: 14px
             }
             .tts-textarea {
-                min-height: 100px;
+                min-height: 160px;
                 max-height: 260px;
                 padding-bottom: 48px;
             }
             .tts-expand-btn {
-                font-size: 16px;
-                padding: 2px 12px;
+                font-size: 18px;
+                padding: 2px 14px;
             }
         }
     </style>
@@ -1511,45 +1522,71 @@
         }
 
         // ============================================================
-        //  saveTtsHistory - 已删除"相同内容不保存"的检查
-        //  用户可能重复生成相同音频（不同参数），所以不检查重复
+        //  saveTtsHistory - 每次都从 localStorage 读取最新数据
+        //  修复：先保存再下载，确保历史记录不会丢失
         // ============================================================
         function saveTtsHistory(content, blobData) {
-            if (!content) return;
+            return new Promise((resolve) => {
+                if (!content) { resolve(); return; }
 
-            const truncatedContent = truncateText(content);
-
-            // ❌ 已删除"相同内容不保存"的检查
-
-            let newItem = {
-                content: truncatedContent,
-                time: Date.now(),
-                blobBase64: null
-            };
-
-            if (blobData) {
-                const reader = new FileReader();
-                reader.readAsDataURL(blobData);
-                reader.onloadend = function() {
-                    newItem.blobBase64 = reader.result;
-                    ttsHistory.unshift(newItem);
-                    cleanupAudioCache();
-                    if (ttsHistory.length > MAX_HISTORY_ITEMS) {
-                        ttsHistory = ttsHistory.slice(0, MAX_HISTORY_ITEMS);
-                    }
-                    localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
-                    renderTtsHistoryByDate();
+                const truncatedContent = truncateText(content);
+                let newItem = {
+                    content: truncatedContent,
+                    time: Date.now(),
+                    blobBase64: null
                 };
-                return;
-            }
 
-            ttsHistory.unshift(newItem);
-            cleanupAudioCache();
-            if (ttsHistory.length > MAX_HISTORY_ITEMS) {
-                ttsHistory = ttsHistory.slice(0, MAX_HISTORY_ITEMS);
-            }
-            localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
-            renderTtsHistoryByDate();
+                const saveToStorage = (item) => {
+                    try {
+                        // ✅ 每次都从 localStorage 读取最新数据
+                        let current = JSON.parse(localStorage.getItem("tts_history_v2")) || [];
+                        // 检查1秒内是否有相同内容（防重复）
+                        const exists = current.some(
+                            x => x.content === item.content &&
+                            Math.abs(x.time - item.time) < 1000
+                        );
+                        if (exists) {
+                            // 如果存在，更新音频数据（如果有的话）
+                            const idx = current.findIndex(
+                                x => x.content === item.content &&
+                                Math.abs(x.time - item.time) < 1000
+                            );
+                            if (idx !== -1 && item.blobBase64) {
+                                current[idx].blobBase64 = item.blobBase64;
+                            }
+                        } else {
+                            current.unshift(item);
+                        }
+                        // 限制数量
+                        if (current.length > MAX_HISTORY_ITEMS) {
+                            current = current.slice(0, MAX_HISTORY_ITEMS);
+                        }
+                        localStorage.setItem("tts_history_v2", JSON.stringify(current));
+                        ttsHistory = current;
+                        renderTtsHistoryByDate();
+                        resolve();
+                    } catch (e) {
+                        console.warn("保存历史记录失败:", e);
+                        resolve();
+                    }
+                };
+
+                if (blobData) {
+                    const reader = new FileReader();
+                    reader.readAsDataURL(blobData);
+                    reader.onloadend = function() {
+                        newItem.blobBase64 = reader.result;
+                        saveToStorage(newItem);
+                    };
+                    reader.onerror = function() {
+                        // 读取失败，只保存文本
+                        saveToStorage(newItem);
+                    };
+                    return;
+                }
+
+                saveToStorage(newItem);
+            });
         }
 
         function cleanupAudioCache() {
@@ -1820,6 +1857,9 @@
             });
         }
 
+        // ============================================================
+        //  ✅ 核心修复：先保存历史记录，再下载
+        // ============================================================
         async function startGenerate() {
             const key = document.getElementById("apiKey").value.trim();
             const vid = document.getElementById("voiceId").value.trim();
@@ -1863,11 +1903,18 @@
                     throw new Error(errorMsg);
                 }
                 const buf = await res.arrayBuffer();
-                const elapsed = Math.round((Date.now() - startTime) / 1000);
                 const blob = new Blob([buf], { type: "audio/mpeg" });
+
+                // ✅ 关键修复：先保存历史记录，等待保存完成
+                log.innerText = `💾 正在保存历史记录...`;
+                await saveTtsHistory(txt, blob);
+
+                // 保存完成后，再执行下载
+                const elapsed = Math.round((Date.now() - startTime) / 1000);
                 const audioUrl = URL.createObjectURL(blob);
                 document.getElementById("audio").src = audioUrl;
                 document.getElementById("audio").play().catch(e => console.log("自动播放被阻止"));
+
                 const fileName = generateFileName(txt);
                 const downloadUrl = URL.createObjectURL(blob);
                 const a = document.createElement("a");
@@ -1880,10 +1927,7 @@
                 setTimeout(() => { URL.revokeObjectURL(downloadUrl);
                     URL.revokeObjectURL(audioUrl); }, 1000);
 
-                // ✅ 使用 saveTtsHistory 保存，已删除重复检查
-                saveTtsHistory(txt, blob);
-
-                log.innerText = `✅ 生成成功！耗时 ${elapsed} 秒，音频已自动播放并下载`;
+                log.innerText = `✅ 生成成功！耗时 ${elapsed} 秒，音频已保存并下载`;
                 await showModalDialog("✅ 下载成功", `文件已保存：${fileName}\n\n文件命名规则：文本第一行_日期时间.mp3`);
                 setTimeout(() => fetchQuotaOnly(key), 1000);
             } catch (error) {
