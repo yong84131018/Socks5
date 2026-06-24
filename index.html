@@ -250,6 +250,94 @@
                 padding: 2px 14px;
             }
         }
+        /* AU 提示弹窗样式 */
+        .au-tip-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 10002;
+            align-items: center;
+            justify-content: center;
+        }
+        .au-tip-modal .modal-box {
+            background: #fff;
+            border-radius: 24px;
+            padding: 32px 36px;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: auFadeIn 0.25s ease;
+        }
+        @keyframes auFadeIn {
+            from { opacity: 0; transform: scale(0.96) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        .au-tip-modal .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .au-tip-modal .modal-header .icon {
+            font-size: 32px;
+        }
+        .au-tip-modal .modal-header .title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #92400e;
+        }
+        .au-tip-modal .modal-body p {
+            font-size: 15px;
+            color: #1e293b;
+            line-height: 1.7;
+            margin-bottom: 8px;
+        }
+        .au-tip-modal .modal-body kbd {
+            background: #e2e8f0;
+            padding: 1px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+        .au-tip-modal .modal-body strong {
+            color: #0d9488;
+        }
+        .au-tip-modal .modal-footer {
+            display: flex;
+            gap: 16px;
+            justify-content: flex-end;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .au-tip-modal .modal-footer label {
+            font-size: 13px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .au-tip-modal .modal-footer .btn-close {
+            background: #0d9488;
+            color: #fff;
+            border: none;
+            border-radius: 40px;
+            padding: 10px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .au-tip-modal .modal-footer .btn-close:hover {
+            background: #0f766e;
+        }
     </style>
 </head>
 <body>
@@ -1105,7 +1193,7 @@
             z-index: 10001;
             display: flex;
             align-items: center;
-            justify-content: center
+            justify-center: center
         }
         .modal-content {
             background: #fff;
@@ -1209,10 +1297,131 @@
                 padding: 2px 14px;
             }
         }
+        /* AU 提示弹窗覆盖 */
+        .au-tip-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 10002;
+            align-items: center;
+            justify-content: center;
+        }
+        .au-tip-modal .modal-box {
+            background: #fff;
+            border-radius: 24px;
+            padding: 32px 36px;
+            max-width: 480px;
+            width: 90%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: auFadeIn 0.25s ease;
+        }
+        @keyframes auFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.96) translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        .au-tip-modal .modal-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .au-tip-modal .modal-header .icon {
+            font-size: 32px;
+        }
+        .au-tip-modal .modal-header .title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #92400e;
+        }
+        .au-tip-modal .modal-body p {
+            font-size: 15px;
+            color: #1e293b;
+            line-height: 1.7;
+            margin-bottom: 8px;
+        }
+        .au-tip-modal .modal-body kbd {
+            background: #e2e8f0;
+            padding: 1px 10px;
+            border-radius: 4px;
+            font-size: 13px;
+            font-family: inherit;
+        }
+        .au-tip-modal .modal-body strong {
+            color: #0d9488;
+        }
+        .au-tip-modal .modal-footer {
+            display: flex;
+            gap: 16px;
+            justify-content: flex-end;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+        .au-tip-modal .modal-footer label {
+            font-size: 13px;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            user-select: none;
+        }
+        .au-tip-modal .modal-footer .btn-close {
+            background: #0d9488;
+            color: #fff;
+            border: none;
+            border-radius: 40px;
+            padding: 10px 32px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .au-tip-modal .modal-footer .btn-close:hover {
+            background: #0f766e;
+        }
     </style>
 </head>
 
 <body>
+    <!-- ============================================================
+    AU 提示弹窗（点击 IIElevenLabs TTS 时弹出）
+    ============================================================ -->
+    <div class="au-tip-modal" id="auTipModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span class="icon">⚠️</span>
+                <span class="title">Audition 用户提示</span>
+            </div>
+            <div class="modal-body">
+                <p>
+                    在 AU 中处理 MP3 文件时，<br>
+                    直接按 <kbd>Ctrl+S</kbd> 保存可能导致尾部音频丢失。
+                </p>
+                <p>
+                    请使用 <strong>「AU左上角的文件 → 导出 → 文件」</strong> 保存，确保音频完整。 -- <kbd>导出快捷键 ：Ctrl+Shift+E</kbd>
+                </p>
+            </div>
+            <div class="modal-footer">
+                <label>
+                    <input type="checkbox" id="dontShowAgain"> 15天内不再提示
+                </label>
+                <button class="btn-close" id="closeAuTipBtn">知道了</button>
+            </div>
+        </div>
+    </div>
+
     <div class="outer-container">
         <div class="container" id="mainContainer">
             <!-- 面板1: 二维码生成工具 -->
@@ -1289,7 +1498,6 @@
                         <select id="apiHistorySelect" class="api-history-select">
                             <option value="">📅 API历史记录</option>
                         </select>
-                        <!-- ✅ 改为：清空所有历史（红色，有弹窗） -->
                         <button id="clearAllHistoryBtn" class="btn-clear-all-history">🗑️ 清空所有历史</button>
                     </div>
                     <div id="quotaCard" class="quota-card" style="display:none">
@@ -1341,7 +1549,6 @@
                         <button id="generateAudioBtn" class="tts-btn-primary">🎙️ 生成音频+自动下载</button>
                         <button id="copyTextBtn" class="btn-copy-text">📋 复制文本</button>
                         <button id="importTxtBtn" class="tts-btn-secondary">📄 导入TXT</button>
-                        <!-- ✅ 改为：清空文本（橙色，无弹窗，只清输入框） -->
                         <button id="clearTextBtn" class="btn-clear-text">🗑️ 清空文本</button>
                     </div>
                     <input type="file" id="ttsFileInput" accept=".txt" style="display:none">
@@ -1349,7 +1556,7 @@
                     <audio id="audio" controls></audio>
                     <div class="history-box">
                         <div class="history-header">
-                            <h4>📜 文本历史 (保存7天 · 文本上限5000字 · 音频缓存最近3条)</h4>
+                            <h4>📜 文本历史 (保存7天 · 文本上限5000字 · 自适应音频缓存)</h4>
                             <a href="https://elevenlabs.io/app/home" target="_blank" class="history-link">官方链接 II ElevenLabs</a>
                         </div>
                         <div id="historyList"></div>
@@ -1381,7 +1588,60 @@
         </div>
     </div>
     <script>
-        // ==================== 域名校验已在最顶部完成 ====================
+        // ============================================================
+        //  AU 提示弹窗控制（15天有效期）
+        // ============================================================
+
+        function isAuTipHidden() {
+            const stored = localStorage.getItem('auTipHidden');
+            if (!stored) return false;
+            const expiryTime = parseInt(stored);
+            return Date.now() < expiryTime;
+        }
+
+        function showAuTip() {
+            if (isAuTipHidden()) return;
+            document.getElementById('auTipModal').style.display = 'flex';
+        }
+
+        function hideAuTip() {
+            document.getElementById('auTipModal').style.display = 'none';
+            if (document.getElementById('dontShowAgain').checked) {
+                const expiryTime = Date.now() + 15 * 24 * 60 * 60 * 1000;
+                localStorage.setItem('auTipHidden', String(expiryTime));
+            }
+        }
+
+        // 绑定弹窗事件
+        document.addEventListener('DOMContentLoaded', function() {
+            const modal = document.getElementById('auTipModal');
+            const closeBtn = document.getElementById('closeAuTipBtn');
+
+            closeBtn.addEventListener('click', hideAuTip);
+
+            // 点击背景关闭（但不记住）
+            modal.addEventListener('click', function(e) {
+                if (e.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+
+            // 按 ESC 关闭（但不记住）
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    modal.style.display = 'none';
+                }
+            });
+
+            // 检查是否在有效期内
+            if (isAuTipHidden()) {
+                modal.style.display = 'none';
+            }
+        });
+
+        // ============================================================
+        //  原有脚本（域名校验已在最顶部完成）
+        // ============================================================
         function showModalDialog(title, message) {
             return new Promise((resolve) => {
                 const overlay = document.createElement('div');
@@ -1461,7 +1721,6 @@
         voiceList = [...BUILTIN_VOICES];
 
         const MAX_TEXT_LENGTH = 5000;
-        const MAX_AUDIO_CACHE = 3;
         const MAX_HISTORY_ITEMS = 200;
         const SEVEN_DAYS = 7 * 24 * 60 * 60 * 1000;
 
@@ -1493,7 +1752,6 @@
             checkExpandButton();
         }
 
-        // 截断文本到5000字（无弹窗）
         function truncateText(content) {
             if (content.length <= MAX_TEXT_LENGTH) return content;
             return content.substring(0, MAX_TEXT_LENGTH) + "\n\n... [文本已截断，原文超过5000字]";
@@ -1507,11 +1765,6 @@
                 if (ttsHistory.length > MAX_HISTORY_ITEMS) {
                     ttsHistory = ttsHistory.slice(0, MAX_HISTORY_ITEMS);
                 }
-                for (let i = 0; i < ttsHistory.length; i++) {
-                    if (i >= MAX_AUDIO_CACHE) {
-                        ttsHistory[i].blobBase64 = null;
-                    }
-                }
                 localStorage.setItem("tts_history_v2", JSON.stringify(ttsHistory));
                 renderTtsHistoryByDate();
             } catch (e) {
@@ -1521,106 +1774,117 @@
             }
         }
 
-        // ============================================================
-        //  saveTtsHistory - 每次都从 localStorage 读取最新数据
-        //  修复：先保存再下载，确保历史记录不会丢失
-        // ============================================================
-        function saveTtsHistory(content, blobData) {
-            return new Promise((resolve) => {
-                if (!content) { resolve(); return; }
+        // 自适应音频缓存
+        function getUsedStorageSize() {
+            let total = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    total += localStorage[key].length * 2;
+                }
+            }
+            return total;
+        }
 
-                const truncatedContent = truncateText(content);
+        function getRemainingStorage() {
+            const maxSize = 5 * 1024 * 1024;
+            const used = getUsedStorageSize();
+            return Math.max(0, maxSize - used);
+        }
+
+        function estimateAudioSize(blob) {
+            return Math.ceil(blob.size * 4 / 3) + 100;
+        }
+
+        function saveAudioWithAdaptiveCache(content, blob) {
+            if (!content || !blob) {
+                saveTextOnly(content);
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.readAsDataURL(blob);
+            reader.onloadend = function() {
+                const base64Data = reader.result;
+                const estimatedSize = base64Data.length;
+
+                let current = JSON.parse(localStorage.getItem("tts_history_v2")) || [];
+                let remaining = getRemainingStorage();
+
+                let maxAttempts = 30;
+                let deletedCount = 0;
+                while (remaining < estimatedSize && current.length > 0 && maxAttempts > 0) {
+                    let removed = false;
+                    for (let i = current.length - 1; i >= 0; i--) {
+                        if (current[i].blobBase64) {
+                            console.log(`🗑️ 删除旧音频缓存: ${current[i].content.substring(0, 30)}...`);
+                            current[i].blobBase64 = null;
+                            removed = true;
+                            deletedCount++;
+                            break;
+                        }
+                    }
+                    if (!removed) break;
+                    localStorage.setItem("tts_history_v2", JSON.stringify(current));
+                    remaining = getRemainingStorage();
+                    maxAttempts--;
+                }
+
+                remaining = getRemainingStorage();
                 let newItem = {
-                    content: truncatedContent,
+                    content: content,
                     time: Date.now(),
                     blobBase64: null
                 };
 
-                const saveToStorage = (item) => {
-                    try {
-                        // ✅ 每次都从 localStorage 读取最新数据
-                        let current = JSON.parse(localStorage.getItem("tts_history_v2")) || [];
-                        // 检查1秒内是否有相同内容（防重复）
-                        const exists = current.some(
-                            x => x.content === item.content &&
-                            Math.abs(x.time - item.time) < 1000
-                        );
-                        if (exists) {
-                            // 如果存在，更新音频数据（如果有的话）
-                            const idx = current.findIndex(
-                                x => x.content === item.content &&
-                                Math.abs(x.time - item.time) < 1000
-                            );
-                            if (idx !== -1 && item.blobBase64) {
-                                current[idx].blobBase64 = item.blobBase64;
-                            }
-                        } else {
-                            current.unshift(item);
-                        }
-                        // 限制数量
-                        if (current.length > MAX_HISTORY_ITEMS) {
-                            current = current.slice(0, MAX_HISTORY_ITEMS);
-                        }
-                        localStorage.setItem("tts_history_v2", JSON.stringify(current));
-                        ttsHistory = current;
-                        renderTtsHistoryByDate();
-                        resolve();
-                    } catch (e) {
-                        console.warn("保存历史记录失败:", e);
-                        resolve();
+                if (remaining >= estimatedSize) {
+                    newItem.blobBase64 = base64Data;
+                    console.log(`✅ 音频已保存 (${(estimatedSize/1024/1024).toFixed(2)} MB)`);
+                } else {
+                    console.warn(`⚠️ 容量不足，仅保存文本 (需要 ${(estimatedSize/1024/1024).toFixed(2)} MB，剩余 ${(remaining/1024/1024).toFixed(2)} MB)`);
+                    if (deletedCount > 0) {
+                        console.warn(`已删除 ${deletedCount} 个旧音频缓存，仍不足`);
                     }
-                };
-
-                if (blobData) {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(blobData);
-                    reader.onloadend = function() {
-                        newItem.blobBase64 = reader.result;
-                        saveToStorage(newItem);
-                    };
-                    reader.onerror = function() {
-                        // 读取失败，只保存文本
-                        saveToStorage(newItem);
-                    };
-                    return;
                 }
 
-                saveToStorage(newItem);
+                current.unshift(newItem);
+                if (current.length > MAX_HISTORY_ITEMS) {
+                    current = current.slice(0, MAX_HISTORY_ITEMS);
+                }
+
+                localStorage.setItem("tts_history_v2", JSON.stringify(current));
+                ttsHistory = current;
+                renderTtsHistoryByDate();
+            };
+
+            reader.onerror = function() {
+                console.warn("FileReader 失败，仅保存文本");
+                saveTextOnly(content);
+            };
+        }
+
+        function saveTextOnly(content) {
+            if (!content) return;
+            const truncatedContent = truncateText(content);
+            let current = JSON.parse(localStorage.getItem("tts_history_v2")) || [];
+            current.unshift({
+                content: truncatedContent,
+                time: Date.now(),
+                blobBase64: null
             });
-        }
-
-        function cleanupAudioCache() {
-            let audioCount = 0;
-            for (let i = 0; i < ttsHistory.length; i++) {
-                if (ttsHistory[i].blobBase64) {
-                    audioCount++;
-                    if (audioCount > MAX_AUDIO_CACHE) {
-                        ttsHistory[i].blobBase64 = null;
-                    }
-                }
+            if (current.length > MAX_HISTORY_ITEMS) {
+                current = current.slice(0, MAX_HISTORY_ITEMS);
             }
+            localStorage.setItem("tts_history_v2", JSON.stringify(current));
+            ttsHistory = current;
+            renderTtsHistoryByDate();
         }
 
-        async function reDownloadHistory(item) {
-            if (item.blobBase64) {
-                try {
-                    const byteString = atob(item.blobBase64.split(',')[1]);
-                    const ab = new ArrayBuffer(byteString.length);
-                    const ia = new Uint8Array(ab);
-                    for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
-                    const blob = new Blob([ab], { type: "audio/mpeg" });
-                    const fileName = generateFileName(item.content);
-                    const a = document.createElement('a');
-                    a.href = URL.createObjectURL(blob);
-                    a.download = fileName;
-                    a.click();
-                    setTimeout(() => URL.revokeObjectURL(a.href), 100);
-                    await showModalDialog("✅ 重新下载成功", `文件已保存：${fileName}`);
-                } catch (e) {
-                    alert("音频数据已损坏，请重新生成。");
-                }
+        function saveTtsHistory(content, blobData) {
+            if (!content) return;
+            if (blobData) {
+                saveAudioWithAdaptiveCache(content, blobData);
             } else {
-                alert("该历史记录的音频缓存已过期（仅保留最近3条），请重新生成。");
+                saveTextOnly(content);
             }
         }
 
@@ -1699,7 +1963,7 @@
                             alert("音频数据已损坏，请重新生成。");
                         }
                     } else {
-                        alert("该历史记录的音频缓存已过期（仅保留最近3条），请重新生成。");
+                        alert("该历史记录的音频缓存已过期，请重新生成。");
                     }
                 });
             });
@@ -1720,28 +1984,36 @@
             return str.replace(/[&<>]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' })[m]);
         }
 
-        // ============================================================
-        //  🗑️ 清空文本（无弹窗，只清输入框）
-        // ============================================================
-        function clearTextOnly() {
-            document.getElementById("text").value = "";
-            updateCharCount();
-            autoResizeTextarea();
-            checkExpandButton();
+        async function reDownloadHistory(item) {
+            if (item.blobBase64) {
+                try {
+                    const byteString = atob(item.blobBase64.split(',')[1]);
+                    const ab = new ArrayBuffer(byteString.length);
+                    const ia = new Uint8Array(ab);
+                    for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+                    const blob = new Blob([ab], { type: "audio/mpeg" });
+                    const fileName = generateFileName(item.content);
+                    const a = document.createElement('a');
+                    a.href = URL.createObjectURL(blob);
+                    a.download = fileName;
+                    a.click();
+                    setTimeout(() => URL.revokeObjectURL(a.href), 100);
+                    await showModalDialog("✅ 重新下载成功", `文件已保存：${fileName}`);
+                } catch (e) {
+                    alert("音频数据已损坏，请重新生成。");
+                }
+            } else {
+                alert("该历史记录的音频缓存已过期，请重新生成。");
+            }
         }
 
-        // ============================================================
-        //  🗑️ 清空所有历史（有弹窗，清空文本历史 + API历史）
-        // ============================================================
         function clearAllHistory() {
             if (!confirm("确定清空所有历史记录吗？\n\n这将同时清空：\n• 文本历史（7天内）\n• API Key 历史")) {
                 return;
             }
-            // 清空文本历史
             ttsHistory = [];
             localStorage.removeItem("tts_history_v2");
             renderTtsHistoryByDate();
-            // 清空API历史
             localStorage.removeItem("api_key_history");
             loadApiHistory();
             document.getElementById("apiKey").value = "";
@@ -1749,6 +2021,13 @@
             document.getElementById("log").innerText = "✅ 所有历史记录已清空";
             setTimeout(() => { if (document.getElementById("log").innerText.includes("已清空")) document.getElementById(
                         "log").innerText = ""; }, 3000);
+        }
+
+        function clearTextOnly() {
+            document.getElementById("text").value = "";
+            updateCharCount();
+            autoResizeTextarea();
+            checkExpandButton();
         }
 
         let autoQuotaTimer = null;
@@ -1778,7 +2057,6 @@
             autoQuotaTimer = setTimeout(() => { if (apiKey && apiKey.length > 10) fetchQuotaOnly(apiKey); }, 800);
         }
 
-        // ==================== 预计等待时间计算 ====================
         function estimateWaitTime(text) {
             const chineseChars = (text.match(/[\u4e00-\u9fa5]/g) || []).length;
             const otherChars = text.length - chineseChars;
@@ -1798,7 +2076,6 @@
             }
         }
 
-        // ==================== 展开/收起功能 ====================
         function checkExpandButton() {
             const ta = document.getElementById('text');
             const btn = document.getElementById('expandBtn');
@@ -1834,7 +2111,6 @@
             setTimeout(() => checkExpandButton(), 100);
         }
 
-        // ==================== 复制文本功能 ====================
         function copyTextContent() {
             const text = document.getElementById('text').value;
             if (!text.trim()) {
@@ -1858,7 +2134,7 @@
         }
 
         // ============================================================
-        //  ✅ 核心修复：先保存历史记录，再下载
+        //  🎙️ 生成音频（流式 Blob 合并 + 自适应保存）
         // ============================================================
         async function startGenerate() {
             const key = document.getElementById("apiKey").value.trim();
@@ -1869,7 +2145,6 @@
             if (!vid) { log.innerText = "❌ 请输入声音ID"; return; }
             if (!txt) { log.innerText = "❌ 请输入要转换的文字"; return; }
 
-            // 计算预计等待时间
             const waitSeconds = estimateWaitTime(txt);
             const waitText = formatWaitTime(waitSeconds);
             const charCount = txt.length;
@@ -1894,6 +2169,7 @@
                         speed: parseFloat(document.getElementById("speed").value)
                     })
                 });
+
                 if (!res.ok) {
                     let errorMsg = "";
                     try {
@@ -1902,14 +2178,28 @@
                     } catch (e) { errorMsg = await res.text(); }
                     throw new Error(errorMsg);
                 }
-                const buf = await res.arrayBuffer();
-                const blob = new Blob([buf], { type: "audio/mpeg" });
 
-                // ✅ 关键修复：先保存历史记录，等待保存完成
-                log.innerText = `💾 正在保存历史记录...`;
-                await saveTtsHistory(txt, blob);
+                // ✅ 流式 Blob 合并
+                const reader = res.body.getReader();
+                const chunks = [];
+                let receivedLength = 0;
+                const contentLength = parseInt(res.headers.get('content-length') || '0');
 
-                // 保存完成后，再执行下载
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    chunks.push(value);
+                    receivedLength += value.length;
+                }
+
+                const blob = new Blob(chunks, { type: "audio/mpeg" });
+
+                if (contentLength > 0 && receivedLength < contentLength) {
+                    console.warn(`⚠️ 数据不完整: ${receivedLength}/${contentLength} 字节`);
+                } else {
+                    console.log(`✅ 音频接收完整: ${receivedLength} 字节`);
+                }
+
                 const elapsed = Math.round((Date.now() - startTime) / 1000);
                 const audioUrl = URL.createObjectURL(blob);
                 document.getElementById("audio").src = audioUrl;
@@ -1927,7 +2217,9 @@
                 setTimeout(() => { URL.revokeObjectURL(downloadUrl);
                     URL.revokeObjectURL(audioUrl); }, 1000);
 
-                log.innerText = `✅ 生成成功！耗时 ${elapsed} 秒，音频已保存并下载`;
+                saveAudioWithAdaptiveCache(txt, blob);
+
+                log.innerText = `✅ 生成成功！耗时 ${elapsed} 秒，音频已下载并保存到历史`;
                 await showModalDialog("✅ 下载成功", `文件已保存：${fileName}\n\n文件命名规则：文本第一行_日期时间.mp3`);
                 setTimeout(() => fetchQuotaOnly(key), 1000);
             } catch (error) {
@@ -1957,9 +2249,6 @@
             return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
         }
 
-        // ============================================================
-        //  saveApiHistory - 保留"相同 Key 不重复保存"的逻辑
-        // ============================================================
         function saveApiHistory(key) {
             if (!key) return;
             let list = JSON.parse(localStorage.getItem("api_key_history")) || [];
@@ -2071,7 +2360,7 @@
         }
 
         // ============================================================
-        //  二维码/V2Ray 逻辑 (精简保留)
+        //  二维码/V2Ray 逻辑
         // ============================================================
         let qrInstance = null,
             selectedNode = null,
@@ -2286,13 +2575,8 @@
         document.getElementById('copyTextBtn').addEventListener('click', copyTextContent);
         document.getElementById('importTxtBtn').addEventListener('click', () => document.getElementById('ttsFileInput')
         .click());
-
-        // ✅ 清空文本（无弹窗）
         document.getElementById('clearTextBtn').addEventListener('click', clearTextOnly);
-
-        // ✅ 清空所有历史（有弹窗）
         document.getElementById('clearAllHistoryBtn').addEventListener('click', clearAllHistory);
-
         document.getElementById('ttsFileInput').addEventListener('change', loadTtsTxtFile);
         document.getElementById('fetchApiInfoBtn').addEventListener('click', fetchApiInfo);
         document.getElementById('voiceId').addEventListener('input', updateVoiceNameDisplay);
@@ -2309,7 +2593,6 @@
             s.addEventListener("input", () => updateSlider(s));
         });
 
-        // 初始化 - 检查展开按钮
         setTimeout(() => {
             checkExpandButton();
         }, 100);
@@ -2323,23 +2606,29 @@
         const qrPanel = document.getElementById('qrToolPanel'),
             v2Panel = document.getElementById('v2rayToolPanel'),
             ttsPanel = document.getElementById('ttsToolPanel');
+
         document.getElementById('switchToV2Btn').addEventListener('click', () => {
             qrPanel.classList.add('hidden-panel');
             v2Panel.classList.remove('hidden-panel');
             ttsPanel.classList.add('hidden-panel');
         });
+
         document.getElementById('switchToTtsBtn').addEventListener('click', () => {
             qrPanel.classList.add('hidden-panel');
             v2Panel.classList.add('hidden-panel');
             ttsPanel.classList.remove('hidden-panel');
             setTimeout(autoResizeTextarea, 50);
             setTimeout(checkExpandButton, 100);
+            // ✅ 点击 IIElevenLabs TTS 时弹出 AU 提示
+            showAuTip();
         });
+
         document.getElementById('backToQrBtn').addEventListener('click', () => {
             v2Panel.classList.add('hidden-panel');
             ttsPanel.classList.add('hidden-panel');
             qrPanel.classList.remove('hidden-panel');
         });
+
         document.getElementById('backToQrFromTtsBtn').addEventListener('click', () => {
             ttsPanel.classList.add('hidden-panel');
             v2Panel.classList.add('hidden-panel');
