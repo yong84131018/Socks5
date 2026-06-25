@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Gi虾米出品 · TikTok出海工具箱 · 三合一工具集</title>
+    <title>Gi虾米 · TikTok出海工具箱 · 三合一工具集</title>
     <style>
         /* 预先加载一个拦截样式，防止闪烁 */
         .block-page {
@@ -337,6 +337,70 @@
         }
         .au-tip-modal .modal-footer .btn-close:hover {
             background: #0f766e;
+        }
+
+        /* 主弹窗样式 - 修复居中 */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(3px);
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .modal-content {
+            background: #fff;
+            border-radius: 28px;
+            padding: 28px 32px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.3);
+            animation: modalFadeIn 0.2s ease;
+            margin: auto;
+        }
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .modal-content h3 {
+            font-size: 24px;
+            margin-bottom: 12px;
+            color: #1e293b;
+        }
+        .modal-content p {
+            font-size: 15px;
+            color: #475569;
+            margin-bottom: 24px;
+            line-height: 1.5;
+            word-break: break-all;
+        }
+        .modal-content button {
+            background: linear-gradient(135deg, #e83e8c, #c8236b);
+            color: #fff;
+            border: none;
+            border-radius: 40px;
+            padding: 12px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .modal-content button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(232, 62, 140, 0.35);
         }
     </style>
 </head>
@@ -1193,7 +1257,8 @@
             z-index: 10001;
             display: flex;
             align-items: center;
-            justify-center: center
+            justify-content: center;
+            flex-direction: column;
         }
         .modal-content {
             background: #fff;
@@ -1203,29 +1268,30 @@
             width: 90%;
             text-align: center;
             box-shadow: 0 20px 35px -12px rgba(0, 0, 0, 0.3);
-            animation: modalFadeIn 0.2s ease
+            animation: modalFadeIn 0.2s ease;
+            margin: auto;
         }
         @keyframes modalFadeIn {
             from {
                 opacity: 0;
-                transform: scale(0.95)
+                transform: scale(0.95);
             }
             to {
                 opacity: 1;
-                transform: scale(1)
+                transform: scale(1);
             }
         }
         .modal-content h3 {
             font-size: 24px;
             margin-bottom: 12px;
-            color: #1e293b
+            color: #1e293b;
         }
         .modal-content p {
             font-size: 15px;
             color: #475569;
             margin-bottom: 24px;
             line-height: 1.5;
-            word-break: break-all
+            word-break: break-all;
         }
         .modal-content button {
             background: linear-gradient(135deg, #e83e8c, #c8236b);
@@ -1236,11 +1302,11 @@
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all .2s
+            transition: all .2s;
         }
         .modal-content button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 6px 16px rgba(232, 62, 140, 0.35)
+            box-shadow: 0 6px 16px rgba(232, 62, 140, 0.35);
         }
         @media (max-width:768px) {
             .container {
@@ -1427,7 +1493,7 @@
             <!-- 面板1: 二维码生成工具 -->
             <div id="qrToolPanel" class="tool-panel">
                 <div class="header">
-                    <h1 class="brand">Gi虾米出品/TikTok出海全渠道服务</h1>
+                    <h1 class="brand">Gi虾米工具箱/TikTok出海全渠道服务</h1>
                     <h2 class="tool-title">二维码生成工具</h2>
                     <p class="protocol-tip">（支持 Socks5/VMess/VLess/Trojan/SS）</p>
                     <p class="contact">制作不易，感谢支持 · 联系：QQ/VX:84131018</p>
@@ -1646,6 +1712,10 @@
             return new Promise((resolve) => {
                 const overlay = document.createElement('div');
                 overlay.className = 'modal-overlay';
+                overlay.style.display = 'flex';
+                overlay.style.alignItems = 'center';
+                overlay.style.justifyContent = 'center';
+                overlay.style.flexDirection = 'column';
                 overlay.onclick = (e) => { if (e.target === overlay) { overlay.remove();
                         resolve(); } };
                 const modal = document.createElement('div');
