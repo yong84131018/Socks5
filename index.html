@@ -475,17 +475,36 @@
             min-height: 100vh;
             padding: 20px 0
         }
-        body::before {
+                body::before {
             content: "";
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 23, 42, 0.4); /* 如果觉得背景暗，可以把 0.4 改小，比如 0.2 */
-            backdrop-filter: blur(2px);
+            background: rgba(15, 23, 42, 0.35); /* 遮罩颜色，0.35 比较有质感 */
             z-index: -1;
-            pointer-events: none
+            pointer-events: none;
+            /* 总周期 16 秒，无限循环，不使用 alternate（因为关键帧里已经包含了来回） */
+            animation: breatheBlur 16s ease-in-out infinite;
+        }
+
+        /* 定义非对称呼吸模糊动画关键帧 */
+        @keyframes breatheBlur {
+            0%, 18.75% { 
+                backdrop-filter: blur(0px); 
+                -webkit-backdrop-filter: blur(0px); 
+            } /* 前 3 秒：保持完全清晰 */
+            
+            50% { 
+                backdrop-filter: blur(8px); 
+                -webkit-backdrop-filter: blur(8px); 
+            } /* 第 3 秒到第 8 秒：慢慢变模糊（用时 5 秒） */
+            
+            81.25%, 100% { 
+                backdrop-filter: blur(0px); 
+                -webkit-backdrop-filter: blur(0px); 
+            } /* 第 8 秒到第 13 秒：慢慢变清晰（用时 5 秒），最后 3 秒保持清晰 */
         }
         .outer-container {
             width: 90%;
