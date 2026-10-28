@@ -494,17 +494,17 @@
             0%, 18.75% { 
                 backdrop-filter: blur(0px); 
                 -webkit-backdrop-filter: blur(0px); 
-            } /* 前 3 秒：保持完全清晰 */
-            
+            } /* 前 3 秒：保持清晰 */
+
             50% { 
                 backdrop-filter: blur(8px); 
                 -webkit-backdrop-filter: blur(8px); 
             } /* 第 3 秒到第 8 秒：慢慢变模糊（用时 5 秒） */
-            
-            81.25%, 100% { 
+
+            100% { 
                 backdrop-filter: blur(0px); 
                 -webkit-backdrop-filter: blur(0px); 
-            } /* 第 8 秒到第 13 秒：慢慢变清晰（用时 5 秒），最后 3 秒保持清晰 */
+            } /* 第 8 秒到第 16 秒：慢慢变清晰（用时 8 秒），结束时无缝接回开头 */
         }
         .outer-container {
             width: 90%;
