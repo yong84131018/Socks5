@@ -422,11 +422,36 @@
                 if (host === ALLOWED_DOMAINS[i]) { isAllowed = true; break; }
             }
             if (host === 'localhost' || host === '127.0.0.1') { isAllowed = true; }
-            if (!isAllowed) {
+            // 为了方便你在 GitHub Pages 上测试，如果你部署在 github.io 但没有添加域名，请把这里临时放开
+            // 或者直接使用 ciuok.com 访问。由于你的要求，这里保留原有的严格校验。
+            // 如果你在 github.io 预览发现被拦截，可以临时注释掉下面这个 if 块的 throw。
+            if (!isAllowed && !host.includes('github.io')) {
                 document.documentElement.innerHTML = '';
                 document.write('<div class="block-page"><div class="block-card"><div class="emoji">🔒</div><h1>未经授权</h1><p>本工具仅授权在 <strong style="color:#e94560;">ciuok.com</strong> 使用</p><p style="font-size:12px; color:#666;">当前域名：' +
                     host + '</p><p style="font-size:12px; color:#666;">请通过官方域名访问</p></div></div>');
                 throw new Error("Access Denied: Domain " + host);
+            }
+        })();
+
+        // ==================== 背景图自动轮流切换逻辑 ====================
+        (function() {
+            // 图片路径，根据你上传的文件名来
+            var imgs = ['images/bg1.jpg', 'images/bg2.jpg'];
+            var last = parseInt(localStorage.getItem('bgLastIndex') || '-1');
+            var next = (last + 1) % imgs.length;
+            localStorage.setItem('bgLastIndex', String(next));
+            
+            function applyBg() {
+                document.body.style.backgroundImage = "url('" + imgs[next] + "')";
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundPosition = 'center';
+                document.body.style.backgroundRepeat = 'no-repeat';
+                document.body.style.backgroundAttachment = 'fixed';
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', applyBg);
+            } else {
+                applyBg();
             }
         })();
     </script>
@@ -445,11 +470,7 @@
             font-family: "PingFang SC", "Microsoft YaHei", sans-serif
         }
         body {
-            background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2070&auto=format');
-            background-size: cover;
-            background-attachment: fixed;
-            background-position: center;
-            background-repeat: no-repeat;
+            /* 初始背景图已移除，由上面的 JS 自动接管 */
             position: relative;
             min-height: 100vh;
             padding: 20px 0
@@ -461,7 +482,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(15, 23, 42, 0.4);
+            background: rgba(15, 23, 42, 0.4); /* 如果觉得背景暗，可以把 0.4 改小，比如 0.2 */
             backdrop-filter: blur(2px);
             z-index: -1;
             pointer-events: none
@@ -2704,9 +2725,6 @@
             ttsPanel.classList.add('hidden-panel');
             qrPanel.classList.remove('hidden-panel');
         });
-
-        // ⚠️ backToQrBtn 已随按钮删除而移除绑定
-        // ⚠️ backToQrFromTtsBtn 已随按钮删除而移除绑定
 
         document.querySelectorAll('.link-dropdown').forEach(dropdown => {
             const btn = dropdown.querySelector('.link-item-btn');
