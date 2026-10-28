@@ -602,7 +602,7 @@
             border-bottom: 1px solid #eef2f6
         }
         .header .brand {
-            font-size: 24px;
+            font-size: 32px;
             color: #1e293b;
             margin-bottom: 8px;
             font-weight: 600
@@ -859,7 +859,8 @@
             font-size: 14px;
             resize: vertical;
             font-family: monospace;
-            margin-bottom: 16px
+            margin-bottom: 16px;
+            min-height: 140px
         }
         .v2-textarea:focus {
             border-color: #3b82f6;
@@ -1365,7 +1366,7 @@
         }
         /* AU 提示弹窗覆盖 */
         .au-tip-modal {
-            display: none;
+            display: none !important;
             position: fixed;
             top: 0;
             left: 0;
@@ -1490,8 +1491,8 @@
 
     <div class="outer-container">
         <div class="container" id="mainContainer">
-            <!-- 面板1: 二维码生成工具 -->
-            <div id="qrToolPanel" class="tool-panel">
+            <!-- 面板1: 二维码生成工具（默认隐藏） -->
+            <div id="qrToolPanel" class="tool-panel hidden-panel">
                 <div class="header">
                     <h1 class="brand">Gi虾米工具箱/TikTok出海全渠道服务</h1>
                     <h2 class="tool-title">二维码生成工具</h2>
@@ -1531,9 +1532,11 @@
                     <p>© 2026 Gi虾米出品 版权所有 | 本工具为免费开源工具，请勿倒卖或篡改版权信息</p>
                 </div>
             </div>
-            <!-- 面板2: V2Ray 格式转换工具 -->
+            <!-- 面板2: V2Ray 格式转换工具（默认隐藏） -->
             <div id="v2rayToolPanel" class="tool-panel hidden-panel">
-                <div style="display:flex;justify-content:flex-start;margin-bottom:12px"><button id="backToQrBtn" class="switch-tool-btn">← 返回二维码生成器</button></div>
+                <div class="header">
+                    <h1 class="brand">Gi虾米工具箱/TikTok出海全渠道服务</h1>
+                </div>
                 <div class="v2ray-card">
                     <h3>V2Ray 标准格式转换</h3>
                     <div style="text-align:center"><span class="v2-sub">ip:端口:用户名:密码 → socks:// 链接 (V2Ray/Clash 通用)</span></div>
@@ -1551,10 +1554,10 @@
                     <p>© 2026 Gi虾米出品 版权所有 | 本工具为免费开源工具，请勿倒卖或篡改版权信息</p>
                 </div>
             </div>
-            <!-- 面板3: IIElevenLabs 文本转语音朗读器 -->
-            <div id="ttsToolPanel" class="tool-panel hidden-panel">
-                <div style="display:flex;justify-content:flex-start;margin-bottom:12px">
-                    <button id="backToQrFromTtsBtn" class="switch-tool-btn">← 返回二维码生成器</button>
+            <!-- 面板3: IIElevenLabs 文本转语音朗读器（默认显示） -->
+            <div id="ttsToolPanel" class="tool-panel">
+                <div class="header">
+                    <h1 class="brand">Gi虾米工具箱/TikTok出海全渠道服务</h1>
                 </div>
                 <div class="tts-card">
                     <h3>IIElevenLabs 文本转语音朗读器</h3>
@@ -1622,7 +1625,7 @@
                     <audio id="audio" controls></audio>
                     <div class="history-box">
                         <div class="history-header">
-                            <h4>📜 文本历史 (保存7天 · 文本上限5000字 · 自适应音频缓存)</h4>
+                            <h4>📜 文本历史 (保存7天 · 文本上限10000字 · 注意字符额度)</h4>
                             <a href="https://elevenlabs.io/app/home" target="_blank" class="history-link">官方链接 II ElevenLabs</a>
                         </div>
                         <div id="historyList"></div>
@@ -1650,6 +1653,8 @@
             </div>
             <button id="switchToV2Btn" class="contact-link-btn" style="background:#2c5282; margin-bottom:8px;">V2Ray格式转换</button>
             <button id="switchToTtsBtn" class="link-item-btn btn-tts">IIElevenLabs TTS</button>
+            <!-- ✅ 新增：二维码生成工具按钮（在商务合作上方） -->
+            <button id="switchToQrBtn" class="link-item-btn btn-tool">二维码生成工具</button>
             <a href="https://gist.githubusercontent.com/yong84131018/5369dc7764ce5a93756cbd9fe9cbba14/raw" target="_blank" class="contact-link-btn">商务合作</a>
         </div>
     </div>
@@ -2693,17 +2698,15 @@
             showAuTip();
         });
 
-        document.getElementById('backToQrBtn').addEventListener('click', () => {
+        // ✅ 新增：二维码生成工具按钮 → 切换到二维码面板
+        document.getElementById('switchToQrBtn').addEventListener('click', () => {
             v2Panel.classList.add('hidden-panel');
             ttsPanel.classList.add('hidden-panel');
             qrPanel.classList.remove('hidden-panel');
         });
 
-        document.getElementById('backToQrFromTtsBtn').addEventListener('click', () => {
-            ttsPanel.classList.add('hidden-panel');
-            v2Panel.classList.add('hidden-panel');
-            qrPanel.classList.remove('hidden-panel');
-        });
+        // ⚠️ backToQrBtn 已随按钮删除而移除绑定
+        // ⚠️ backToQrFromTtsBtn 已随按钮删除而移除绑定
 
         document.querySelectorAll('.link-dropdown').forEach(dropdown => {
             const btn = dropdown.querySelector('.link-item-btn');
